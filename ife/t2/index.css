@@ -1,10 +1,16 @@
+/*
+ * 块级元素
+ * 行内元素
+ * line-height
+ * 垂直居中
+ */
 body{
 	background-color: #dddddd;
 	padding: 0;
 	margin: 0;
 }
 .navbar{
-	background-color: #202020;
+	background-color: #303030;
 	position: relative;
 	height: 3em;
 }
@@ -31,7 +37,7 @@ body{
 .navbar-links > li > a:hover{
 	color:gray;
 }
-article, section{
+article, section, aside{
 	background-color: white;
 	border-color: gray;
 	margin: 1em;
@@ -45,4 +51,67 @@ article > header > h3, section > header > h3{
 article > header > p, section > header > p{
 	color: gray;
 	font-size: 0.8em;
+}
+.pictures{
+	border-width: 1px;
+	border-color: black;
+	border-style: solid;
+	padding: 1em;
+	margin: 1em;
+	width: 10em;
+	height: 10em;
+	text-align: center;
+}
+.pictures > p{
+	height: 20%;
+	margin: 0;
+}
+.pictures > img{
+	height: 80%;
+	width: 100%;
+}
+.mytable{
+	border-style: solid;
+	border-width: 1px;
+	border-color: silver;
+	font-size: 0.9em;
+	width: 100%;
+}
+.mytable, .mytable td{
+	border-style: solid;
+	border-width: 1px;
+	border-color: silver;
+	border-collapse: collapse;
+	padding: 2px;
+}
+.mytable > thead{
+	background-color: #303030;
+	color: white;
+	font-weight: bold;
+}
+.mytable > tfoot{
+	background-color: silver;
+	font-weight: bold;
+}
+.sidebar form{
+	font-size: 0.8em;
+}
+.sidebar header{
+	border-left-style: solid;
+	border-color: silver;
+	border-left-width: 3px;
+	height: 2em;
+	padding-left: 1em;
+	font-weight: bold;
+}
+.btn{
+	width: 100%;
+	height: 3em;
+	border-radius: 8px;
+	border-width: 1px;
+	border-style: solid;
+	color: white;
+	background-color: #3333CC;
+	font-weight: bold;
+	font-size: 1.25em;
 }
