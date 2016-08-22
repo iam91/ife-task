@@ -1,0 +1,48 @@
+body{
+	background-color: #dddddd;
+	padding: 0;
+	margin: 0;
+}
+.navbar{
+	background-color: #202020;
+	position: relative;
+	height: 3em;
+}
+.navbar{
+	height: 5em;
+}
+.navbar > img{
+	height: 100%;
+}
+.navbar-links{
+	position: absolute;
+	top: 0;
+	right: 1em;
+	height: 100%;
+}
+.navbar-links > li{
+	float:left;
+	margin: 1em;
+}
+.navbar-links > li > a{
+	color: white;
+	text-decoration: none;
+}
+.navbar-links > li > a:hover{
+	color:gray;
+}
+article, section{
+	background-color: white;
+	border-color: gray;
+	margin: 1em;
+	padding: 1em;
+	border-width: 1px;
+	box-shadow: 2px 2px 2px 1px gray;
+}
+article > header > h3, section > header > h3{
+	color: gray;
+}
+article > header > p, section > header > p{
+	color: gray;
+	font-size: 0.8em;
+}
