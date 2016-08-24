@@ -104,15 +104,16 @@ article > header > p, section > header > p{
 	font-weight: bold;
 }
 #form-person > div{
-	margin: 0.5em;
+	margin: 1em;
 }
 .form-title{
 	float: left;
 	width: 30%;
 	text-align: right;
 }
-.form-content{
+.form-tips{
 	margin: 0.5em 0 0.5em 30%;
+	color: gray;
 }
 .btn{
 	width: 100%;
