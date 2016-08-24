@@ -1,8 +1,5 @@
 /*
- * 块级元素
- * 行内元素
  * line-height
- * 垂直居中
  */
 body{
 	background-color: #dddddd;
@@ -12,9 +9,6 @@ body{
 .navbar{
 	background-color: #303030;
 	position: relative;
-	height: 3em;
-}
-.navbar{
 	height: 5em;
 }
 .navbar > img{
@@ -24,15 +18,17 @@ body{
 	position: absolute;
 	top: 0;
 	right: 1em;
-	height: 100%;
+	margin: 0;
 }
 .navbar-links > li{
 	float:left;
-	margin: 1em;
+	margin-right: 1em;
+	margin-left: 1em;
 }
 .navbar-links > li > a{
 	color: white;
 	text-decoration: none;
+	line-height: 5em;
 }
 .navbar-links > li > a:hover{
 	color:gray;
@@ -96,6 +92,9 @@ article > header > p, section > header > p{
 .sidebar form{
 	font-size: 0.8em;
 }
+.sidebar form div{
+	margin: 0.5em;
+}
 .sidebar header{
 	border-left-style: solid;
 	border-color: silver;
@@ -103,6 +102,17 @@ article > header > p, section > header > p{
 	height: 2em;
 	padding-left: 1em;
 	font-weight: bold;
+}
+#form-person > div{
+	margin: 0.5em;
+}
+.form-title{
+	float: left;
+	width: 30%;
+	text-align: right;
+}
+.form-content{
+	margin: 0.5em 0 0.5em 30%;
 }
 .btn{
 	width: 100%;
@@ -114,4 +124,10 @@ article > header > p, section > header > p{
 	background-color: #3333CC;
 	font-weight: bold;
 	font-size: 1.25em;
+}
+.btn:hover{
+	background-color: #3300CC; 
+}
+.btn:active{
+	background-color: #333399;
 }

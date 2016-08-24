@@ -189,45 +189,48 @@
 			</article>
 			<aside class="sidebar">
 				<header>这里以后是一个侧栏，这是侧栏的标题</header>
-				<div class="form-title">
-					
-				</div>
-				<div class="form-content">
-					
-				</div>
-				<form class="form-email">
-					<p><label>请输入邮箱地址：</label><input type="text" value="这是一个文本输入框"></p>
-					<p>邮箱地址请按要求格式输入</p>
+				<form id="form-email">
+					<div><label class="form-title">请输入邮箱地址：</label><input type="text" value="这是一个文本输入框"></div>
+					<div><label class="form-content">邮箱地址请按要求格式输入</label></div>
 				</form>
-				<form class="form-password">
-					<p><label>请输入密码：</label><input type="password"></p>
-					<p><label>请重复输入密码：</label><input type="password"></p>
-					<p>密码请为6-16位英文数字</p>
+				<form id="form-password">
+					<div><label class="form-title">请输入密码：</label><input type="password"></div>
+					<div><label class="form-title">请重复输入密码：</label><input type="password"></div>
+					<div><label class="form-content">密码请为6-16位英文数字</label></div>
 				</form>
-				<form class="form-person">
-					<p>
-						<label>性别：</label>
+				<form id="form-person">
+					<div>
+						<label class="form-title">性别：</label>
 						<input type="radio" checked>
 						<label>男</label>
 						<input type="radio">
 						<label>女</label>
-						<label>城市：</label>
+					</div>
+					<div>
+						<label class="form-title">城市：</label>
 						<select>
 							<option value="beijing">北京</option>
 							<option value="chengdu">成都</option>
 							<option value="shanghai">上海</option>
 							<option value="guangzhou">广州</option>
 						</select>
-						<label>爱好：</label>
+					</div>
+					<div>
+						<label class="form-title">爱好：</label>
 						<input type="checkbox">
 						<label>运动</label>
 						<input type="checkbox">
 						<label>艺术</label>
 						<input type="checkbox">
 						<label>科学</label>
-						<textarea rows="1">这是一个多行输入框，输入您的个人描述</textarea>
+					</div>
+					<div>
+						<label class="form-title">个人描述：</label>
+						<textarea rows="5" cols="100">这是一个多行输入框，输入您的个人描述</textarea>
+					</div>
+					<div>
 						<input class="btn" type="button" value="确认提交">
-					</p>
+					</div>
 				</form>
 			</aside>
 			<footer>版权所有&copy;</footer>
