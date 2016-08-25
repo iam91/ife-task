@@ -1,9 +1,7 @@
 /*
- * right 和 middle 位置对于float的影响
- * 自适应，中间部分被压缩到最小
  * 行模型
  */
-section.container{
+div.container{
 	padding: 20px;
 	background-color: #eee;
 	border-color: #999;
@@ -13,13 +11,13 @@ section.container{
 	min-height: 420px;
 	min-width: 600px;
 }
-section.left, section.right, section.middle{
+div.left, div.right, div.middle{
 	background-color: white;
 	border-color: #999;
 	border-style: solid;
 	border-width: 1px;
 }
-section.left{
+div.left{
 	width: 160px;
 	padding: 20px;
 	float: left;
@@ -28,17 +26,17 @@ span.team-name{
 	margin-left: 10px;
 	vertical-align: top;
 }
-section.middle{
+div.middle{
 	padding: 20px;
-	margin-left: 220px;
-	margin-right: 140px;
+	margin-left: 222px;
+	margin-right: 142px;
 }
-section.right{
+div.right{
 	width: 120px;
 	padding-top: 20px;
 	float: right;
 }
-section.right > img{
+div.right > img{
 	display: block;
 	margin: 0 20px 20px 20px;
 }
