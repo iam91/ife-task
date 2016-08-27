@@ -100,11 +100,15 @@ article > header > p, section > header > p{
 	color: gray;
 	font-size: 0.8em;
 }
+/*
+以下注释与.picture设置float:left;配合也可以实现10张图片自适应排列
+*/
+/*
 .float-group::after{
 	content: "";
 	clear: both;
 	display: block;
-}
+}*/
 .pictures{
 	border-width: 1px;
 	border-color: black;
@@ -114,7 +118,8 @@ article > header > p, section > header > p{
 	width: 5em;
 	height: 5em;
 	text-align: center;
-	float: left;
+	/*float: left;*/
+	display: inline-block;
 }
 .pictures > p{
 	height: 20%;
