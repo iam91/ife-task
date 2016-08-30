@@ -50,7 +50,7 @@
 	padding-left: 26px;
 }
 .zwy-select-option:hover{
-	background-image: url(images/select-option.gif);
+	background-image: url(../images/select-option.gif);
 	background-position: 6px 10px;
 	background-repeat:  no-repeat;
 	background-color:  #be4e48;

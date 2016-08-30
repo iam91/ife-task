@@ -623,6 +623,7 @@ nav > ul > li > a{
 	margin-bottom: 15px;
 	resize: none;
 	padding: 12px;
+	overflow: auto;
 }
 .sec-6-r > form input[type="text"]{
 	width: 297px;
@@ -667,17 +668,18 @@ nav > ul > li > a{
 	margin: 11px 0 0 0;
 }
 .sec-7 > form{
-	width: 514px;
+	width: 520px;
 	height: 41px;
 	margin: 36px auto;
 	font-family: "Microsoft YaHei";
 }
 .sec-7 > form > input[type="email"]{
 	width: 417px;
-	height: 39px;
+	height: 41px;
 	font-size: 14px;
 	color: #aaaaaa;
 	padding-left: 14px;
+	border: none;
 	display: block;
 	float: left;
 }
