@@ -1,0 +1,45 @@
+.flex-container{
+	display: flex;
+	justify-content: space-between;
+	flex-direction: row;
+	border: 1px solid black;
+}
+.flex-item{
+	width: 150px;
+	margin: 5px;
+	border: 1px solid #f00;
+}
+.flex-item-1{
+	height: 120px;
+}
+.flex-item-2{
+	height: 100px;
+}
+.flex-item-3{
+	height: 40px;
+}
+.flex-item-4{
+	height: 200px;
+	border: 1px solid #0f0;
+}
+@media screen and (min-width: 640px){
+	.flex-container{
+		align-items: center;
+	}
+	@for $i from 1 through 4{
+		.flex-item-#{$i}{
+			order: $i;
+		}
+	}
+}
+@media screen and (max-width: 640px){
+	.flex-container{
+		align-items: flex-start;
+		flex-wrap: wrap;
+	}
+	@for $i from 1 through 4{
+		.flex-item-#{$i}{
+			order: $i % 4 + 1;
+		}
+	}
+}
