@@ -1,0 +1,50 @@
+body{
+	text-align: center;
+}
+table{
+	width: 100%;
+}
+table > thead{
+	background-color: #080808;
+	color: #ffffff;
+}
+table > tbody > tr:nth-of-type(2n){
+	background-color: #909090;
+}
+table > tbody > tr:nth-of-type(-n+3){
+	color: red;
+}
+input{
+	margin: 10px 0;
+	width: 50%;
+	transition: width 0.3s linear;
+}
+input:focus{
+	width: 95%;
+	transition: width 0.3s linear;
+}
+.banner{
+	width: 100%;
+	height: 100px;
+	position: relative;
+}
+.banner > *{
+	width: 100%;
+	height: 100px;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+.pad-2 > *{
+	width: 50%;
+	height: 100px;
+	position: absolute;
+}
+.pad-2-l{
+	top: 0;
+	left: 0;
+}
+.pad-2-r{
+	top: 0;
+	left: 50%;
+}
