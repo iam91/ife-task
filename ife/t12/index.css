@@ -1,6 +1,10 @@
 body{
 	text-align: center;
 }
+body *{
+	margin: 0;
+	padding: 0;
+}
 table{
 	width: 100%;
 }
@@ -18,33 +22,50 @@ input{
 	margin: 10px 0;
 	width: 50%;
 	transition: width 0.3s linear;
+	border: 1px solid gray;
 }
 input:focus{
 	width: 95%;
 	transition: width 0.3s linear;
 }
-.banner{
-	width: 100%;
-	height: 100px;
+div.banner-container{
+	width: 300px;
+	height: 200px;
+	overflow: hidden;
 	position: relative;
 }
-.banner > *{
-	width: 100%;
-	height: 100px;
+@-moz-keyframes mybanner{
+	0%{left: 0;}
+	15%{left: -100%;}
+	33.33333%{left: -100%;}
+	48.33333%{left: -200%;}
+	66.66666%{left: -200%;}
+	81.66666%{left: -300%;}
+	100%{left: -300%;}
+}
+ul.banner{
+	width: 400%;
+	height: 100%;
+	list-style: none;
 	position: absolute;
 	top: 0;
-	left: 0;
+	animation: mybanner 6s infinite;
+	z-index: 1;
 }
-.pad-2 > *{
-	width: 50%;
-	height: 100px;
-	position: absolute;
+ul.banner > .pad{
+	width: 25%;
+	height: 100%;
+	float: left;
 }
-.pad-2-l{
-	top: 0;
-	left: 0;
+ul.banner > .pad:nth-of-type(4){
+	background-color: red;
 }
-.pad-2-r{
-	top: 0;
-	left: 50%;
+ul.banner > .pad:nth-of-type(5){
+	background-color: green;
+}
+ul.banner > .pad:nth-of-type(6){
+	background-color: blue;
+}
+ul.banner > .pad:nth-of-type(7){
+	background-color: red;
 }
