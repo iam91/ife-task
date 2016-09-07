@@ -58,7 +58,22 @@ li.banner-button:nth-of-type(3){
 }
 li.banner-button:hover{
 	opacity: 0.8;
-}/*
+}
+li.banner-button:nth-of-type(1):hover ~ ul.banner{
+	animation: none;
+	left: 0;
+	transition: left 0.6s;
+}
+li.banner-button:nth-of-type(2):hover ~ ul.banner{
+	animation: none;
+	left: -100%;
+	transition: left 0.6s;
+}
+li.banner-button:nth-of-type(3):hover ~ ul.banner{
+	animation: none;
+	left: -200%;
+	transition: left 0.6s;
+}
 @keyframes mybanner{
 	0%{left: 0;}
 	15%{left: -100%;}
@@ -67,40 +82,31 @@ li.banner-button:hover{
 	66.66666%{left: -200%;}
 	81.66666%{left: -300%;}
 	100%{left: -300%;}
-}*/
+}
 ul.banner{
-	width: 200%;
+	width: 400%;
 	height: 100%;
 	list-style: none;
 	position: absolute;
 	top: 0;
 	z-index: 0;
+	animation: mybanner 4s infinite;
+	transition: left 0.6s;
 }
 ul.banner > .pad{
-	width: 50%;
+	width: 25%;
 	height: 100%;
-	position: absolute;
-	bottom: 0;
-	right: 0;
-}
-@keyframes pad1{
-
-}
-@keyframes pad2{
-	
-}
-@keyframes pad3{
-	
+	float: left;
 }
 ul.banner > .pad:nth-of-type(1){
 	background-color: red;
-	animation: pad1;
 }
 ul.banner > .pad:nth-of-type(2){
 	background-color: green;
-	animation: pad2;
 }
 ul.banner > .pad:nth-of-type(3){
 	background-color: blue;
-	animation: pad3;
+}
+ul.banner > .pad:nth-of-type(4){
+	background-color: red;
 }
