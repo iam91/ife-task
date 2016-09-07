@@ -58,7 +58,7 @@ li.banner-button:nth-of-type(3){
 }
 li.banner-button:hover{
 	opacity: 0.8;
-}
+}/*
 @keyframes mybanner{
 	0%{left: 0;}
 	15%{left: -100%;}
@@ -67,34 +67,40 @@ li.banner-button:hover{
 	66.66666%{left: -200%;}
 	81.66666%{left: -300%;}
 	100%{left: -300%;}
-}
+}*/
 ul.banner{
-	width: 400%;
+	width: 200%;
 	height: 100%;
 	list-style: none;
 	position: absolute;
 	top: 0;
 	z-index: 0;
-	animation: mybanner 6s infinite;
-}
-li.banner-button:nth-of-type(2):hover ~ ul.banner {
-	animation-play-state: paused;
-	left: -100%;
 }
 ul.banner > .pad{
-	width: 25%;
+	width: 50%;
 	height: 100%;
-	float: left;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+}
+@keyframes pad1{
+
+}
+@keyframes pad2{
+	
+}
+@keyframes pad3{
+	
 }
 ul.banner > .pad:nth-of-type(1){
 	background-color: red;
+	animation: pad1;
 }
 ul.banner > .pad:nth-of-type(2){
 	background-color: green;
+	animation: pad2;
 }
 ul.banner > .pad:nth-of-type(3){
 	background-color: blue;
-}
-ul.banner > .pad:nth-of-type(4){
-	background-color: red;
+	animation: pad3;
 }
