@@ -39,11 +39,14 @@
         return b[1] - a[1];
       });
 
+      var view = '';
+      var toCh = ['一', '二', '三', '四', '五', '六'];
+
       for(var i = 0; i < filtedData.length; i++){
-        var li = document.createElement('li');
-        li.innerText = '第' + (i + 1) + '名: ' + filtedData[i][0] + ',' + filtedData[i][1];
-        aqiList.appendChild(li);
+        view += '<li>第' + toCh[i] + '名: ' + filtedData[i][0] + ',' + filtedData[i][1] + '</li>';
       }
+
+      aqiList.innerHTML = view;
 
     })();
 
