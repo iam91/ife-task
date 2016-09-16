@@ -106,21 +106,6 @@ function delBtnHandle(event) {
   }
 }
 
-/**
- * function for adding event handler
- */
-function addHandler(elem, type, handler){
-	if(elem.attachEvent){
-		elem.attachEvent('on' + type, handler);
-	}
-	else if(elem.addEventListener){
-		elem.addEventListener(type, handler, false);
-	}
-	else{
-		elem['on' + type] = handler;
-	}
-}
-
 function init() {
   var addBtn = document.getElementById('add-btn');
   var aqiTable = document.getElementById('aqi-table');

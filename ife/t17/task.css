@@ -1,0 +1,15 @@
+#aqi-chart-wrap{
+	width: calc(100% - 100px);
+	height: 500px;
+	margin: 10px 50px;
+	position: relative;
+}
+.bar{
+	margin: 0 5px;
+	position: absolute;
+	bottom: -0;
+	display: block;
+}
+.bar:hover{
+	opacity: 0.6;
+}
