@@ -71,14 +71,6 @@ function rightOutHandler(){
 }
 
 /**
- * click to remove
- */
-function clickToRemove(event){
-	var target = event.target;
-	field.removeChild(target);
-}
-
-/**
  * initialize event handler
  */
 function init(){
@@ -86,7 +78,6 @@ function init(){
 	addHandler(btnRIn, 'click', rightInHandler);
 	addHandler(btnLOut, 'click', leftOutHandler);
 	addHandler(btnROut, 'click', rightOutHandler);
-	addHandler(field, 'click', clickToRemove);
 }
 
 init();
