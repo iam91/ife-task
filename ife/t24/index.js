@@ -12,7 +12,6 @@ function textExtractor(node){
 	var text = '';
 	var extract = /^\s*([\s, \w]+)\s*$/
 	for(var i = 0; i < node.childNodes.length; i++){
-		//text += extract.exec(node.childNodes[i])[1];
 		if(node.childNodes[i].nodeType === 3){
 			text += node.childNodes[i].nodeValue.trim();
 		}
@@ -90,7 +89,12 @@ function btnHandler(e){
 }
 
 function del(){
-	chosen.parentNode.removeChild(chosen);
+	var p = chosen.parentNode;
+	p.removeChild(chosen);
+	chosen = null;
+	if(p.id === 'field'){
+		chosen = p;
+	}
 }
 function add(){
 	var val = addInput.value.trim();
@@ -114,15 +118,15 @@ function changeHandler(e){
 	}
 }
 
-var chosen = null;
+var chosen = field;
 
 function chooseHandler(e){
 	var target = e.target;
-	if(chosen){
-		chosen.style.backgroundColor = 'white';
-	}
+	chosen.style.backgroundColor = 'white';
 	chosen = target;
-	chosen.style.backgroundColor = 'green';
+	if(chosen.id !== 'field'){
+		chosen.style.backgroundColor = 'green';
+	}
 }
 
 function init(){

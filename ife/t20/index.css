@@ -3,4 +3,17 @@
 }
 #field{
 	margin: 2em;
+	display: flex;
+	flex-wrap: wrap;
+}
+.elem{
+	line-height: 2em;
+	padding: 0 1em;
+	margin: 0 1em;
+	background-color: red;
+	color: white;
+	font-weight: bold;
+}
+.found{
+	color: black;
 }
