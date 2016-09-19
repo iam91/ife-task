@@ -4,7 +4,7 @@
 function Node(){
 	this.data = null;
 	this._view = null;
-	this.children = [];
+	this._children = [];
 	Node.prototype.setView = function(view){
 		this._view = view;
 		//link back to data node
@@ -12,6 +12,10 @@ function Node(){
 	}
 	Node.prototype.getView = function(view){
 		return this._view;
+	}
+	Node.prototype.pushChildren = function(child){
+		this._children.push(child);
+		this._view.children[1].appendChild(child._view);
 	}
 }
 
@@ -21,7 +25,7 @@ function Node(){
  */
 function Tree(){
 	this.root;
-	Tree.prototype._render = function(initData, parent){
+	Tree.prototype._render = function(initData){
 		var newView = document.createElement('div');
 		newView.setAttribute('class', 'dir');
 		var iconClass = null;
@@ -31,22 +35,24 @@ function Tree(){
 		else{
 			iconClass = 'icon-close';
 		}
-		newView.innerHTML = "<div><span class='"
+		newView.innerHTML = "<div class='dir-name'><span class='"
 			+ iconClass 
 			+ "'></span><span class='head'>"
 			+ initData.val
-			+ "</span></div>";
-		parent.appendChild(newView);
+			+ "</span></div><div class='dir-body'></div>";
 		return newView;
 	}
-	Tree.prototype.build = function(initData, parent){
-		var newView = Tree.prototype._render(initData, parent);
+	Tree.prototype._build = function(initData){
+		var newView = Tree.prototype._render(initData);
 		var newNode = new Node();
 		newNode.data = initData.val;
 		newNode.setView(newView);
 		for(var i = 0; i < initData.children.length; i++){
-			newNode.children[i] = arguments.callee(initData.children[i], newView);
+			newNode.pushChildren(arguments.callee(initData.children[i], newView));
 		}
 		return newNode;
+	}
+	Tree.prototype.buildTree = function(initData, field){
+		field.appendChild(Tree.prototype._build(initData).getView());
 	}
 }
