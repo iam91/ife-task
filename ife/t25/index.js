@@ -1,10 +1,27 @@
-var div = document.createElement('div');
+var $ = function(query){
+	return document.querySelector(query);
+};
 
-function Node(t){
-	this.age = t;
+var field = $('#field');
+
+function collapseHandler(event){
+	var target = event.target;
+	var currStatus = target.getAttribute('class');
+	if(currStatus === 'icon-close'){
+		for(var i = 0; i < target.children.length; i++){
+			children[i].setAttribute
+		}
+	}
+	else if(currStatus === 'icon-open'){
+
+	}
 }
 
-var node = new Node(23);
-div.Node = node;
+function init(){
+	var tree = new Tree();
+	tree.build(mock, field);
 
-console.log(div.Node);
+	addHandler(field, 'click', collapseHandler);
+}
+
+init();

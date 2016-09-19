@@ -1,4 +1,4 @@
-.icon-open {
+.icon-close {
   height: 0;
   width: 0;
   border-bottom: 0.3em solid transparent;
@@ -6,13 +6,21 @@
   border-left: 0.6em solid black;
   display: inline-block; }
 
-.icon-close {
+.icon-open {
   height: 0;
   width: 0;
   border-left: 0.3em solid transparent;
   border-right: 0.3em solid transparent;
   border-top: 0.6em solid black;
   display: inline-block; }
+
+.icon-none {
+  height: 0.6em;
+  width: 0.6em;
+  display: inline-block; }
+
+.dir {
+  margin-left: 1em; }
 
 .head {
   height: 0.6em;

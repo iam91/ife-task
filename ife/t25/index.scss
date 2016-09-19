@@ -1,11 +1,10 @@
 $icon-color: black;
-$icon-height: 0.6em;
-$icon-width: 0.6em;
+$icon-size: 0.6em;
 
-$icon-hori: $icon-width / 2 solid transparent;
-$icon-vert: $icon-height solid $icon-color;
+$icon-hori: $icon-size / 2 solid transparent;
+$icon-vert: $icon-size solid $icon-color;
 
-.icon-open{
+.icon-close{
 	height: 0;
 	width: 0;
 	border-bottom: $icon-hori;
@@ -13,7 +12,7 @@ $icon-vert: $icon-height solid $icon-color;
 	border-left: $icon-vert;
 	display: inline-block;
 }
-.icon-close{
+.icon-open{
 	height: 0;
 	width: 0;
 	border-left: $icon-hori;
@@ -21,8 +20,15 @@ $icon-vert: $icon-height solid $icon-color;
 	border-top: $icon-vert;
 	display: inline-block;
 }
-
+.icon-none{
+	height: $icon-size;
+	width: $icon-size;
+	display: inline-block;
+}
+.dir{
+	margin-left: 1em;
+}
 .head{
-	height: $icon-height;
+	height: $icon-size;
 	margin-left: 0.5em;
 }

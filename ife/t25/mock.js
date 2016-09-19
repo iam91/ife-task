@@ -30,7 +30,7 @@ var mock = {
 					children: []
 				},
 				{
-					val: '',
+					val: 'Void',
 					children: [
 						{
 							val: 'Book',
