@@ -89,6 +89,4 @@ var mock = {
 			children: []
 		}
 	]
-}
-
-console.log(mock);
+};

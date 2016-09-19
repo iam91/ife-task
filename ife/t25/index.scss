@@ -1,0 +1,28 @@
+$icon-color: black;
+$icon-height: 0.6em;
+$icon-width: 0.6em;
+
+$icon-hori: $icon-width / 2 solid transparent;
+$icon-vert: $icon-height solid $icon-color;
+
+.icon-open{
+	height: 0;
+	width: 0;
+	border-bottom: $icon-hori;
+	border-top: $icon-hori;
+	border-left: $icon-vert;
+	display: inline-block;
+}
+.icon-close{
+	height: 0;
+	width: 0;
+	border-left: $icon-hori;
+	border-right: $icon-hori;
+	border-top: $icon-vert;
+	display: inline-block;
+}
+
+.head{
+	height: $icon-height;
+	margin-left: 0.5em;
+}
