@@ -1,18 +1,10 @@
 /**
  * ModelNode constructor
  */
-function ModelNode(data){
+function ModelNode(data, parent){
 	this.data = data;
-	this._viewNode = null;
+	this.parent = parent;
 	this.children = [];
-	ModelNode.prototype.setViewNode = function(viewNode){
-		this._viewNode = viewNode;
-		//connect DOM(view) and with model
-		this._viewNode.modelNode = this;
-	}
-	ModelNode.prototype.getViewNode = function(){
-		return this._viewNode;
-	}
 }
 
 /**
@@ -21,20 +13,46 @@ function ModelNode(data){
 function DirModel(rawData, view){
 	this._view = view;
 	this._rawData = rawData;
-	this._root = null;
+	this.root = null;
+
 	DirModel.prototype.init = function(){
-		var rootView = DirModel.prototype._build.call(this, this._rawData);
-		this._view.show(rootView.getViewNode());
+		this.root = DirModel.prototype._build.call(this, this._rawData, null);
 	};
-	DirModel.prototype._build = function(data, view){
-		var modelNode = new ModelNode(data);
-		var newViewNode = this._view.renderNewDir(data.val);
-		modelNode.setViewNode(newViewNode);
+
+	DirModel.prototype._build = function(data, view, parent){
+		var modelNode = new ModelNode(data.val, parent);
 		for(var i = 0; i < data.children.length; i++){
-			var childModelNode = DirModel.prototype._build.call(this, data.children[i]);
+			var childModelNode = arguments.callee.call(this, data.children[i], modelNode);
 			modelNode.children.push(childModelNode);
-			this._view.appendChild(newViewNode, childModelNode.getViewNode());
 		}
 		return modelNode;
 	};
+
+	DirModel.prototype._delNode = function(modelNode){
+		for(var i = 0; i < modelNode.children.length; i++){
+			arguments.callee(modelNode.children[i]);
+		}
+		var pchildren = modelNode.parent.children;
+		
+		var i = 0;
+		while(pchildren[i] !== modelNode){
+			i++;
+		}
+		while(i < pchildren.length - 1){
+			pchildren[i] = pchildren[i + 1];
+		}
+		pchildren.pop();
+
+	}
+
+	DirModel.prototype.del = function(modelNode){
+		if(modelNode){
+			DirModel.prototype._delNode(modelNode);
+		}
+		console.log(this.root);
+	}
+
+	DirModel.prototype.add = function(modelNode){
+
+	}
 }
