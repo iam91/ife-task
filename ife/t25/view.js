@@ -1,7 +1,6 @@
-function DirView(base, model. ctrl){
+function DirView(base, model){
 	this.base = base;
-	this._model = model;
-	this._ctrl = ctrl;
+	this.model = model;
 
 	DirView.prototype.renderNewDir = function(data){
 		var newDir = document.createElement('div');
@@ -28,7 +27,7 @@ function DirView(base, model. ctrl){
 		dirBody.appendChild(child);
 	};
 
-	DirView.prototype._collapse = function(event){
+	DirView.prototype.collapse = function(target){
 		var t = target.parentNode.nextSibling;
 		if(ClassTool.contains(target, 'dir-icon-open')){
 			ClassTool.replace(target, 'dir-icon-collapse', 'dir-icon-open');
@@ -41,26 +40,9 @@ function DirView(base, model. ctrl){
 	};
 
 	DirView.prototype.init = function(){
-		this.base.appendChild(DirView.prototype._build(this._model.root));
+		this.base.appendChild(DirView.prototype._build(this.model.root));
 		//couple html with view
 		this.base.view = this;
-
-		addHandler(this.base, 'click', DirView.prototype.eventDispatch);
-	}
-
-	DirView.prototype.eventDispatch(event){
-		var target = event.target;
-		var base = event.currTarget;
-		var thisView = base.view;
-		if(ClassTool.contains(target, 'dir-del')){
-			thisView._ctrl.del();
-		}
-		else if(ClassTool.contains(target, 'dir-add')){
-			//thisView._ctrl.add();
-		}
-		else{
-			DirView.prototype._collapse(target);
-		}
 	}
 
 	DirView.prototype._build = function(modelNode){
@@ -88,5 +70,9 @@ function DirView(base, model. ctrl){
 			currDir.modelNode = null;
 			DirView.prototype._delView(currDir);
 		}
+	}
+
+	DirView.prototype.findTargetDir = function(target){
+		return target.parentNode.parentNode;
 	}
 }

@@ -10,8 +10,7 @@ function ModelNode(data, parent){
 /**
  * DirModel constructor
  */
-function DirModel(rawData, view){
-	this._view = view;
+function DirModel(rawData){
 	this._rawData = rawData;
 	this.root = null;
 
@@ -19,7 +18,7 @@ function DirModel(rawData, view){
 		this.root = DirModel.prototype._build.call(this, this._rawData, null);
 	};
 
-	DirModel.prototype._build = function(data, view, parent){
+	DirModel.prototype._build = function(data, parent){
 		var modelNode = new ModelNode(data.val, parent);
 		for(var i = 0; i < data.children.length; i++){
 			var childModelNode = arguments.callee.call(this, data.children[i], modelNode);
@@ -40,9 +39,9 @@ function DirModel(rawData, view){
 		}
 		while(i < pchildren.length - 1){
 			pchildren[i] = pchildren[i + 1];
+			i++;
 		}
 		pchildren.pop();
-
 	}
 
 	DirModel.prototype.del = function(modelNode){
