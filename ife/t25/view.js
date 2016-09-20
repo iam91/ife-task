@@ -12,7 +12,7 @@ function DirView(base){
 						 + "</div>" 
 						 + "<div class='dir-body'></div>";
 		return newDir;
-	}
+	};
 	DirView.prototype.appendChild = function(parent, child){
 		var dirIcon = parent.children[0].children[0];
 		var dirBody = parent.children[1];
@@ -20,11 +20,11 @@ function DirView(base){
 			ClassTool.replace(dirIcon, 'dir-icon-open', 'dir-icon-none');
 		}
 		dirBody.appendChild(child);
-	}
+	};
 	DirView.prototype.show = function(rootView){
 		this.base.appendChild(rootView);
-	}
+	};
 	DirView.prototype.collapse = function(elem){
 		
-	}
+	};
 }

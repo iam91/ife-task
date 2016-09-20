@@ -23,18 +23,20 @@ function DirModel(rawData, view){
 	this._rawData = rawData;
 	this._root = null;
 	DirModel.prototype.init = function(){
-		var rootView = DirModel.prototype._build(this._rawData, this._view);
+		var rootView = DirModel.prototype.build(this._rawData, this._view);
 		this._view.show(rootView.getViewNode());
-	}
-	DirModel.prototype._build = function(data, view){
+		console.log(this);
+	};
+	DirModel.prototype.build = function(data, view){
+		console.log(this);
 		var modelNode = new ModelNode(data);
 		var newViewNode = view.renderNewDir(data.val);
 		modelNode.setViewNode(newViewNode);
 		for(var i = 0; i < data.children.length; i++){
-			var childModelNode = arguments.callee(data.children[i], view);
+			var childModelNode = DirModel.prototype.build(data.children[i], view);
 			modelNode.children.push(childModelNode);
 			view.appendChild(newViewNode, childModelNode.getViewNode());
 		}
 		return modelNode;
-	}
+	};
 }
