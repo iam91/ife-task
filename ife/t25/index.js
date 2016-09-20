@@ -3,27 +3,29 @@ var $ = function(query){
 };
 
 var field = $('#field');
-
+/*
 function collapseHandler(event){
 	var target = event.target;
-	var currStatus = target.getAttribute('class');
-	if(currStatus === 'icon-close'){
-		target.setAttribute('class', 'icon-open');
-		/*
-		for(var i = 0; i < target.children.length; i++){
-			children[i].setAttribute('class', 'icon-open');
-		}*/
+	var t = target.parentNode.nextSibling;
+	if(ClassTool.contains(target, 'icon-close')){
+		ClassTool.replace(target, 'icon-open', 'icon-close');
+		ClassTool.replace(t, 'dir-body', 'dir-body-collapse');
 	}
-	else if(currStatus === 'icon-open'){
-		target.setAttribute('class', 'icon-close');
+	else if(ClassTool.contains(target, 'icon-open')){
+		ClassTool.replace(target, 'icon-close', 'icon-open');
+		ClassTool.replace(t, 'dir-body-collapse', 'dir-body');
 	}
 }
+*/
+
+var view = null;
+var model = null;
 
 function init(){
-	var tree = new Tree();
-	tree.buildTree(mock, field);
+	view = new DirView(field);
+	model = new DirModel(mock, view);
 
-	addHandler(field, 'click', collapseHandler);
+	model.init();
 }
 
 init();

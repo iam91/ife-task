@@ -1,4 +1,4 @@
-.icon-close {
+.dir-icon-collapse {
   height: 0;
   width: 0;
   border-bottom: 0.3em solid transparent;
@@ -6,7 +6,7 @@
   border-left: 0.6em solid black;
   display: inline-block; }
 
-.icon-open {
+.dir-icon-open {
   height: 0;
   width: 0;
   border-left: 0.3em solid transparent;
@@ -14,7 +14,7 @@
   border-top: 0.6em solid black;
   display: inline-block; }
 
-.icon-none {
+.dir-icon-none {
   height: 0.6em;
   width: 0.6em;
   display: inline-block; }
@@ -22,8 +22,15 @@
 .dir {
   margin-left: 1em; }
 
-.head {
+.dir-name-text {
   height: 0.6em;
   margin-left: 0.5em; }
+
+.dir-body {
+  overflow: visible; }
+
+.dir-body-collapse {
+  height: 0;
+  overflow: hidden; }
 
 /*# sourceMappingURL=index.css.map */

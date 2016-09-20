@@ -6,7 +6,7 @@ $icon-vert: $icon-size solid $icon-color;
 
 $dir-height: 1.5em;
 
-.icon-close{
+.dir-icon-collapse{
 	height: 0;
 	width: 0;
 	border-bottom: $icon-hori;
@@ -14,7 +14,7 @@ $dir-height: 1.5em;
 	border-left: $icon-vert;
 	display: inline-block;
 }
-.icon-open{
+.dir-icon-open{
 	height: 0;
 	width: 0;
 	border-left: $icon-hori;
@@ -22,7 +22,7 @@ $dir-height: 1.5em;
 	border-top: $icon-vert;
 	display: inline-block;
 }
-.icon-none{
+.dir-icon-none{
 	height: $icon-size;
 	width: $icon-size;
 	display: inline-block;
@@ -30,7 +30,14 @@ $dir-height: 1.5em;
 .dir{
 	margin-left: 1em;
 }
-.head{
+.dir-name-text{
 	height: $icon-size;
 	margin-left: 0.5em;
+}
+.dir-body{
+	overflow: visible;
+}
+.dir-body-collapse{
+	height: 0;
+	overflow: hidden;
 }

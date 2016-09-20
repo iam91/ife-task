@@ -8,7 +8,7 @@ function Node(){
 	Node.prototype.setView = function(view){
 		this._view = view;
 		//link back to data node
-		this._view.link = this;
+		this._view.Node = this;
 	}
 	Node.prototype.getView = function(view){
 		return this._view;
@@ -39,7 +39,7 @@ function Tree(){
 			+ iconClass 
 			+ "'></span><span class='head'>"
 			+ initData.val
-			+ "</span></div><div class='dir-body'></div>";
+			+ "</span></div><div class='dir-body-collapse'></div>";
 		return newView;
 	}
 	Tree.prototype._build = function(initData){
