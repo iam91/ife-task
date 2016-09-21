@@ -48,10 +48,9 @@ function DirModel(rawData){
 		if(modelNode){
 			DirModel.prototype._delNode(modelNode);
 		}
-		console.log(this.root);
 	}
 
-	DirModel.prototype.add = function(modelNode){
+	DirModel.prototype.append = function(modelNode){
 
 	}
 }

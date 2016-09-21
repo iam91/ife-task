@@ -10,8 +10,9 @@ function DirControl(view){
 		var base = event.currentTarget;
 		var thisView = base.view;
 		if(ClassTool.contains(target, 'dir-del')){
-			thisView.model.del(thisView.findTargetDir(target).modelNode);
-			thisView.del(target);
+			var currDir = thisView.findTargetDir(target,'dir-del');
+			thisView.model.del(currDir.modelNode);
+			thisView.del(currDir);
 		}
 		else if(ClassTool.contains(target, 'dir-add')){
 			//thisView._ctrl.add();

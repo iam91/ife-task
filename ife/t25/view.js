@@ -64,15 +64,18 @@ function DirView(base, model){
 		}
 	}
 
-	DirView.prototype.del = function(target){
-		if(ClassTool.contains(target, 'dir-del')){
-			var currDir = target.parentNode.parentNode;
-			currDir.modelNode = null;
-			DirView.prototype._delView(currDir);
-		}
+	DirView.prototype.del = function(currDir){
+		currDir.modelNode = null;
+		DirView.prototype._delView(currDir);
 	}
 
-	DirView.prototype.findTargetDir = function(target){
-		return target.parentNode.parentNode;
+	DirView.prototype.append = function(currDir){
+	}
+
+	DirView.prototype.findTargetDir = function(target, className){
+		if(className === 'dir-del' || className === 'dir-add'){
+			return target.parentNode.parentNode;
+		}
+		return null;
 	}
 }
