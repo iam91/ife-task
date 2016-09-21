@@ -1,6 +1,27 @@
 //TODO: handle deletion of root node
 //TODO: decouple view and template
 //TODO: class parser
+/**************** template ****************/
+function DirTemplate = function(){
+	DirTemplate.prototype.create = function(data){
+		var newDir = document.createElement('div');
+		ClassTool.add(newDir, 'dir');
+		newDir.innerHTML = "<div class='dir-name '>" 
+						 	+ "<span class='dir-icon-none '>" 
+							+ "</span>" 
+						 	+ "<span class='dir-name-text '>"
+						 		+ data
+						 	+ "</span>" 
+						 	+ "<span class='dir-add '>+</span>"
+						 	+ "<span class='dir-del '>-</span>"
+						 + "</div>" 
+						 + "<div class='dir-body '></div>";
+		return newDir;
+	};
+
+	DirTemplate.prototype.
+}
+/******************************************/
 function DirView(base, model){
 	this.base = base;
 	this.model = model;
