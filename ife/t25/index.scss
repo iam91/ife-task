@@ -6,6 +6,8 @@ $icon-vert: $icon-size solid $icon-color;
 
 $dir-height: 1.5em;
 
+$found-color: red;
+
 .dir-icon-collapse{
 	height: 0;
 	width: 0;
@@ -40,4 +42,7 @@ $dir-height: 1.5em;
 .dir-body-collapse{
 	height: 0;
 	overflow: hidden;
+}
+.found{
+	color: $found-color;
 }

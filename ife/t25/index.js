@@ -3,6 +3,15 @@ var $ = function(query){
 };
 
 var field = $('#field');
+var searchText = $('#search-text');
+var searchBtn = $('#search-btn');
+
+function searchHandler(event){
+	var searchValue = searchText.value.trim();
+	if(searchValue && searchValue !== ''){
+		view.search(searchValue);
+	}
+}
 
 var view = null;
 var model = null;
@@ -10,19 +19,13 @@ var model = null;
 function init(){
 	model = new DirModel(mock);
 	view = new DirView(field, model);
-	ctrl = new DirControl(view);
+	ctrl = new DirControl(view, model);
 	model.init();
 	view.init();
 	ctrl.init();
+
+	addHandler(searchBtn, 'click', searchHandler);
 }
 
 init();
 
-console.log(model.root);
-
-function T(t){
-	var _t = t;
-	T.prototype.get = function(){
-		return _t;
-	}
-}

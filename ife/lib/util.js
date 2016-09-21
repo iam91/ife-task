@@ -40,7 +40,7 @@ var ClassTool = {
 	remove: function(elem, className){
 		var old = elem.getAttribute('class');
 		if(old === null){
-			return old;
+			return;
 		}
 		var start = old.indexOf(className);
 		if(start !== -1){

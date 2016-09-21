@@ -14,10 +14,6 @@ function DirModel(rawData){
 	this._rawData = rawData;
 	this.root = null;
 
-	DirModel.prototype.init = function(){
-		this.root = DirModel.prototype._build.call(this, this._rawData, null);
-	};
-
 	DirModel.prototype._build = function(data, parent){
 		var modelNode = new ModelNode(data.val, parent);
 		for(var i = 0; i < data.children.length; i++){
@@ -42,15 +38,22 @@ function DirModel(rawData){
 			i++;
 		}
 		pchildren.pop();
-	}
+	};
 
 	DirModel.prototype.del = function(modelNode){
 		if(modelNode){
 			DirModel.prototype._delNode(modelNode);
 		}
-	}
+	};
 
-	DirModel.prototype.append = function(modelNode){
+	DirModel.prototype.append = function(currModelNode, data){
+		var modelNode = new ModelNode(data, currModelNode);
+		currModelNode.children.push(modelNode);
+		console.log(this.root);
+		return modelNode;
+	};
 
-	}
+	DirModel.prototype.init = function(){
+		this.root = DirModel.prototype._build.call(this, this._rawData, null);
+	};
 }

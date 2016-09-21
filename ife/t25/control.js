@@ -1,24 +1,20 @@
-function DirControl(view){
+function DirControl(view, model){
 	this._view = view;
+	this._model = model;
 
+	DirControl.prototype.del = function(targetDir, targetModelNode){
+		this._view.del(targetDir);
+		this._control.del(targetModelNode);
+	};
+
+	DirControl.prototype.append = function(targetDir, targetModelNode, data){
+		this._view.append(targetDir,
+			this._model.append(targetModelNode, data));
+	}
+
+	//register to view
 	DirControl.prototype.init = function(){
-		addHandler(this._view.base, 'click', DirControl.prototype.eventDispatch);
-	}
-
-	DirControl.prototype.eventDispatch = function(event){
-		var target = event.target;
-		var base = event.currentTarget;
-		var thisView = base.view;
-		if(ClassTool.contains(target, 'dir-del')){
-			var currDir = thisView.findTargetDir(target,'dir-del');
-			thisView.model.del(currDir.modelNode);
-			thisView.del(currDir);
-		}
-		else if(ClassTool.contains(target, 'dir-add')){
-			//thisView._ctrl.add();
-		}
-		else{
-			thisView.collapse(target);
-		}
-	}
+		this._view.register('del', this, DirControl.prototype.del);
+		this._view.register('add', this, DirControl.prototype.append);
+	};
 }
