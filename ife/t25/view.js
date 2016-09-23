@@ -1,37 +1,15 @@
 //TODO: handle deletion of root node
 //TODO: decouple view and template
 //TODO: class parser
-/**************** template ****************/
-function DirTemplate = function(){
-	DirTemplate.prototype.create = function(data){
-		var newDir = document.createElement('div');
-		ClassTool.add(newDir, 'dir');
-		newDir.innerHTML = "<div class='dir-name '>" 
-						 	+ "<span class='dir-icon-none '>" 
-							+ "</span>" 
-						 	+ "<span class='dir-name-text '>"
-						 		+ data
-						 	+ "</span>" 
-						 	+ "<span class='dir-add '>+</span>"
-						 	+ "<span class='dir-del '>-</span>"
-						 + "</div>" 
-						 + "<div class='dir-body '></div>";
-		return newDir;
-	};
-
-	DirTemplate.prototype.
-}
-/******************************************/
 function DirView(base, model){
-	this.base = base;
-	this.model = model;
-	this._obs = {};
 
-	DirView.prototype.renderNewDir = function(data){
+	var _ = DirView.prototype;
+
+	_.renderNewDir = function(data){
 		var newDir = document.createElement('div');
 		ClassTool.add(newDir, 'dir');
 		newDir.innerHTML = "<div class='dir-name '>" 
-						 	+ "<span class='dir-icon-none '>" 
+						 	+ "<span class='dir-icon dir-icon-none '>" 
 							+ "</span>" 
 						 	+ "<span class='dir-name-text '>"
 						 		+ data
@@ -43,7 +21,7 @@ function DirView(base, model){
 		return newDir;
 	};
 
-	DirView.prototype.appendChild = function(parent, child){
+	_.appendChild = function(parent, child){
 		var dirIcon = parent.children[0].children[0];
 		var dirBody = parent.children[1];
 		if(ClassTool.contains(dirIcon, 'dir-icon-none')){
@@ -52,7 +30,7 @@ function DirView(base, model){
 		dirBody.appendChild(child);
 	};
 
-	DirView.prototype.collapse = function(target){
+	_.collapse = function(target){
 		var t = target.parentNode.nextSibling;
 		if(ClassTool.contains(target, 'dir-icon-open')){
 			ClassTool.replace(target, 'dir-icon-collapse', 'dir-icon-open');
@@ -64,17 +42,17 @@ function DirView(base, model){
 		}
 	};
 
-	DirView.prototype._build = function(modelNode){
-		var newViewNode = DirView.prototype.renderNewDir(modelNode.data);
+	_._build = function(modelNode){
+		var newViewNode = _.renderNewDir(modelNode.data);
 		newViewNode.modelNode = modelNode;
 		for(var i = 0; i < modelNode.children.length; i++){
-			DirView.prototype.appendChild(newViewNode, 
+			_.appendChild(newViewNode, 
 				arguments.callee.call(this, modelNode.children[i]));
 		}
 		return newViewNode;
 	};
 	
-	DirView.prototype._delView = function(currParent){
+	_._delView = function(currParent){
 		if(currParent){
 			for(var i = 0; i < currParent.children.length; i++){
 				arguments.callee(currParent.children[i]);
@@ -83,18 +61,18 @@ function DirView(base, model){
 		}
 	};
 
-	DirView.prototype.del = function(currDir){
+	_.del = function(currDir){
 		currDir.modelNode = null;
-		DirView.prototype._delView(currDir);
+		_._delView(currDir);
 	};
 
-	DirView.prototype.append = function(currDir, newModel){
-		var newViewNode = DirView.prototype.renderNewDir(newModel.data);
+	_.append = function(currDir, newModel){
+		var newViewNode = _.renderNewDir(newModel.data);
 		newViewNode.modelNode = newModel;
-		DirView.prototype.appendChild(currDir, newViewNode);
+		_.appendChild(currDir, newViewNode);
 	};
 
-	DirView.prototype._search = function(currDir, data){
+	_._search = function(currDir, data){
 		var currDirName = currDir.children[0].children[1];
 		ClassTool.remove(currDirName, 'found');
 		var currData = currDirName.innerHTML;
@@ -124,8 +102,8 @@ function DirView(base, model){
 		}
 	}
 
-	DirView.prototype.search = function(data){
-		var result = DirView.prototype._search(this.base.children[0], data);
+	_.search = function(data){
+		var result = _._search(this.base.children[0], data);
 		if(result){
 			alert('Found!');
 		}
@@ -136,11 +114,11 @@ function DirView(base, model){
 
 
 
-	DirView.prototype.register = function(ev, obs, obsFn){
+	_.register = function(ev, obs, obsFn){
 		this._obs[ev] = [obs, obsFn];
 	};
 
-	DirView.prototype.eventDispatch = (function(){
+	_.eventDispatch = (function(){
 
 		//__this points to the DirView object
 		var __this = this;
@@ -173,8 +151,9 @@ function DirView(base, model){
 		}
 	}).call(this);
 
-	DirView.prototype.init = function(){
-		this.base.appendChild(DirView.prototype._build(this.model.root));
-		addHandler(this.base, 'click', DirView.prototype.eventDispatch);
-	};
+	this.base = base;
+	this.model = model;
+	this._obs = {};
+	this.base.appendChild(_._build(this.model.root));
+	addHandler(this.base, 'click', _.eventDispatch);
 }

@@ -1,0 +1,44 @@
+$space-size: 500px;
+$space-color: black;
+
+$planet-radius: 50px;
+$planet-color: blue;
+
+$orbit-radius: 80px;
+
+$ship-length: 10px;
+$ship-width: 5px;
+
+.space{
+	width: $space-size;
+	height: $space-size;
+	background-color: $space-color;
+	position: relative;
+}
+
+@mixin concentric($radius){
+	position: absolute;
+	left: $space-size / 2 - $radius;
+	top: $space-size / 2 - $radius;
+	height: 2 * $radius;
+	width: 2 * $radius;
+}
+
+.planet{
+	@include concentric($planet-radius);
+	border-radius: $planet-radius;
+	background-color: $planet-color;
+}
+
+.orbit{
+	@include concentric($orbit-radius);
+}
+
+.ship{
+	width: $ship-width;
+	height: $ship-length;
+	background-color: red;
+	position: absolute;
+	left: $orbit-radius;
+	top: 0;
+}

@@ -1,0 +1,32 @@
+.space {
+  width: 500px;
+  height: 500px;
+  background-color: black;
+  position: relative; }
+
+.planet {
+  position: absolute;
+  left: 200px;
+  top: 200px;
+  height: 100px;
+  width: 100px;
+  border-radius: 50px;
+  background-color: blue; }
+
+.orbit {
+  position: absolute;
+  left: 170px;
+  top: 170px;
+  height: 160px;
+  width: 160px;
+  transition: transform; }
+
+.ship {
+  width: 5px;
+  height: 10px;
+  background-color: red;
+  position: absolute;
+  left: 80px;
+  top: 0; }
+
+/*# sourceMappingURL=index.css.map */
