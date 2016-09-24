@@ -212,6 +212,18 @@ function Mediator(){
 }
 
 Mediator.prototype.getCommand = function(cmd){
+	var delayTimeOut;
+	var self = this;
+	
+	function delay(){
+		clearTimeout(delayTimeOut);
+		self._getCommand(cmd);
+	}
+
+	delayTimeOut = setTimeout(delay, 1000);
+};
+
+Mediator.prototype._getCommand = function(cmd){
 	var rand = Math.random();
 	var command = cmd.command;
 	var r = false;
