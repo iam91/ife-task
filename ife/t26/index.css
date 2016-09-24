@@ -1,3 +1,6 @@
+body {
+  position: relative; }
+
 .space {
   width: 500px;
   height: 500px;
@@ -6,27 +9,44 @@
 
 .planet {
   position: absolute;
-  left: 200px;
-  top: 200px;
-  height: 100px;
-  width: 100px;
-  border-radius: 50px;
+  left: 150px;
+  top: 150px;
+  height: 200px;
+  width: 200px;
+  border-radius: 100px;
   background-color: blue; }
 
 .orbit {
   position: absolute;
-  left: 170px;
-  top: 170px;
-  height: 160px;
-  width: 160px;
-  transition: transform; }
+  left: 100px;
+  top: 100px;
+  height: 300px;
+  width: 300px; }
 
 .ship {
-  width: 5px;
-  height: 10px;
+  width: 70px;
+  height: 30px;
   background-color: red;
   position: absolute;
-  left: 80px;
-  top: 0; }
+  left: 115px;
+  top: 0;
+  color: white;
+  text-align: center; }
+
+.cmd {
+  width: 500px;
+  border-top: 3px solid gray;
+  border-bottom: 3px solid gray;
+  margin: 10px 0;
+  padding: 10px 0; }
+
+.console {
+  width: 500px;
+  height: 200px;
+  background-color: gray;
+  position: absolute;
+  top: 0;
+  right: 0;
+  overflow: scroll; }
 
 /*# sourceMappingURL=index.css.map */

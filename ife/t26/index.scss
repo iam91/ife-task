@@ -1,13 +1,19 @@
 $space-size: 500px;
 $space-color: black;
 
-$planet-radius: 50px;
+$planet-radius: 100px;
 $planet-color: blue;
 
-$orbit-radius: 80px;
+$orbit-radius: 150px;
 
-$ship-length: 10px;
-$ship-width: 5px;
+$ship-length: 70px;
+$ship-width: 30px;
+
+$cmd-border: 3px solid gray;
+
+body{
+	position: relative;
+}
 
 .space{
 	width: $space-size;
@@ -35,10 +41,30 @@ $ship-width: 5px;
 }
 
 .ship{
-	width: $ship-width;
-	height: $ship-length;
+	width: $ship-length;
+	height: $ship-width;
 	background-color: red;
 	position: absolute;
-	left: $orbit-radius;
+	left: $orbit-radius - $ship-length / 2;
 	top: 0;
+	color: white;
+	text-align: center;
+}
+
+.cmd{
+	width: $space-size;
+	border-top: $cmd-border;
+	border-bottom: $cmd-border;
+	margin: 10px 0;
+	padding: 10px 0;
+}
+
+.console{
+	width: 500px;
+	height: 200px;
+	background-color: gray;
+	position: absolute;
+	top: 0;
+	right: 0;
+	overflow: scroll;
 }
