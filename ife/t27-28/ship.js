@@ -71,12 +71,15 @@ var EnergyFactory = {
 |--- ship ---|
 
 */
-function Ship(id, engine, energy){
+function Ship(id, engine, energy, media){
 	this._space = $('.space');
+	this._media = media;
+
 	this._id = id;
 	this._fuel = 100;
 	this._position = 0;
-
+	this._isRunning = false;
+	this._isCharging = false;
 
 	this._engine = EngineFactory.getInstance(engine);
 	this._energy = EnergyFactory.getInstance(energy);
@@ -84,16 +87,16 @@ function Ship(id, engine, energy){
 	this._moveTimer = -1;
 	this._chargeTimer = -1;
 	this._renderTimer = -1;
+	this._reportTimer = -1;
 
 	this._dom = null;
 
-	this._isRunning = false;
-	this._isCharging = false;
 }
 
 Ship.prototype.template = "<div class=ship>{}号-[]%</div>";
 Ship.prototype.sysInterval = sysTimeInterval;
 Ship.prototype.renderInterval = 1000;
+Ship.prototype.reportInterval = 1000;
 
 Ship.prototype.render = function(dom){
 	dom.html(this.template.replace(/\{\}/g, this._id)
@@ -114,17 +117,35 @@ Ship.prototype.init = function(){
 		_this.render(_this._dom);
 	};
 
+	var report = function(){
+		_this.report();
+	}
+
 	this._chargeTimer = setInterval(charge, this.sysInterval);
 	this._renderTimer = setInterval(render, this.renderInterval);
+	this._reportTimer = setInterval(report, this.reportInterval);
 };
 
 Ship.prototype.exec = function(cmd){
+	var cmd = JSON.parse(cmd);
 	if(cmd.id === this._id){
 		this[cmd.command].call(this);
-		return true;
+		if(cmd.command === 'destroy'){
+			return true;
+		}
 	}
 	return false;
-}
+};
+
+Ship.prototype.report = function(){
+	var report = {
+		id: -1, 
+		state: this._isRunning ? 'move' : 'stop', 
+		shipId: this._id,
+		fuel: this._fuel,
+	};
+	this._media.getMessage(JSON.stringify(report));
+};
 
 Ship.prototype.stop = function(){
 	this._isRunning = false;

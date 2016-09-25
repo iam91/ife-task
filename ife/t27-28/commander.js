@@ -4,7 +4,7 @@
 
 */
 
-function Commander(space){
+function Commander(){
 	this._dom = $('.cmd');
 	this.ships = {};
 	this.shipCnt = 0;
@@ -17,12 +17,12 @@ Commander.prototype.template =
 			 "<button name='{}' class='cmd-stop'>停止</button>" +
 			 "<button name='{}' class='cmd-destroy'>销毁</button>";
 
-Commander.prototype.command = function(btn, mediator){
+Commander.prototype.buttonHandler = function(btn, forward, media){
 	var id = parseInt(btn.attr('name'));
 	var cmd = {};
 	cmd.id = id;
 	if(btn.hasClass('cmd-create')){
-		this.create(mediator);
+		this.create(forward, media);
 		return;
 	}
 	else if(btn.hasClass('cmd-move')){
@@ -35,16 +35,24 @@ Commander.prototype.command = function(btn, mediator){
 		cmd.command = 'destroy';
 		this.destroy(id);
 	}
-	mediator.getCommand(cmd);
+	media.getMessage(JSON.stringify(cmd));
+};
+
+Commander.prototype.exec = function(report){
+	var report = JSON.parse(report);
+	if(report.id === -1){
+		console.log(report.shipId + ': ' + report.state);
+	}
+	return false;
 };
 
 Commander.prototype.destroy = function(id){
 	this.ships[id].detach();
 	delete this.ships[id];
 	this.shipCnt--;
-}
+};
 
-Commander.prototype.create = function(mediator){
+Commander.prototype.create = function(forward, media){
 	var code = 0;
 	if(this.shipCnt < this.max){
 		for(var i = 0; i < this.max; i++){
@@ -63,9 +71,10 @@ Commander.prototype.create = function(mediator){
 
 		console.log(engine + ',' + energy);
 
-		var newShip = new Ship(code, engine, energy);
+		var newShip = new Ship(code, engine, energy, media);
 		newShip.init();
-		mediator.register(newShip);
+		//register 
+		forward.register(newShip);
 		this.ships[code] = dom;
 		this.shipCnt++;
 	}
