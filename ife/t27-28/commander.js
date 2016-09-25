@@ -1,14 +1,67 @@
 /*
 
+|--- data center ---|
+
+*/
+
+function DC(){
+	this._ships = {};
+	this._dc = $('.dc tbody');
+}
+
+DC.prototype._template = '<td>No.{id}</td>'
+	+ '<td>{energy}</td>'
+	+ '<td>{engine}</td>'
+	+ '<td>{state}</td>'
+	+ '<td>{fuel}</td>';
+
+DC.prototype._render = function(ship){
+	ship.dom.html(this._template.replace(/\{id\}/g, ship.id)
+									  	   .replace(/\{energy\}/g, ship.energy)
+									  	   .replace(/\{engine\}/g, ship.engine)
+									  	   .replace(/\{state\}/g, ship.state)
+									  	   .replace(/\{fuel\}/g, ship.fuel));
+};
+
+DC.prototype.destroy = function(id){
+	var ship = this._ships[id];
+	ship.dom.detach();
+	delete this._ships[id];
+};
+
+DC.prototype.update = function(report){
+	var id = report.id;
+	var ship = this._ships[id];
+	ship.state = report.state;
+	ship.fuel = report.fuel;
+	this._render(ship);
+};
+
+DC.prototype.addShip = function(id, engine, energy){
+	var ship = {
+		id: id,
+		engine: engine, 
+		energy: energy,
+		state: 'unknown',
+		fuel: 'unknown',
+		dom: $$('tr').appendTo(this._dc)
+	};
+	this._render(ship);
+	this._ships[id] = ship;
+};
+
+/*
+
 |--- commander ---|
 
 */
 
-function Commander(){
+function Commander(dc){
 	this._dom = $('.cmd');
 	this.ships = {};
 	this.shipCnt = 0;
 	this.max = 4;
+	this._dc = dc;
 };
 
 Commander.prototype.template = 
@@ -19,8 +72,10 @@ Commander.prototype.template =
 
 Commander.prototype.buttonHandler = function(btn, forward, media){
 	var id = parseInt(btn.attr('name'));
-	var cmd = {};
-	cmd.id = id;
+	var cmd = {
+		type: 'cmd',
+		id: id
+	};
 	if(btn.hasClass('cmd-create')){
 		this.create(forward, media);
 		return;
@@ -34,14 +89,17 @@ Commander.prototype.buttonHandler = function(btn, forward, media){
 	else if(btn.hasClass('cmd-destroy')){
 		cmd.command = 'destroy';
 		this.destroy(id);
+		this._dc.destroy(id);
 	}
 	media.getMessage(JSON.stringify(cmd));
 };
 
 Commander.prototype.exec = function(report){
 	var report = JSON.parse(report);
-	if(report.id === -1){
-		console.log(report.shipId + ': ' + report.state);
+	if(report.type === 'report'){
+		//send to data center
+		console.log(report.id + ': ' + report.state + ',' + report.fuel);
+		this._dc.update(report);
 	}
 	return false;
 };
@@ -75,6 +133,7 @@ Commander.prototype.create = function(forward, media){
 		newShip.init();
 		//register 
 		forward.register(newShip);
+		this._dc.addShip(code, engine, energy);
 		this.ships[code] = dom;
 		this.shipCnt++;
 	}

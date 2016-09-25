@@ -128,7 +128,7 @@ Ship.prototype.init = function(){
 
 Ship.prototype.exec = function(cmd){
 	var cmd = JSON.parse(cmd);
-	if(cmd.id === this._id){
+	if(cmd.type === 'cmd' && cmd.id === this._id){
 		this[cmd.command].call(this);
 		if(cmd.command === 'destroy'){
 			return true;
@@ -139,10 +139,10 @@ Ship.prototype.exec = function(cmd){
 
 Ship.prototype.report = function(){
 	var report = {
-		id: -1, 
+		type: 'report',
+		id: this._id, 
 		state: this._isRunning ? 'move' : 'stop', 
-		shipId: this._id,
-		fuel: this._fuel,
+		fuel: parseInt(this._fuel),
 	};
 	this._media.getMessage(JSON.stringify(report));
 };
@@ -191,6 +191,7 @@ Ship.prototype.move = function(){
 Ship.prototype.destroy = function(){
 	clearInterval(this._chargeTimer);
 	clearInterval(this._renderTimer);
+	clearInterval(this._reportTimer);
 	clearInterval(this._moveTimer);
 	this._dom.remove();
 	this._space = null;

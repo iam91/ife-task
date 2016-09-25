@@ -11,8 +11,12 @@ $ship-width: 30px;
 
 $cmd-border: 3px solid gray;
 
-body{
-	position: relative;
+.left{
+	float: left;
+}
+
+.right{
+	float: right;
 }
 
 .space{
@@ -63,8 +67,12 @@ body{
 	width: 500px;
 	height: 200px;
 	background-color: gray;
-	position: absolute;
-	top: 0;
-	right: 0;
 	overflow: scroll;
+	margin: 20px 0;
+}
+
+.dc{
+	width: 600px;
+	height: 200px;
+	background-color: gray;
 }

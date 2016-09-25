@@ -3,7 +3,8 @@
 //////////////////
 
 function init(){
-	var commander = new Commander();
+	var dc = new DC();
+	var commander = new Commander(dc);
 	var forward = new Forward();
 	var media = new Media(0.1, 300, 'bus', forward);
 

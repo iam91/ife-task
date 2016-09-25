@@ -1,5 +1,8 @@
-body {
-  position: relative; }
+.left {
+  float: left; }
+
+.right {
+  float: right; }
 
 .space {
   width: 500px;
@@ -24,11 +27,11 @@ body {
   width: 300px; }
 
 .ship {
-  width: 70px;
+  width: 90px;
   height: 30px;
   background-color: red;
   position: absolute;
-  left: 115px;
+  left: 105px;
   top: 0;
   color: white;
   text-align: center; }
@@ -44,9 +47,12 @@ body {
   width: 500px;
   height: 200px;
   background-color: gray;
-  position: absolute;
-  top: 0;
-  right: 0;
-  overflow: scroll; }
+  overflow: scroll;
+  margin: 20px; }
+
+.dc {
+  width: 600px;
+  height: 200px;
+  background-color: gray; }
 
 /*# sourceMappingURL=index.css.map */
