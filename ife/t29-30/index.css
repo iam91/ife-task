@@ -1,14 +1,30 @@
-input[class^='z-form'] {
-  outline: none;
-  border: 1px solid transparent; }
-
-input.z-form-msg {
-  border-color: blue; }
-
-input.z-form-failed {
-  border-color: red; }
-
-input.z-form-successful {
-  border-color: green; }
+form.z-form {
+  font-family: 'Microsoft YaHei'; }
+  form.z-form input {
+    outline: none;
+    border: 1px solid gray;
+    border-radius: 5px;
+    display: block;
+    height: 2em;
+    padding: 0 1em;
+    color: #666666; }
+  form.z-form input.z-form-msg {
+    border-color: #0099cc;
+    box-shadow: 0 0 3px 1px #0099cc; }
+  form.z-form input.z-form-failed {
+    border-color: #cc3333; }
+  form.z-form input.z-form-successful {
+    border-color: #339933; }
+  form.z-form div {
+    margin: 0.5em 0; }
+  form.z-form span {
+    font-size: 0.8em;
+    padding: 0 0.5em; }
+  form.z-form span.z-form-msg {
+    color: #666666; }
+  form.z-form span.z-form-failed {
+    color: #cc3333; }
+  form.z-form span.z-form-successful {
+    color: #339933; }
 
 /*# sourceMappingURL=index.css.map */

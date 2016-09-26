@@ -1,19 +1,50 @@
-$border-style: 1px solid transparent;
+$border-style: 1px solid gray;
 
-$msg-color: blue;
-$failed-color: red;
-$successful-color: green;
+$msg-color: #0099cc;
+$msg-font-color: #666666;
+$failed-color: #cc3333;
+$successful-color: #339933;
 
-form.z-form input[type='text']{
-	border: $border-style;
-	outline: none;
-}
-input.z-form-msg{
-	border-color: $msg-color;
-}
-input.z-form-failed{
-	border-color: $failed-color;
-}
-input.z-form-successful{
-	border-color: $successful-color;
+form.z-form{
+	font-family: 'Microsoft YaHei';
+
+	input{
+		outline: none;
+		border: $border-style;
+		border-radius: 5px;
+		display: block;
+		height: 2em;
+		padding: 0 1em;
+		color: #666666;
+	}
+
+	input.z-form-msg{
+		border-color: $msg-color;
+		box-shadow: 0 0 3px 1px $msg-color;
+	}
+	input.z-form-failed{
+		border-color: $failed-color;
+	}
+	input.z-form-successful{
+		border-color: $successful-color;
+	}
+
+	div{
+		margin: 0.5em 0;
+	}
+
+	span{
+		font-size: 0.8em;
+		padding: 0 0.5em;
+	}
+
+	span.z-form-msg{
+		color: $msg-font-color;
+	}
+	span.z-form-failed{
+		color: $failed-color;
+	}
+	span.z-form-successful{
+		color: $successful-color;
+	}
 }
