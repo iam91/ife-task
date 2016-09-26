@@ -32,14 +32,24 @@ var _$ = function(query){
 			var type = target.getAttribute('type');
 			if(type === 'submit' || type === 'button'){
 				var inputs = _dom.elements;
+				var isValid = true;
 				for(var i = 0; i < inputs.length; i++){
 					if(inputs[i] !== target){
 						var value = inputs[i].value.trim();
 						var validate = validator[inputs[i].getAttribute('name')];
 						var info = validateFn(validate, value);
 						render(inputs[i], info);
+						if(info[0] === 'z-form-failed'){
+							isValid = false;
+						}
 					}
+				}
+				if(isValid){
+					alert('提交成功');
 				}	
+				else{
+					alert('提交失败');
+				}
 			}
 		};
 
@@ -79,7 +89,9 @@ var validator = {
 		valid: '验证成功',
 		invalid: {
 			nonempty: [/^.+$/, '名字不能为空'],
-			length: [/^[a-z,A-Z,\d,\u4e00-\u9fa5]{4, 16}$/, '长度非法']
+			length: [{test: function(val){
+				return /^[a-z,A-Z,\d]{4,16}$/.test(val.replace(/[\u0391-\uFFE5]/g, 'nn'));
+			}}, '长度非法']
 		}
 	},
 	password: {
