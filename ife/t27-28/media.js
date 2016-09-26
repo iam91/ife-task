@@ -62,7 +62,9 @@ Media.prototype.transmit = function(msg, receiver){
 		timer = setTimeout(delay, this._delay);
 	}
 	else{
-		$$('p').html("Message: " + msg + " lost!").appendTo(this._console);
+		if(JSON.parse(msg).type === 'cmd'){
+			$$('p').html("Message: " + msg + " lost!").appendTo(this._console);
+		}
 	}
 };
 
@@ -93,5 +95,7 @@ Forward.prototype.receive = function(msg){
 			this._participants.slice(0, t)
 							  .concat(this._participants.slice(t + 1));
 	}
-	$$('p').html("Message: " + msg + " transmitted!").appendTo(this._console);
+	if(JSON.parse(msg).type === 'cmd'){
+		$$('p').html("Message: " + msg + " transmitted!").appendTo(this._console);
+	}
 };

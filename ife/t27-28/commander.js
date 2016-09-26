@@ -32,9 +32,15 @@ DC.prototype.destroy = function(id){
 DC.prototype.update = function(report){
 	var id = report.id;
 	var ship = this._ships[id];
-	ship.state = report.state;
-	ship.fuel = report.fuel;
-	this._render(ship);
+	if(ship){
+		/* 
+		 * A little bug here, ship information should be removed when ship is really destroyed!
+		 * 
+		 */
+		ship.state = report.state;
+		ship.fuel = report.fuel;
+		this._render(ship);
+	}
 };
 
 DC.prototype.addShip = function(id, engine, energy){
@@ -98,7 +104,6 @@ Commander.prototype.exec = function(report){
 	var report = JSON.parse(report);
 	if(report.type === 'report'){
 		//send to data center
-		console.log(report.id + ': ' + report.state + ',' + report.fuel);
 		this._dc.update(report);
 	}
 	return false;

@@ -13,8 +13,9 @@ function init(){
 	$('.cmd').delegate('button', 'click', (function(){
 		var com = commander;
 		var med = media;
+		var forw = forward;
 		return function(){
-			com.buttonHandler($(this), forward, med);
+			com.buttonHandler($(this), forw, med);
 		}
 	})());
 }

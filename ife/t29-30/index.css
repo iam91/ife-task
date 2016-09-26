@@ -1,0 +1,14 @@
+input[class^='z-form'] {
+  outline: none;
+  border: 1px solid transparent; }
+
+input.z-form-msg {
+  border-color: blue; }
+
+input.z-form-failed {
+  border-color: red; }
+
+input.z-form-successful {
+  border-color: green; }
+
+/*# sourceMappingURL=index.css.map */

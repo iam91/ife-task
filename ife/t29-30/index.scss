@@ -1,0 +1,19 @@
+$border-style: 1px solid transparent;
+
+$msg-color: blue;
+$failed-color: red;
+$successful-color: green;
+
+form.z-form input[type='text']{
+	border: $border-style;
+	outline: none;
+}
+input.z-form-msg{
+	border-color: $msg-color;
+}
+input.z-form-failed{
+	border-color: $failed-color;
+}
+input.z-form-successful{
+	border-color: $successful-color;
+}
