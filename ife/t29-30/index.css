@@ -7,7 +7,11 @@ form.z-form {
     display: block;
     height: 2em;
     padding: 0 1em;
-    color: #666666; }
+    color: #666666;
+    transition: box-shadow 0.5s; }
+  form.z-form input[type='submit']:hover, form.z-form input[type='button']:hover {
+    border-color: #0099cc;
+    color: #0099cc; }
   form.z-form input.z-form-msg {
     border-color: #0099cc;
     box-shadow: 0 0 3px 1px #0099cc; }

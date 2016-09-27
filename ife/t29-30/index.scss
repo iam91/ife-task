@@ -16,17 +16,27 @@ form.z-form{
 		height: 2em;
 		padding: 0 1em;
 		color: #666666;
+		transition: box-shadow 0.5s;
 	}
 
-	input.z-form-msg{
-		border-color: $msg-color;
-		box-shadow: 0 0 3px 1px $msg-color;
+	input[type='submit'], input[type='button']{
+		&:hover{
+			border-color: $msg-color;
+			color: $msg-color;
+		}
 	}
-	input.z-form-failed{
-		border-color: $failed-color;
-	}
-	input.z-form-successful{
-		border-color: $successful-color;
+
+	input{
+		&.z-form-msg{
+			border-color: $msg-color;
+			box-shadow: 0 0 3px 1px $msg-color;
+		}
+		&.z-form-failed{
+			border-color: $failed-color;
+		}
+		&.z-form-successful{
+			border-color: $successful-color;
+		}
 	}
 
 	div{
