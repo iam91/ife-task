@@ -1,0 +1,12 @@
+.switch-content{
+	position: relative;
+	.student, .nonstudent{
+		position: absolute;
+	}
+	.show{
+		visibility: visible;
+	}
+	.hide{
+		visibility: hidden;
+	}
+}

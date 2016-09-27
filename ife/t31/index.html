@@ -9,22 +9,19 @@
 	</head>
 	<body>
 		<form action="">
-			<div>
-				<input type='radio' name='student'><label>在校生</label>
-				<input type='radio' name='notstudent'><label>非在校生</label>
+			<div class='switch'>
+				<input type='radio' name='ifstudent' value='student' checked><label>在校生</label>
+				<input type='radio' name='ifstudent' value='nonstudent'><label>非在校生</label>
 			</div>
-			<div>	
-				<label>学校</label>
-				<select>
-					<option>北京</option>
-					<option>成都</option>
-				</select>
-				<select>
-					
-				</select>
-			</div>
-			<div>	
-				<label>就业单位</label><input type='text'>
+			<div class='switch-content'>
+				<div class='student show'>	
+					<label>学校</label>
+					<select class='city'></select>
+					<select class='school'></select>
+				</div>
+				<div class='nonstudent hide'>	
+					<label>就业单位</label><input type='text'>
+				</div>
 			</div>
 		</form>
 	</body>
