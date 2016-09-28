@@ -1,0 +1,18 @@
+#field {
+  width: 520px;
+  height: 520px;
+  border: 1px solid grey; }
+  #field div {
+    float: left; }
+  #field .grid {
+    border: 1px solid grey;
+    width: 50px;
+    height: 50px; }
+  #field .box {
+    width: 52px;
+    height: 52px;
+    box-sizing: border-box;
+    background-color: red;
+    border-top: 20px solid blue; }
+
+/*# sourceMappingURL=index.css.map */

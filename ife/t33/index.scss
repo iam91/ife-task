@@ -1,0 +1,29 @@
+$field-width: 10;
+$field-height: 10;
+
+$grid-size: 50px;
+$grid-border-size: 1px;
+
+#field{
+	width: (2 * $grid-border-size + $grid-size) * $field-width;
+	height: (2 * $grid-border-size + $grid-size) * $field-width;
+	border: 1px solid grey;
+
+	div{
+		float: left;
+	}
+
+	.grid{
+		border: $grid-border-size solid grey;
+		width: $grid-size;
+		height: $grid-size;
+	}
+	.box{
+		width: $grid-size + 2 * $grid-border-size;
+		height: $grid-size + 2 * $grid-border-size;
+		box-sizing: border-box;
+		background-color: red;
+		border-top: 20px solid blue;
+	}
+}
+
