@@ -1,7 +1,8 @@
 #field {
   width: 520px;
   height: 520px;
-  border: 1px solid grey; }
+  border: 1px solid grey;
+  position: relative; }
   #field div {
     float: left; }
   #field .grid {
@@ -13,7 +14,9 @@
     height: 52px;
     box-sizing: border-box;
     background-color: red;
-    border-top: 20px solid blue; }
+    border-top: 20px solid blue;
+    transition: transform 0.5s, left 0.5s, top 0.5s;
+    position: absolute; }
 
 #direct {
   margin: 1em 0; }

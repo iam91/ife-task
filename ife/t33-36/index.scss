@@ -8,6 +8,7 @@ $grid-border-size: 1px;
 	width: (2 * $grid-border-size + $grid-size) * $field-width;
 	height: (2 * $grid-border-size + $grid-size) * $field-width;
 	border: 1px solid grey;
+	position: relative;
 
 	div{
 		float: left;
@@ -19,11 +20,15 @@ $grid-border-size: 1px;
 		height: $grid-size;
 	}
 	.box{
+		$ani-time: 0.5s;
+
 		width: $grid-size + 2 * $grid-border-size;
 		height: $grid-size + 2 * $grid-border-size;
 		box-sizing: border-box;
 		background-color: red;
 		border-top: 20px solid blue;
+		transition: transform $ani-time, left $ani-time, top $ani-time;
+		position: absolute;
 	}
 }
 

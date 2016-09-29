@@ -8,6 +8,7 @@ var $$ = function(elem){
 var field = $('#field');
 var fieldWidth = 10;
 var fieldHeight = 10;
+var boxSize = 52;
 
 var box = {
 	_x: 0,
@@ -15,66 +16,104 @@ var box = {
 	_deg: 0,
 	_curr: null,
 	
-	_pos: function(x, y){
-		return x + fieldWidth * y;
+	_fix: function(){
+		this._curr.style.left = this._x * boxSize + 'px';
+		this._curr.style.top = this._y * boxSize + 'px';
 	},
 
-	born: function(){
-		var init = field.children[this._pos(this._x, this._y)];
-		init.classList.remove('grid');
-		init.classList.add('box');
-		init.style.transform = 'rotate(' + this._deg + 'deg)';
-		this._curr = init;
+	_fixAngle: function(){
+		this._deg = this._deg < -180 ? this._deg + 360 : this._deg;
+		this._deg = this._deg > 180 ? this._deg - 360 : this._deg;
 	},
 
-	go: function(){
-		this._curr.classList.remove('box');
-		this._curr.classList.add('grid');
-
-		//compute new coordinates
-		var tx = this._x + 1 * Math.sin(this._deg * Math.PI / 180.0);
-		var ty = this._y - 1 * Math.cos(this._deg * Math.PI / 180.0);
-
+	_set: function(tx, ty){
 		//move if it's not moving out of the field
 		this._x = (tx >= 0 && tx < fieldWidth) ? tx : this._x;
 		this._y = (ty >= 0 && ty < fieldHeight) ? ty : this._y;
-
-		var next = field.children[this._pos(this._x, this._y)];
-
-		next.classList.remove('grid');
-		next.classList.add('box');
-
-		this._curr = next;
 	},
 
-	turnLeft: function(){
+	born: function(){
+		var init = $$('div');
+		init.classList.add('box');
+		init.style.transform = 'rotate(' + this._deg + 'deg)';
+		this._curr = init;
+
+		field.appendChild(this._curr);
+
+		this._fix();
+	},
+
+	_go: function(){
+		//compute new coordinates
+		var tx = this._x + 1 * Math.sin(this._deg * Math.PI / 180);
+		var ty = this._y - 1 * Math.cos(this._deg * Math.PI / 180);
+
+		this._set(tx, ty);
+		this._fix();
+	},
+
+	_tur_lef: function(){
 		this._curr.style.transform = 'rotate(' + (this._deg -= 90) + 'deg)';
+		this._fixAngle();
 	},
 	
-	turnRight: function(){
+	_tur_rig: function(){
 		this._curr.style.transform = 'rotate(' + (this._deg += 90) + 'deg)';
+		this._fixAngle();
 	},
 	
-	turnBack: function(){
+	_tur_bac: function(){
 		this._curr.style.transform = 'rotate(' + (this._deg += 180) + 'deg)';
+		this._fixAngle();
+	},
+
+	_tra_lef: function(){
+		var tx = this._x - 1;
+		this._set(tx, this._y);
+		this._fix();
+	},
+
+	_tra_rig: function(){
+		var tx = this._x + 1;
+		this._set(tx, this._y);
+		this._fix();
+	},
+
+	_tra_top: function(){
+		var ty = this._y - 1;
+		this._set(this._x, ty);
+		this._fix();
+	},
+
+	_tra_bot: function(){
+		var ty = this._y + 1;
+		this._set(this._x, ty);
+		this._fix();
+	},
+
+	_mov_left: function(){
+		this._curr.style.transform = 'rotate(' + (this._deg = -90) + 'deg)';
+		this.go();
+	},
+
+	_mov_right: function(){
+		this._curr.style.transform = 'rotate(' + (this._deg = 90) + 'deg)';
+		this.go();
+	},
+
+	_mov_top: function(){
+		this._curr.style.transform = 'rotate(' + (this._deg = 0) + 'deg)';
+		this.go();
+	},
+
+	_mov_bot: function(){
+		this._curr.style.transform = 'rotate(' + (this._deg = 180) + 'deg)';
+		this.go();
 	}
 };
 
 function exec(direct){
-	if(/^GO/.test(direct)){
-		box.go();
-	}
-	else if(/^TUN/.test(direct)){
-		if(/.*LEF$/.test(direct)){
-			box.turnLeft();
-		}
-		else if(/.*RIG/.test(direct)){
-			box.turnRight();
-		}
-		else if(/.*BAC/.test(direct)){
-			box.turnBack();
-		}
-	}
+	var parts = direct.split(' ');
 }
 
 function fieldRender(){
@@ -98,5 +137,3 @@ function fieldRender(){
 
 fieldRender();
 box.born();
-
-console.log(Math.sin(-90 * Math.PI / 180));
