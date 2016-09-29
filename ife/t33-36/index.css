@@ -20,5 +20,27 @@
 
 #direct {
   margin: 1em 0; }
+  #direct #win {
+    margin: 1em 0;
+    font-family: 'Microsoft YaHei'; }
+    #direct #win .line, #direct #win #serial, #direct #win textarea {
+      font-size: 16px;
+      line-height: 16px;
+      height: 80px; }
+    #direct #win #serial {
+      text-align: right;
+      float: left;
+      overflow: hidden;
+      background-color: grey;
+      color: white; }
+    #direct #win textarea {
+      padding: 0;
+      outline: none;
+      border: none;
+      color: green;
+      background-color: black;
+      resize: none;
+      display: block;
+      float: left; }
 
 /*# sourceMappingURL=index.css.map */

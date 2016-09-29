@@ -15,6 +15,23 @@ var box = {
 	_y: 9,
 	_deg: 0,
 	_curr: null,
+
+	born: function(){
+		var init = $$('div');
+		init.classList.add('box');
+		init.style.transform = 'rotate(' + this._deg + 'deg)';
+		
+		this._curr = init;
+		field.appendChild(this._curr);
+		this._fix();
+	},
+
+	exec: function(direct){
+		var parts = direct.toLowerCase().split(' ');
+		var meth = '_' + parts.join('_');
+		console.log(meth);
+		this[meth]();
+	},
 	
 	_fix: function(){
 		this._curr.style.left = this._x * boxSize + 'px';
@@ -30,17 +47,6 @@ var box = {
 		//move if it's not moving out of the field
 		this._x = (tx >= 0 && tx < fieldWidth) ? tx : this._x;
 		this._y = (ty >= 0 && ty < fieldHeight) ? ty : this._y;
-	},
-
-	born: function(){
-		var init = $$('div');
-		init.classList.add('box');
-		init.style.transform = 'rotate(' + this._deg + 'deg)';
-		this._curr = init;
-
-		field.appendChild(this._curr);
-
-		this._fix();
 	},
 
 	_go: function(){
@@ -91,30 +97,67 @@ var box = {
 		this._fix();
 	},
 
-	_mov_left: function(){
+	_mov_lef: function(){
 		this._curr.style.transform = 'rotate(' + (this._deg = -90) + 'deg)';
-		this.go();
+		this._go();
 	},
 
-	_mov_right: function(){
+	_mov_rig: function(){
 		this._curr.style.transform = 'rotate(' + (this._deg = 90) + 'deg)';
-		this.go();
+		this._go();
 	},
 
 	_mov_top: function(){
 		this._curr.style.transform = 'rotate(' + (this._deg = 0) + 'deg)';
-		this.go();
+		this._go();
 	},
 
 	_mov_bot: function(){
 		this._curr.style.transform = 'rotate(' + (this._deg = 180) + 'deg)';
-		this.go();
+		this._go();
 	}
 };
 
-function exec(direct){
-	var parts = direct.split(' ');
-}
+var serialFn = (function(){
+	var serial = $('#serial');
+	var num = 0;
+
+	function add(){
+		var t = $$('div');
+		t.innerHTML = (num++) + '.';
+		serial.appendChild(t);
+	}
+
+	function validate(){
+		//TODO
+	};
+
+	add();
+
+	return function(e){
+		var target = e.target;
+		var code = e.keyCode;
+		if(code === 13){
+			add();
+			serial.scrollTop = target.scrollTop;
+			validate();
+		}
+		else if(code === 8){
+			
+		}
+	};
+
+})();
+
+var scrollFn = (function(){
+	var serial = $('#serial');
+	var textWin = $('#win textarea');
+
+	return function(e){
+		var scrollTop = textWin.scrollTop;
+		serial.scrollTop = scrollTop;
+	};
+})();
 
 function fieldRender(){
 	var fieldArea = fieldWidth * fieldHeight;
@@ -130,9 +173,12 @@ function fieldRender(){
 	var button = $('#direct input[type="button"]');
 
 	addHandler(button, 'click', function(e){
-		var dir = direct.value.trim();
-		exec(dir);
+		var dirs = direct.value.trim();
+		box.exec(dirs);
 	});
+
+	addHandler($('#win'), 'keyup', serialFn);
+	addHandler($('#win textarea'), 'scroll', scrollFn);
 }
 
 fieldRender();

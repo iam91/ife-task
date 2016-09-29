@@ -4,6 +4,10 @@ $field-height: 10;
 $grid-size: 50px;
 $grid-border-size: 1px;
 
+$line-size: 16px;
+$line-height: 20px;
+$line-num: 5;
+
 #field{
 	width: (2 * $grid-border-size + $grid-size) * $field-width;
 	height: (2 * $grid-border-size + $grid-size) * $field-width;
@@ -34,4 +38,35 @@ $grid-border-size: 1px;
 
 #direct{
 	margin: 1em 0;
+	#win {
+		margin: 1em 0;
+		font-family: 'Microsoft YaHei';
+	
+		.line{
+			font-size: $line-size;
+			line-height: $line-size;
+			height: $line-num * $line-size;
+		}
+
+		
+		#serial{
+			@extend .line;
+			text-align: right;
+			float: left;
+			overflow: hidden;
+			background-color: grey;
+			color: white;
+		}
+		textarea{
+			@extend .line;
+			padding: 0;
+			outline: none;
+			border: none;
+			color: green;
+			background-color: black;
+			resize: none;
+			display: block;
+			float: left;
+		}
+	}
 }
