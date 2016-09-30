@@ -28,9 +28,29 @@ var box = {
 
 	exec: function(direct){
 		var parts = direct.toLowerCase().split(' ');
-		var meth = '_' + parts.join('_');
+
+		var parse = this._parse(parts);
+
+		var meth = parse.meth;
+		var param = parse.param;
+
 		console.log(meth);
-		this[meth]();
+		this[meth](param);
+	},
+
+	_parse: function(parts){
+		var ins = parts[0];
+		if(/^(go|tra|mov)/.test(ins)){
+			return {
+				meth: '_' + parts.slice(0, parts.length - 1).join('_'), 
+				param: parseInt(parts[parts.length - 1])
+			};
+		}
+		else if(/^tur/.test(ins)){
+			return {
+				meth: '_' + parts.join('_')
+			}
+		}
 	},
 	
 	_fix: function(){
@@ -49,10 +69,12 @@ var box = {
 		this._y = (ty >= 0 && ty < fieldHeight) ? ty : this._y;
 	},
 
-	_go: function(){
+	//The following are instruction execution functions.
+
+	_go: function(dist){
 		//compute new coordinates
-		var tx = this._x + 1 * Math.sin(this._deg * Math.PI / 180);
-		var ty = this._y - 1 * Math.cos(this._deg * Math.PI / 180);
+		var tx = this._x + dist * Math.sin(this._deg * Math.PI / 180);
+		var ty = this._y - dist * Math.cos(this._deg * Math.PI / 180);
 
 		this._set(tx, ty);
 		this._fix();
@@ -73,48 +95,48 @@ var box = {
 		this._fixAngle();
 	},
 
-	_tra_lef: function(){
-		var tx = this._x - 1;
+	_tra_lef: function(dist){
+		var tx = this._x - dist;
 		this._set(tx, this._y);
 		this._fix();
 	},
 
-	_tra_rig: function(){
-		var tx = this._x + 1;
+	_tra_rig: function(dist){
+		var tx = this._x + dist;
 		this._set(tx, this._y);
 		this._fix();
 	},
 
-	_tra_top: function(){
-		var ty = this._y - 1;
+	_tra_top: function(dist){
+		var ty = this._y - dist;
 		this._set(this._x, ty);
 		this._fix();
 	},
 
-	_tra_bot: function(){
-		var ty = this._y + 1;
+	_tra_bot: function(dist){
+		var ty = this._y + dist;
 		this._set(this._x, ty);
 		this._fix();
 	},
 
-	_mov_lef: function(){
+	_mov_lef: function(dist){
 		this._curr.style.transform = 'rotate(' + (this._deg = -90) + 'deg)';
-		this._go();
+		this._go(dist);
 	},
 
-	_mov_rig: function(){
+	_mov_rig: function(dist){
 		this._curr.style.transform = 'rotate(' + (this._deg = 90) + 'deg)';
-		this._go();
+		this._go(dist);
 	},
 
-	_mov_top: function(){
+	_mov_top: function(dist){
 		this._curr.style.transform = 'rotate(' + (this._deg = 0) + 'deg)';
-		this._go();
+		this._go(dist);
 	},
 
-	_mov_bot: function(){
+	_mov_bot: function(dist){
 		this._curr.style.transform = 'rotate(' + (this._deg = 180) + 'deg)';
-		this._go();
+		this._go(dist);
 	}
 };
 
@@ -122,28 +144,39 @@ var serialFn = (function(){
 	var serial = $('#serial');
 	var num = 0;
 
+	var pre = '';
+	var incre = 0;
+
 	function add(){
 		var t = $$('div');
 		t.innerHTML = (num++) + '.';
 		serial.appendChild(t);
 	}
 
-	function validate(){
-		//TODO
-	};
+	function del(){
+		serial.removeChild(serial.lastChild);
+	}
 
 	add();
 
 	return function(e){
 		var target = e.target;
 		var code = e.keyCode;
+
+		var val = target.value;
+		pre = val;
+
 		if(code === 13){
 			add();
 			serial.scrollTop = target.scrollTop;
-			validate();
 		}
 		else if(code === 8){
-			
+			var cursor = target.selectionStart;
+			var incre = pre.substring(cursor - 1, cursor);
+			if(incre === '\n'){
+				num--;
+				del();
+			}
 		}
 	};
 
@@ -159,6 +192,58 @@ var scrollFn = (function(){
 	};
 })();
 
+var runFn = (function(){
+	var textWin = $('#win textarea');
+	
+	return function(e){
+		e.target.disabled = 'disabled';
+		var val =  textWin.value;
+		var dirs = val.split('\n');
+
+		//TODO instructions validation
+
+		var i = 0;
+		var t = -1;
+
+		function run(){
+			if(i >= dirs.length){
+				e.target.disabled = ''
+				clearInterval(t);
+				return;
+			}
+			var curr = dirs[i++];
+			box.exec(curr);
+		}
+
+		setInterval(run, 600);
+		/*
+		for(var i = 0; i < dirs.length; i++){
+			var currDir = dirs[i].trim();
+			
+		}*/
+	};
+})();
+
+/*
+GO
+GO
+GO
+GO
+TUR RIG
+GO
+GO
+GO
+TUR RIG
+MOV LEF
+MOV LEF
+TUR RIG
+GO
+GO
+TUR BAC
+MOV RIG
+MOV RIG
+*/
+
 function fieldRender(){
 	var fieldArea = fieldWidth * fieldHeight;
 	var gridTemplate = "<div class='grid'></div>";
@@ -169,17 +254,15 @@ function fieldRender(){
 	}
 	field.innerHTML = fieldHTML;
 
-	var direct = $('#direct input[type="text"]');
-	var button = $('#direct input[type="button"]');
+	var runBtn = $('#run');
+	var refreshBtn = $('#refresh');
 
-	addHandler(button, 'click', function(e){
-		var dirs = direct.value.trim();
-		box.exec(dirs);
-	});
-
-	addHandler($('#win'), 'keyup', serialFn);
+	addHandler(runBtn, 'click', runFn);
+	addHandler($('#win'), 'keydown', serialFn);
 	addHandler($('#win textarea'), 'scroll', scrollFn);
 }
 
 fieldRender();
 box.born();
+
+console.log('123'.substring(3));
