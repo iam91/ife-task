@@ -10,11 +10,19 @@ var fieldWidth = 10;
 var fieldHeight = 10;
 var boxSize = 52;
 
+function timerFn(fn, that){
+	
+	return function (){
+
+	}
+}
+
 var box = {
 	_x: 0,
 	_y: 9,
 	_deg: 0,
 	_curr: null,
+	_interval: 500,
 
 	born: function(){
 		var init = $$('div');
@@ -26,16 +34,30 @@ var box = {
 		this._fix();
 	},
 
-	exec: function(direct){
-		var parts = direct.toLowerCase().split(' ');
+	exec: function(directs, runBtn){
+		var execQ = [];
 
-		var parse = this._parse(parts);
+		for(var i = 0; i < directs.length; i++){
+			var direct = directs[i];
+			var parts = direct.toLowerCase().split(' ');
+			var parse = this._parse(parts);
+			var meth = parse.meth;
+			var param = parse.param;
+			this[meth](execQ, param);
+		}
 
-		var meth = parse.meth;
-		var param = parse.param;
-
-		console.log(meth);
-		this[meth](param);
+		var j = 0;
+		var t = -1;
+		var that = this;
+		t = setInterval(function(){
+			if(j < execQ.length){
+				execQ[j++].call(that);
+			}
+			else{
+				clearInterval(t);
+				runBtn.disabled = '';
+			}
+		}, this._interval);
 	},
 
 	_parse: function(parts){
@@ -69,74 +91,139 @@ var box = {
 		this._y = (ty >= 0 && ty < fieldHeight) ? ty : this._y;
 	},
 
-	//The following are instruction execution functions.
-
-	_go: function(dist){
+	//The following are micor-instructions
+	_micro_forward: function(){
 		//compute new coordinates
-		var tx = this._x + dist * Math.sin(this._deg * Math.PI / 180);
-		var ty = this._y - dist * Math.cos(this._deg * Math.PI / 180);
-
+		var tx = this._x + Math.sin(this._deg * Math.PI / 180);
+		var ty = this._y - Math.cos(this._deg * Math.PI / 180);
 		this._set(tx, ty);
 		this._fix();
 	},
 
-	_tur_lef: function(){
+	_micro_set_lef: function(){
+		this._curr.style.transform = 'rotate(' + (this._deg = -90) + 'deg)';
+	},
+
+	_micro_set_rig: function(){
+		this._curr.style.transform = 'rotate(' + (this._deg = 90) + 'deg)';
+	},
+
+	_micro_set_top: function(){
+		this._curr.style.transform = 'rotate(' + (this._deg = 0) + 'deg)';
+	},
+
+	_micro_set_bot: function(){
+		this._curr.style.transform = 'rotate(' + (this._deg = 180) + 'deg)';
+	},
+
+	_micro_tur_lef: function(){
 		this._curr.style.transform = 'rotate(' + (this._deg -= 90) + 'deg)';
 		this._fixAngle();
 	},
-	
-	_tur_rig: function(){
+
+	_micro_tur_rig: function(){
 		this._curr.style.transform = 'rotate(' + (this._deg += 90) + 'deg)';
 		this._fixAngle();
 	},
-	
-	_tur_bac: function(){
+
+	_micro_tur_bac: function(){
 		this._curr.style.transform = 'rotate(' + (this._deg += 180) + 'deg)';
 		this._fixAngle();
 	},
 
-	_tra_lef: function(dist){
-		var tx = this._x - dist;
-		this._set(tx, this._y);
+	_micro_tra_lef: function(){
+		this._micro_tra(-1, 0);
+	},
+
+	_micro_tra_rig: function(){
+		this._micro_tra(1, 0);
+	},
+
+	_micro_tra_top: function(){
+		this._micro_tra(0, 1);
+	},
+
+	_micro_tra_bot: function(){
+		this._micro_tra(0, -1);
+	},
+
+	_micro_tra: function(aimX, aimY){
+		var tx = this._x + aimX;
+		var ty = this._y + aimY
+		this._set(tx, ty);
 		this._fix();
 	},
 
-	_tra_rig: function(dist){
-		var tx = this._x + dist;
-		this._set(tx, this._y);
-		this._fix();
+	//The following are instruction execution functions.
+
+	_go: function(execQ, dist){
+		while((dist--) > 0){
+			execQ.push(this._micro_forward);
+		}
 	},
 
-	_tra_top: function(dist){
-		var ty = this._y - dist;
-		this._set(this._x, ty);
-		this._fix();
+	_tur_lef: function(execQ){
+		execQ.push(this._micro_tur_lef);
+	},
+	
+	_tur_rig: function(execQ){
+		execQ.push(this._micro_tur_rig);
+	},
+	
+	_tur_bac: function(execQ){
+		execQ.push(this._micro_tur_bac);
 	},
 
-	_tra_bot: function(dist){
-		var ty = this._y + dist;
-		this._set(this._x, ty);
-		this._fix();
+	_tra_lef: function(execQ, dist){
+		while((dist--) > 0){
+			execQ.push(this._micro_tra_lef);
+		}
 	},
 
-	_mov_lef: function(dist){
-		this._curr.style.transform = 'rotate(' + (this._deg = -90) + 'deg)';
-		this._go(dist);
+	_tra_rig: function(execQ, dist){
+		while((dist--) > 0){
+			execQ.push(this._micro_tra_rig);
+		}
 	},
 
-	_mov_rig: function(dist){
-		this._curr.style.transform = 'rotate(' + (this._deg = 90) + 'deg)';
-		this._go(dist);
+	_tra_top: function(execQ, dist){
+		while((dist--) > 0){
+			execQ.push(this._micro_tra_top);
+		}
 	},
 
-	_mov_top: function(dist){
-		this._curr.style.transform = 'rotate(' + (this._deg = 0) + 'deg)';
-		this._go(dist);
+	_tra_bot: function(execQ, dist){
+		while((dist--) > 0){
+			execQ.push(this._micro_tra_bot);
+		}
 	},
 
-	_mov_bot: function(dist){
-		this._curr.style.transform = 'rotate(' + (this._deg = 180) + 'deg)';
-		this._go(dist);
+	_mov_lef: function(execQ, dist){
+		execQ.push(this._micro_set_lef);
+		while((dist--) > 0){
+			execQ.push(this._micro_forward);
+		}
+	},
+
+	_mov_rig: function(execQ, dist){
+		execQ.push(this._micro_set_rig);
+		while((dist--) > 0){
+			execQ.push(this._micro_forward);
+		}
+	},
+
+	_mov_top: function(execQ, dist){
+		execQ.push(this._micro_set_top);
+		while((dist--) > 0){
+			execQ.push(this._micro_forward);
+		}
+	},
+
+	_mov_bot: function(execQ, dist){
+		execQ.push(this._micro_set_bot);
+		while((dist--) > 0){
+			execQ.push(this._micro_forward);
+		}
 	}
 };
 
@@ -199,28 +286,15 @@ var runFn = (function(){
 		e.target.disabled = 'disabled';
 		var val =  textWin.value;
 		var dirs = val.split('\n');
-
 		//TODO instructions validation
+		box.exec(dirs, e.target);
+	};
+})();
 
-		var i = 0;
-		var t = -1;
-
-		function run(){
-			if(i >= dirs.length){
-				e.target.disabled = ''
-				clearInterval(t);
-				return;
-			}
-			var curr = dirs[i++];
-			box.exec(curr);
-		}
-
-		setInterval(run, 600);
-		/*
-		for(var i = 0; i < dirs.length; i++){
-			var currDir = dirs[i].trim();
-			
-		}*/
+var refreshFn = (function(){
+	var textWin = $('#win textarea');
+	return function(e){
+		textWin.value = '';
 	};
 })();
 
@@ -242,6 +316,13 @@ GO
 TUR BAC
 MOV RIG
 MOV RIG
+
+go 3
+mov rig 3
+tra lef 2
+tur bac
+tra rig 4
+mov top 4
 */
 
 function fieldRender(){
