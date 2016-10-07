@@ -10,19 +10,13 @@ var fieldWidth = 10;
 var fieldHeight = 10;
 var boxSize = 52;
 
-function timerFn(fn, that){
-	
-	return function (){
-
-	}
-}
-
 var box = {
 	_x: 0,
 	_y: 9,
 	_deg: 0,
 	_curr: null,
 	_interval: 500,
+	isRunning: false,
 
 	born: function(){
 		var init = $$('div');
@@ -34,8 +28,10 @@ var box = {
 		this._fix();
 	},
 
-	exec: function(directs, runBtn){
+	exec: function(directs){
 		var execQ = [];
+		var illegFlag = false;
+		var illegIns = [];
 
 		for(var i = 0; i < directs.length; i++){
 			var direct = directs[i];
@@ -43,21 +39,36 @@ var box = {
 			var parse = this._parse(parts);
 			var meth = parse.meth;
 			var param = parse.param;
-			this[meth](execQ, param);
+			if(this[meth]){
+				if(!illegFlag){
+					this[meth](execQ, param);
+				}
+			}
+			else{
+				illegIns.push(i);
+				illegFlag = true;
+			}
+		}
+
+		if(illegFlag){
+			return illegIns;
 		}
 
 		var j = 0;
 		var t = -1;
 		var that = this;
+		this.isRunning = true;
 		t = setInterval(function(){
 			if(j < execQ.length){
 				execQ[j++].call(that);
 			}
 			else{
 				clearInterval(t);
-				runBtn.disabled = '';
+				that.isRunning = false;
 			}
 		}, this._interval);
+
+		return illegIns;
 	},
 
 	_parse: function(parts){
@@ -71,7 +82,12 @@ var box = {
 		else if(/^tur/.test(ins)){
 			return {
 				meth: '_' + parts.join('_')
-			}
+			};
+		}
+		else{
+			return {
+				meth: '_'
+			};
 		}
 	},
 	
@@ -140,11 +156,11 @@ var box = {
 	},
 
 	_micro_tra_top: function(){
-		this._micro_tra(0, 1);
+		this._micro_tra(0, -1);
 	},
 
 	_micro_tra_bot: function(){
-		this._micro_tra(0, -1);
+		this._micro_tra(0, 1);
 	},
 
 	_micro_tra: function(aimX, aimY){
@@ -281,13 +297,28 @@ var scrollFn = (function(){
 
 var runFn = (function(){
 	var textWin = $('#win textarea');
+	var serial = $('#serial');
 	
 	return function(e){
-		e.target.disabled = 'disabled';
+		var target = e.target;
+
+		for(var i = 0; i < serial.children.length; i++){
+			serial.children[i].classList.remove('warn');
+		}
+
+		if(box.isRunning){
+			console.warn('Box is running.');
+			return;
+		}
 		var val =  textWin.value;
 		var dirs = val.split('\n');
 		//TODO instructions validation
-		box.exec(dirs, e.target);
+		var illegQ = box.exec(dirs, target);
+		if(illegQ.length > 0){
+			for(var i = 0; i < illegQ.length; i++){
+				serial.children[illegQ[i]].classList.add('warn');
+			}
+		}
 	};
 })();
 
@@ -338,12 +369,11 @@ function fieldRender(){
 	var runBtn = $('#run');
 	var refreshBtn = $('#refresh');
 
-	addHandler(runBtn, 'click', runFn);
+	addHandler($('#run'), 'click', runFn);
+	addHandler($('#refresh'), 'click', refreshFn);
 	addHandler($('#win'), 'keydown', serialFn);
 	addHandler($('#win textarea'), 'scroll', scrollFn);
 }
 
 fieldRender();
 box.born();
-
-console.log('123'.substring(3));

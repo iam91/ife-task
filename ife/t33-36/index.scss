@@ -56,6 +56,10 @@ $line-num: 5;
 			overflow: hidden;
 			background-color: grey;
 			color: white;
+
+			.warn{
+				background-color: red;
+			}
 		}
 		textarea{
 			@extend .line;
