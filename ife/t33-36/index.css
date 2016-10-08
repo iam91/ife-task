@@ -23,7 +23,7 @@
   #direct #win {
     margin: 1em 0;
     font-family: 'Microsoft YaHei'; }
-    #direct #win .line, #direct #win #serial, #direct #win textarea {
+    #direct #win .line, #direct #win #serial, #direct #win textarea, #direct #win .ztext .serial, .ztext #direct #win .serial, #direct #win .ztext .win, .ztext #direct #win .win {
       font-size: 16px;
       line-height: 16px;
       height: 80px; }
@@ -44,5 +44,30 @@
       resize: none;
       display: block;
       float: left; }
+
+.ztext {
+  margin: 1em 0;
+  font-family: 'Microsoft YaHei'; }
+  .ztext .line, .ztext #direct #win #serial, #direct #win .ztext #serial, .ztext #direct #win textarea, #direct #win .ztext textarea, .ztext .serial, .ztext .win {
+    font-size: 16px;
+    line-height: 16px;
+    height: 80px; }
+  .ztext .serial {
+    text-align: right;
+    float: left;
+    overflow: hidden;
+    background-color: grey;
+    color: white; }
+    .ztext .serial .warn {
+      background-color: red; }
+  .ztext .win {
+    width: 10em;
+    padding: 0;
+    outline: none;
+    border: none;
+    color: green;
+    background-color: black;
+    float: left;
+    overflow: auto; }
 
 /*# sourceMappingURL=index.css.map */
