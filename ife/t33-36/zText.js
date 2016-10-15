@@ -208,7 +208,6 @@
 			anc.innerHTML = anc.innerHTML.substring(0, sel.anchorOffset)
 				+ (focus.nodeName === 'DIV' ?'':foc.innerHTML.substring(sel.focusOffset));
 			this._win.removeChild(foc);
-			sel.removeAllRanges();
 		}
 	};
 
