@@ -46,9 +46,10 @@
 
 		this._addLine();
 
-		addHandler(this._base, 'keydown', this._handlerWrapper(this._newLineHandler));
 		addHandler(this._base, 'keydown', this._handlerWrapper(this._backspaceHandler));
+		addHandler(this._base, 'keydown', this._handlerWrapper(this._newLineHandler));
 		addHandler(this._win, 'scroll', this._handlerWrapper(this._scrollHandler));
+		addHandler(this._win, 'paste', this._handlerWrapper(this._pasteHandler));
 	};
 
 	ZText.prototype._handlerWrapper = function(handler){
@@ -56,6 +57,18 @@
 		return function(e){
 			handler.call(_this, e);
 		};
+	};
+
+	ZText.prototype._countLines = function(str){
+		return str.split('\n').length - 1;
+	};
+
+	ZText.prototype._pasteHandler = function(e){
+		var data = e.clipboardData.getData('text/plain');
+		var lineCnt = this._countLines(data);
+		while(lineCnt-- > 0){
+			this._addLine();
+		}
 	};
 
 	ZText.prototype._scrollHandler = function(e){
@@ -75,12 +88,14 @@
 		var code = e.keyCode;
 
 		if(code === 8){
-			this._pre = target.innerText;
-			var cursor = target.selectionStart;
-			var incre = this._pre.substring(cursor - 1, cursor);
-			console.log(cursor);
-			if(incre === '\n'){
-				this._num--;
+			var sel = window.getSelection();
+			var selAnchor = sel.anchorOffset;
+
+			var lineCnt = this._countLines(sel.toString());
+			while(lineCnt-- > 0){
+				this._removeLine();
+			}
+			if(selAnchor === 0 && this._num > 1){
 				this._removeLine();
 			}
 		}
@@ -94,6 +109,7 @@
 
 	ZText.prototype._removeLine = function(){
 		this._serial.removeChild(this._serial.lastChild);
+		this._num--;
 	};
 
 	window.ZText = ZText;

@@ -14,7 +14,7 @@
     .ztext .ztext-serial .warn {
       background-color: red; }
   .ztext .ztext-win {
-    width: 10em;
+    min-width: 10em;
     padding: 0;
     outline: none;
     border: none;
