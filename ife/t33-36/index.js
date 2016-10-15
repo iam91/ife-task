@@ -4,7 +4,7 @@ var $ = function(query){
 var $$ = function(elem){
 	return document.createElement(elem);
 };
-
+/*
 var field = $('#field');
 var fieldWidth = 10;
 var fieldHeight = 10;
@@ -242,59 +242,7 @@ var box = {
 		}
 	}
 };
-/*
-var serialFn = (function(){
-	var serial = $('#serial');
-	var num = 0;
 
-	var pre = '';
-	var incre = 0;
-
-	function add(){
-		var t = $$('div');
-		t.innerHTML = (num++) + '.';
-		serial.appendChild(t);
-	}
-
-	function del(){
-		serial.removeChild(serial.lastChild);
-	}
-
-	add();
-
-	return function(e){
-		var target = e.target;
-		var code = e.keyCode;
-
-		var val = target.value;
-		pre = val;
-
-		if(code === 13){
-			add();
-			serial.scrollTop = target.scrollTop;
-		}
-		else if(code === 8){
-			var cursor = target.selectionStart;
-			var incre = pre.substring(cursor - 1, cursor);
-			if(incre === '\n'){
-				num--;
-				del();
-			}
-		}
-	};
-
-})();
-
-var scrollFn = (function(){
-	var serial = $('#serial');
-	var textWin = $('#win textarea');
-
-	return function(e){
-		var scrollTop = textWin.scrollTop;
-		serial.scrollTop = scrollTop;
-	};
-})();
-*/
 var runFn = (function(){
 	var textWin = $('#win textarea');
 	var serial = $('#serial');
@@ -355,7 +303,7 @@ tur bac
 tra rig 4
 mov top 4
 */
-
+/*
 function fieldRender(){
 	var fieldArea = fieldWidth * fieldHeight;
 	var gridTemplate = "<div class='grid'></div>";
@@ -364,22 +312,16 @@ function fieldRender(){
 	for(var i = 0; i < fieldArea; i++){
 		fieldHTML += gridTemplate;
 	}
-	field.innerHTML = fieldHTML;
+	//field.innerHTML = fieldHTML;
 
 	var runBtn = $('#run');
 	var refreshBtn = $('#refresh');
 
 	addHandler($('#run'), 'click', runFn);
 	addHandler($('#refresh'), 'click', refreshFn);
-	//addHandler($('#win'), 'keydown', serialFn);
-	//addHandler($('#win textarea'), 'scroll', scrollFn);
-}
+}*/
 
-fieldRender();
-box.born();
-
-var a = document.querySelectorAll('.a')[0];
-var b1 = document.querySelectorAll('.b');
-var b2 = a.querySelectorAll('.a .b');
-console.log(b1);
-console.log(b2);
+//fieldRender();
+//box.born();
+console.log($('.t'));
+$('.t').innerHTML = '</div><div></div><div>';

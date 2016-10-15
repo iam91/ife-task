@@ -21,6 +21,7 @@
     color: green;
     background-color: black;
     float: left;
-    overflow: auto; }
+    overflow: auto;
+    white-space: pre; }
 
 /*# sourceMappingURL=ztext.css.map */
