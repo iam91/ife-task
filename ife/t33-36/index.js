@@ -242,7 +242,7 @@ var box = {
 		}
 	}
 };
-
+/*
 var serialFn = (function(){
 	var serial = $('#serial');
 	var num = 0;
@@ -294,7 +294,7 @@ var scrollFn = (function(){
 		serial.scrollTop = scrollTop;
 	};
 })();
-
+*/
 var runFn = (function(){
 	var textWin = $('#win textarea');
 	var serial = $('#serial');
@@ -371,9 +371,15 @@ function fieldRender(){
 
 	addHandler($('#run'), 'click', runFn);
 	addHandler($('#refresh'), 'click', refreshFn);
-	addHandler($('#win'), 'keydown', serialFn);
-	addHandler($('#win textarea'), 'scroll', scrollFn);
+	//addHandler($('#win'), 'keydown', serialFn);
+	//addHandler($('#win textarea'), 'scroll', scrollFn);
 }
 
 fieldRender();
 box.born();
+
+var a = document.querySelectorAll('.a')[0];
+var b1 = document.querySelectorAll('.b');
+var b2 = a.querySelectorAll('.a .b');
+console.log(b1);
+console.log(b2);
