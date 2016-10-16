@@ -323,5 +323,3 @@ function fieldRender(){
 
 //fieldRender();
 //box.born();
-console.log($('.t'));
-$('.t').innerHTML = '</div><div></div><div>';
