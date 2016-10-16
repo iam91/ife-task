@@ -11,7 +11,7 @@
 	};
 	
 	/**
-	 * Create DOM element
+	 * Create DOM elementd
 	 */
 	var $e = function(elem){
 		return document.createElement(elem);
@@ -25,15 +25,10 @@
 	};
 
 	/**
-	 * Reset cursor according to index of an anchor
+	 * Connect
 	 */
-	var _ = function(sel, anchor, index){
-		var r = document.createRange();
-		r.setStart(anchor, index);
-		r.collapse(true);
-		sel.removeAllRanges();
-		sel.addRange(r);
-		return sel;
+	var connect = function(a, b){
+
 	};
 
 	/**
@@ -60,16 +55,56 @@
 		this._pre = '';
 	};
 
-	ZText.prototype._initSerial = function(){};
+	ZText.prototype._isEmptyLine = function(line){
+		return line.indexOf('\b') == 0;
+	};
+
+	ZText.prototype._getLineNode = function(node){
+		return this._isEmptyLine(node) ? node: node.parentNode;
+	};
+
+	ZText.prototype._setCaret = function(anchor, index){
+		var r = document.createRange();
+		r.setStart(anchor, index);
+		r.collapse(true);
+		var sel = getSelection();
+		sel.removeAllRanges();
+		sel.addRange(r);
+		r.detach();
+		r = null;
+		sel = null;
+	};
+
+	ZText.prototype._collapse = function(){
+		var sel = getSelection();
+		if(sel.isCollapsed){return;}
+		var anchor = sel.anchorNode;
+		var offset = sel.anchorOffset;
+		sel.deleteFromDocument();
+
+		var r = document.createRange();
+		r.setStart(anchor, offset);
+		r.collapse(true);
+		sel.removeAllRanges();
+		sel.addRange(r);
+		r.detach();
+		r = null;
+		sel = null;
+	};
 
 	ZText.prototype.init = function(){
 		this._base.innerHTML = "<div class='ztext-serial'></div>" 
-			+ "<div class='ztext-win' contenteditable='true'></div>";
+			+ "<div class='ztext-win' contenteditable='true'><div><br></div></div>";
 
 		this._serial = $(this._base, '.ztext-serial');
 		this._win = $(this._base, '.ztext-win');
 
 		this._addLine();
+		//initialize editable area with an empty line
+		var initLine = $(this._win, 'div');
+		//little trick: add a text node before <br>
+		initLine.insertBefore($t('\b'), initLine.firstChild);
+		this._setCaret(initLine.firstChild, 1);
 
 		addHandler(this._base, 'keydown', this._handlerWrapper(this._backspaceHandler));
 		addHandler(this._base, 'keydown', this._handlerWrapper(this._newLineHandler));
@@ -86,7 +121,6 @@
 	};
 
 	ZText.prototype._pasteHandler = function(e){
-		console.log('oops');
 		e.preventDefault();
 		var data = e.clipboardData.getData('text/plain');
 		
@@ -104,16 +138,38 @@
 		}
 
 		var anchor = sel.anchorNode;
-		if(anchor === this._win){
-			
+		var parAnchor = anchor.nodeName === 'DIV'?anchor:anchor.parentNode;
+		if(anchor.nodeName === '#text'){
+			var oldText = parAnchor.innerHTML;
+			var lNode = $e('div');
+			var rNode = $e('div');
+			lNode.innerHTML = oldText.substring(0, offset);
+			rNode.innerHTML = oldText.substring(offset);
+			this._win.insertBefore(lNode, parAnchor);
+			this._win.insertBefore(rNode, parAnchor);
+
+			sel = _(sel, rNode.firstChild);
+
+			this._win.removeChild(parAnchor);
 		}
-		else if(anchor.nodeName === 'DIV'){
-			
+		/*
+		var anchor = sel.anchorNode;
+		var focus = sel.focusNode;
+		var parAnchor = anchor.nodeName === 'DIV'?anchor:anchor.parentNode;
+		var parFocus = focus.nodeName === 'DIV'?focus:focus.parentNode;
+		parFocus = parFocus === this._win?null:parFocus;
+
+
+		for(var i = newLines.length - 1, curr = parFocus; i >= 0; i--){
+			this._win.insertBefore(newLines[i], curr);
+			curr = newLines[i];
 		}
+
+		
 
 		while(lineCnt-- > 0){
 			this._addLine();
-		}
+		}*/
 	};
 
 	ZText.prototype._scrollHandler = function(e){
@@ -138,30 +194,12 @@
 			|| (code >= 189 && code <= 192)
 			|| (code >= 219 && code <= 221)){
 			e.preventDefault();
+			//this._collapse();
 			var sel = getSelection();
-
-			sel = this._multiLineCollapse(sel);
-
 			var anchor = sel.anchorNode;
-			if(anchor === this._win){
-				this._win.innerHTML = '<div>' + key + '</div>';
-				sel = _(sel, this._win.firstChild.firstChild, 1);
-			}
-			else{
-				if(anchor.nodeName === 'DIV'){
-					var anc = anchor;
-					var preInner = anc.innerHTML;
-					preInner = preInner.substring(preInner.indexOf('<br>') + 4);
-				}
-				else{
-					var anc = anchor.parentNode;
-					var preInner = anc.innerHTML;
-				}
-				preInner += key;
-				var index = preInner.length;
-				anc.innerHTML = preInner;
-				sel = _(sel, anc.firstChild, index);
-			}
+			var offset = sel.anchorOffset;
+			anchor.insertData(offset, key)
+			this._setCaret(anchor, offset + key.length);
 		}
 	};
 
@@ -171,47 +209,23 @@
 		if(code === 13){
 			//when enter pressed, different browsers execute differently.
 			e.preventDefault();
+			//_.collapse();
 			var sel = getSelection();
-
-			sel = this._multiLineCollapse(sel);
-
 			var anchor = sel.anchorNode;
-			if(anchor === this._win){
-				this._win.innerHTML = '<div><br></div><div><br></div>';
-				sel = _(sel, this._win.lastChild.lastChild);
-			}
-			else{
-				if(anchor.nodeName === 'DIV'){
-					var newLine = $e('div');
-					newLine.innerHTML = '<br>';
-					this._win.insertBefore(newLine, anchor);
-					sel = _(sel, this._win.lastChild.lastChild);
-				}
-				else if(anchor.nodeName === '#text'){
-					var parAnchor = anchor.parentNode;
-					var offset = sel.anchorOffset;
-					var oldText = parAnchor.innerHTML;
+			var parAnchor = anchor.parentNode;
+			var offset = sel.anchorOffset;
 
-					if(oldText.length == offset){
-						var newLine = $e('div');
-						newLine.innerHTML = '<br>';
-						this._win.appendChild(newLine);
-						sel = _(sel, this._win.lastChild.lastChild);
-					}
-					else{
-						var lNode = $e('div');
-						var rNode = $e('div');
-						lNode.innerHTML = oldText.substring(0, offset);
-						rNode.innerHTML = oldText.substring(offset);
-						this._win.insertBefore(lNode, parAnchor);
-						this._win.insertBefore(rNode, parAnchor);
+			anchor.splitText(offset);
 
-						sel = _(sel, rNode.firstChild, 0);
-
-						this._win.removeChild(parAnchor);
-					}
-				}
-			}
+			var rText =  parAnchor.firstChild.nextSibling;
+			rText.insertData(0, '\b');
+			parAnchor.removeChild(rText);
+			var newline = $e('div');
+			var newBr = $e('br');
+			newline.appendChild(rText);
+			newline.appendChild(newBr);
+			this._win.insertBefore(newline, parAnchor.nextSibling);
+			this._setCaret(rText, 1);
 			
 			this._addLine();
 		}
@@ -223,35 +237,23 @@
 
 		if(code === 8){
 			e.preventDefault();
+			//this._collapse();
 			var sel = getSelection();
-			if(!sel.isCollapsed){
-				sel = this._multiLineCollapse(sel);
-			}
-			else{
+			if(sel.isCollapsed){
 				var anchor = sel.anchorNode;
-				if(anchor.nodeName === 'DIV'){
-					if(anchor === this._win || anchor === this._win.firstChild){
-						return;
-					}
-					else{
-						if(anchor.nextSibling.nodeName === 'DIV'){
-							var next = anchor.nextSibling;
-						}
-						else if(anchor.nextSibling.nodeName === '#text'){
-							var next = anchor.nextSibling.firstChild;
-						}
-						sel = _(sel, next, 0);
-						this._win.removeChild(anchor);
-						this._removeLine();
-					}
+				var offset = sel.anchorOffset;
+				console.log(offset);
+				if(offset == 1){
+					if(anchor.parentNode.previousSibling)
+					var preText = anchor.parentNode.previousSibling.firstChild;
+					var preOff = preText.data.length;
+					preText.insertData(preOff, anchor.data.substring(1));
+					this._win.removeChild(anchor.parentNode);
+					this._removeLine();
+					this._setCaret(preText, preOff);
 				}
-				else if(anchor.nodeName === '#text'){
-					var parAnchor = anchor.parentNode;
-					var preInner = parAnchor.innerHTML;
-					var off = sel.anchorOffset;
-					parAnchor.innerHTML = preInner.substring(0, off - 1) + preInner.substring(off);
-					parAnchor.innerHTML = parAnchor.innerHTML === ''?'<br>':parAnchor.innerHTML;
-					sel = _(sel, anchor, off - 1);
+				else{
+					anchor.deleteData(offset - 1, 1);
 				}
 			}
 		}

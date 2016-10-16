@@ -323,3 +323,18 @@ function fieldRender(){
 
 //fieldRender();
 //box.born();
+
+var textWin = document.querySelector('.win');
+var div = textWin.firstChild;
+var br = div.firstChild;
+var text = document.createTextNode('');
+div.insertBefore(text, br);
+
+var r = document.createRange();
+r.setStart(text, 0);
+r.collapse(true);
+var sel = getSelection();
+sel.removeAllRanges();
+sel.addRange(r);
+//console.log(r);
+//console.log(sel);
