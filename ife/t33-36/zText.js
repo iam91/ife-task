@@ -62,23 +62,31 @@
 
 	ZText.prototype._collapse = function(){
 		var sel = getSelection();
+		if(sel.isCollapsed){return;}
+
 		var anchor = sel.anchorNode;
 		var anchorOffset = sel.anchorOffset;
 		var focus = sel.focusNode;
-		var focusOffset = sel.anchorOffset;
-		if(sel.isCollapsed){return;}
+		var focusOffset = sel.focusOffset;
+
+		var curr = anchor.parentNode;
+		while(curr != focus.parentNode){
+			this._removeLine();
+			curr = curr.nextSibling;
+		}
+
 		sel.deleteFromDocument();
 
-		focus.insertData(0, anchor.data);
-		this._win.removeChild(anchor.parentNode);
+		if(anchor !== focus){
+			anchor.insertData(anchorOffset, focus.data);
+			this._win.removeChild(focus.parentNode);
+		}
 		
 		var r = document.createRange();
-		r.setStart(focus, anchorOffset);
+		r.setStart(anchor, anchorOffset);
 		r.collapse(true);
-		console.log(r);
 		sel.removeAllRanges();
 		sel.addRange(r);
-		console.log(sel);
 		r.detach();
 		r = null;
 		sel = null;
@@ -119,49 +127,23 @@
 		var lines = data.split('\n');//todo: add newline for different system
 		var lineCnt = lines.length;
 
+		this._collapse();
+		this._splitLine();
+
 		var sel = getSelection();
-		sel = this._multiLineCollapse(sel);
 
 		var newLines = [];
 		for(var i = 0; i < lineCnt; i++){
 			var ne = $e('div');
-			ne.innerHTML = lines[i] === ''?'<br>':lines[i];
+			var br = $e('br');
+			var t = $t('\b' + lines[i]);
+			ne.appendChild(t);
+			ne.appendChild(br);
 			newLines.push(ne);
 		}
 
-		var anchor = sel.anchorNode;
-		var parAnchor = anchor.nodeName === 'DIV'?anchor:anchor.parentNode;
-		if(anchor.nodeName === '#text'){
-			var oldText = parAnchor.innerHTML;
-			var lNode = $e('div');
-			var rNode = $e('div');
-			lNode.innerHTML = oldText.substring(0, offset);
-			rNode.innerHTML = oldText.substring(offset);
-			this._win.insertBefore(lNode, parAnchor);
-			this._win.insertBefore(rNode, parAnchor);
-
-			sel = _(sel, rNode.firstChild);
-
-			this._win.removeChild(parAnchor);
-		}
-		/*
-		var anchor = sel.anchorNode;
-		var focus = sel.focusNode;
-		var parAnchor = anchor.nodeName === 'DIV'?anchor:anchor.parentNode;
-		var parFocus = focus.nodeName === 'DIV'?focus:focus.parentNode;
-		parFocus = parFocus === this._win?null:parFocus;
-
-
-		for(var i = newLines.length - 1, curr = parFocus; i >= 0; i--){
-			this._win.insertBefore(newLines[i], curr);
-			curr = newLines[i];
-		}
-
-		
-
-		while(lineCnt-- > 0){
-			this._addLine();
-		}*/
+		var rText = sel.anchor;
+		var lText = sel.anchor.parentNode.previousSibling;
 	};
 
 	ZText.prototype._scrollHandler = function(e){
@@ -195,6 +177,27 @@
 		}
 	};
 
+	ZText.prototype._splitLine = function(){
+		var sel = getSelection();
+		var anchor = sel.anchorNode;
+		var parAnchor = anchor.parentNode;
+		var offset = sel.anchorOffset;
+
+		anchor.splitText(offset);
+
+		var rText =  parAnchor.firstChild.nextSibling;
+		rText.insertData(0, '\b');
+		parAnchor.removeChild(rText);
+		var newline = $e('div');
+		var newBr = $e('br');
+		newline.appendChild(rText);
+		newline.appendChild(newBr);
+		this._win.insertBefore(newline, parAnchor.nextSibling);
+		this._setCaret(rText, 1);
+		
+		this._addLine();
+	};
+
 	ZText.prototype._newLineHandler = function(e){
 		var target = e.target;
 		var code = e.keyCode;
@@ -202,24 +205,7 @@
 			//when enter pressed, different browsers execute differently.
 			e.preventDefault();
 			this._collapse();
-			var sel = getSelection();
-			var anchor = sel.anchorNode;
-			var parAnchor = anchor.parentNode;
-			var offset = sel.anchorOffset;
-
-			anchor.splitText(offset);
-
-			var rText =  parAnchor.firstChild.nextSibling;
-			rText.insertData(0, '\b');
-			parAnchor.removeChild(rText);
-			var newline = $e('div');
-			var newBr = $e('br');
-			newline.appendChild(rText);
-			newline.appendChild(newBr);
-			this._win.insertBefore(newline, parAnchor.nextSibling);
-			this._setCaret(rText, 1);
-			
-			this._addLine();
+			this._splitLine();
 		}
 	};
 
@@ -229,12 +215,10 @@
 
 		if(code === 8){
 			e.preventDefault();
-			this._collapse();
 			var sel = getSelection();
 			if(sel.isCollapsed){
 				var anchor = sel.anchorNode;
 				var offset = sel.anchorOffset;
-				console.log(offset);
 				if(offset == 1){
 					if(anchor.parentNode.previousSibling)
 					var preText = anchor.parentNode.previousSibling.firstChild;
@@ -247,6 +231,9 @@
 				else{
 					anchor.deleteData(offset - 1, 1);
 				}
+			}
+			else{
+				this._collapse();
 			}
 		}
 	};
