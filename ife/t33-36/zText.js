@@ -123,14 +123,11 @@
 	ZText.prototype._pasteHandler = function(e){
 		e.preventDefault();
 		var data = e.clipboardData.getData('text/plain');
+
+		if(data === ''){return;}
 		
 		var lines = data.split('\n');//todo: add newline for different system
 		var lineCnt = lines.length;
-
-		this._collapse();
-		this._splitLine();
-
-		var sel = getSelection();
 
 		var newLines = [];
 		for(var i = 0; i < lineCnt; i++){
@@ -142,8 +139,28 @@
 			newLines.push(ne);
 		}
 
-		var rText = sel.anchor;
-		var lText = sel.anchor.parentNode.previousSibling;
+		this._collapse();
+
+		var sel = getSelection();
+		var anchor = sel.anchorNode;
+		var parAnchor = anchor.parentNode;
+		var anchorOffset = sel.anchorOffset;
+
+		var firstNew = newLines[0].firstChild;
+		var lastNew = newLines[lineCnt - 1].firstChild;
+
+		//concate
+		firstNew.insertData(1, anchor.data.substring(1, anchorOffset));
+		lastNew.insertData(lastNew.data.length, anchor.data.substring(anchorOffset));
+
+		var frag = document.createDocumentFragment();
+		for(var i = 0; i < lineCnt; i++){
+			frag.appendChild(newLines[i]);
+			this._addLine();
+		}
+		this._win.insertBefore(frag, parAnchor);
+		this._win.removeChild(parAnchor);
+		this._removeLine();
 	};
 
 	ZText.prototype._scrollHandler = function(e){
@@ -177,27 +194,6 @@
 		}
 	};
 
-	ZText.prototype._splitLine = function(){
-		var sel = getSelection();
-		var anchor = sel.anchorNode;
-		var parAnchor = anchor.parentNode;
-		var offset = sel.anchorOffset;
-
-		anchor.splitText(offset);
-
-		var rText =  parAnchor.firstChild.nextSibling;
-		rText.insertData(0, '\b');
-		parAnchor.removeChild(rText);
-		var newline = $e('div');
-		var newBr = $e('br');
-		newline.appendChild(rText);
-		newline.appendChild(newBr);
-		this._win.insertBefore(newline, parAnchor.nextSibling);
-		this._setCaret(rText, 1);
-		
-		this._addLine();
-	};
-
 	ZText.prototype._newLineHandler = function(e){
 		var target = e.target;
 		var code = e.keyCode;
@@ -205,7 +201,25 @@
 			//when enter pressed, different browsers execute differently.
 			e.preventDefault();
 			this._collapse();
-			this._splitLine();
+
+			var sel = getSelection();
+			var anchor = sel.anchorNode;
+			var parAnchor = anchor.parentNode;
+			var offset = sel.anchorOffset;
+
+			anchor.splitText(offset);
+
+			var rText =  parAnchor.firstChild.nextSibling;
+			rText.insertData(0, '\b');
+			parAnchor.removeChild(rText);
+			var newline = $e('div');
+			var newBr = $e('br');
+			newline.appendChild(rText);
+			newline.appendChild(newBr);
+			this._win.insertBefore(newline, parAnchor.nextSibling);
+			this._setCaret(rText, 1);
+			
+			this._addLine();
 		}
 	};
 
