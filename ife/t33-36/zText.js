@@ -1,9 +1,4 @@
-//处理多行被选中
-//paste事件
-//setStart当#text长度为0的问题
-//Range #text和其他的区别
-//Selection中返回的Node的类型
-
+//TODO add shortcut handle
 ;(function(window, document){
 
 	var $ = function(root, query){
@@ -45,7 +40,6 @@
 		this._win = null;
 
 		this._num = 0;
-		this._pre = '';
 	};
 
 	ZText.prototype._setCaret = function(anchor, index){
@@ -94,23 +88,69 @@
 
 	ZText.prototype.init = function(){
 		this._base.innerHTML = "<div class='ztext-serial'></div>" 
-			+ "<div class='ztext-win' contenteditable='true'><div><br></div></div>";
+			+ "<div class='ztext-win' contenteditable='true'></div>";
 
 		this._serial = $(this._base, '.ztext-serial');
 		this._win = $(this._base, '.ztext-win');
-
-		this._addLine();
-		//initialize editable area with an empty line
-		var initLine = $(this._win, 'div');
-		//little trick: add a text node before <br>
-		initLine.insertBefore($t('\b'), initLine.firstChild);
-		this._setCaret(initLine.firstChild, 1);
+		this._initLine();
 
 		addHandler(this._base, 'keydown', this._handlerWrapper(this._backspaceHandler));
 		addHandler(this._base, 'keydown', this._handlerWrapper(this._newLineHandler));
 		addHandler(this._base, 'keydown', this._handlerWrapper(this._normalKeyHandler));
 		addHandler(this._win, 'scroll', this._handlerWrapper(this._scrollHandler));
 		addHandler(this._win, 'paste', this._handlerWrapper(this._pasteHandler));
+	};
+
+	ZText.prototype.clear = function(){
+		this._win.innerHTML = '';
+		this._serial.innerHTML = '';
+		this._num = 0;
+		this._initLine();
+	};
+
+	ZText.prototype.lineValidate = function(validateFn){
+		this._win.contentEditable = 'false';
+		var lineCnt = this._win.childNodes.length;
+		var flag = true;
+		for(var i = 0; i < lineCnt; i++){
+			var lineWrapper = this._win.childNodes[i];
+			var line = lineWrapper.firstChild;
+			if(line.data.length > 1){
+				this._serial.childNodes[i].classList.remove('warn');
+				if(!validateFn(line.data.substring(1))){
+					flag = false;
+					this._serial.childNodes[i].classList.add('warn');
+				}
+			}
+		}
+		this._win.contentEditable = 'true';
+		return flag;
+	};
+
+	ZText.prototype.valueInLine = function(){
+		this._win.contentEditable = 'false';
+		var lineCnt = this._win.childNodes.length;
+		var ret = [];
+		for(var i = 0; i < lineCnt; i++){
+			var lineWrapper = this._win.childNodes[i];
+			var line = lineWrapper.firstChild;
+			//ignore empty line
+			if(line.data.length > 1){
+				ret.push(line.data.substring(1));
+			}
+		}
+		this._win.contentEditable = 'true';
+		return ret;
+	};
+
+	ZText.prototype._initLine = function(){
+		this._win.innerHTML = '<div><br></div>';
+		//initialize editable area with an empty line
+		var initLine = $(this._win, 'div');
+		//little trick: add a text node before <br>
+		initLine.insertBefore($t('\b'), initLine.firstChild);
+		this._setCaret(initLine.firstChild, 1);
+		this._addLine();
 	};
 
 	ZText.prototype._handlerWrapper = function(handler){
@@ -174,6 +214,7 @@
 
 		if(e.ctrlKey && code == 86){
 			//ctrl+v shortcut
+			//TODO add shortcut handle
 			return;
 		}
 
@@ -234,13 +275,14 @@
 				var anchor = sel.anchorNode;
 				var offset = sel.anchorOffset;
 				if(offset == 1){
-					if(anchor.parentNode.previousSibling)
-					var preText = anchor.parentNode.previousSibling.firstChild;
-					var preOff = preText.data.length;
-					preText.insertData(preOff, anchor.data.substring(1));
-					this._win.removeChild(anchor.parentNode);
-					this._removeLine();
-					this._setCaret(preText, preOff);
+					if(anchor.parentNode.previousSibling){
+						var preText = anchor.parentNode.previousSibling.firstChild;
+						var preOff = preText.data.length;
+						preText.insertData(preOff, anchor.data.substring(1));
+						this._win.removeChild(anchor.parentNode);
+						this._removeLine();
+						this._setCaret(preText, preOff);
+					}
 				}
 				else{
 					anchor.deleteData(offset - 1, 1);
@@ -265,19 +307,3 @@
 
 	window.ZText = ZText;
 })(window, document);
-
-
-window.onload = function(e){
-
-	var $ = function(query){
-		return document.querySelectorAll(query);
-	};
-	
-	var $$ = function(elem){
-		return document.createElement(elem);
-	};
-
-	var t = $('.ztext');
-	var zt = new ZText(t[0]);
-	zt.init();
-};
