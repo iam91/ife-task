@@ -25,13 +25,6 @@
 	};
 
 	/**
-	 * Connect
-	 */
-	var connect = function(a, b){
-
-	};
-
-	/**
 	 * Add event handler
 	 */
 	function addHandler(elem, type, handler){
@@ -55,14 +48,6 @@
 		this._pre = '';
 	};
 
-	ZText.prototype._isEmptyLine = function(line){
-		return line.indexOf('\b') == 0;
-	};
-
-	ZText.prototype._getLineNode = function(node){
-		return this._isEmptyLine(node) ? node: node.parentNode;
-	};
-
 	ZText.prototype._setCaret = function(anchor, index){
 		var r = document.createRange();
 		r.setStart(anchor, index);
@@ -77,16 +62,23 @@
 
 	ZText.prototype._collapse = function(){
 		var sel = getSelection();
-		if(sel.isCollapsed){return;}
 		var anchor = sel.anchorNode;
-		var offset = sel.anchorOffset;
+		var anchorOffset = sel.anchorOffset;
+		var focus = sel.focusNode;
+		var focusOffset = sel.anchorOffset;
+		if(sel.isCollapsed){return;}
 		sel.deleteFromDocument();
 
+		focus.insertData(0, anchor.data);
+		this._win.removeChild(anchor.parentNode);
+		
 		var r = document.createRange();
-		r.setStart(anchor, offset);
+		r.setStart(focus, anchorOffset);
 		r.collapse(true);
+		console.log(r);
 		sel.removeAllRanges();
 		sel.addRange(r);
+		console.log(sel);
 		r.detach();
 		r = null;
 		sel = null;
@@ -194,7 +186,7 @@
 			|| (code >= 189 && code <= 192)
 			|| (code >= 219 && code <= 221)){
 			e.preventDefault();
-			//this._collapse();
+			this._collapse();
 			var sel = getSelection();
 			var anchor = sel.anchorNode;
 			var offset = sel.anchorOffset;
@@ -209,7 +201,7 @@
 		if(code === 13){
 			//when enter pressed, different browsers execute differently.
 			e.preventDefault();
-			//_.collapse();
+			this._collapse();
 			var sel = getSelection();
 			var anchor = sel.anchorNode;
 			var parAnchor = anchor.parentNode;
@@ -237,7 +229,7 @@
 
 		if(code === 8){
 			e.preventDefault();
-			//this._collapse();
+			this._collapse();
 			var sel = getSelection();
 			if(sel.isCollapsed){
 				var anchor = sel.anchorNode;
@@ -268,52 +260,6 @@
 	ZText.prototype._removeLine = function(){
 		this._serial.removeChild(this._serial.lastChild);
 		this._num--;
-	};
-
-	/**
-	 * Remove contents of a selection if its not collapsed
-	 */
-	ZText.prototype._multiLineCollapse = function(sel){
-		if(sel.isCollapsed){
-			return sel;
-		}
-
-		var anchor = sel.anchorNode;
-		var focus = sel.focusNode;
-
-		var anc = anchor.nodeName === 'DIV'?anchor:anchor.parentNode;
-		var foc = focus.nodeName === 'DIV'?focus:focus.parentNode;
-
-		var preOffset = sel.anchorOffset;
-
-		//remove lines between anchor and focus if anchor !== focus
-		if(anc !== foc){
-			var curr = anc.nextSibling;
-			while(curr && curr !== foc){
-				var next = curr.nextSibling;
-				this._win.removeChild(curr);
-				this._removeLine();
-				curr = next;
-			}
-		}
-
-
-		//collapse anchor and focus
-		anc.innerHTML = anc.innerHTML.substring(0, sel.anchorOffset)
-			+ (focus.nodeName === 'DIV' ?'':foc.innerHTML.substring(sel.focusOffset));
-		anc.innerHTML = anc.innerHTML === ''?'<br>':anc.innerHTML;
-		if(anc !== foc){
-			this._win.removeChild(foc);
-			this._removeLine();
-		}
-	
-		
-		var r = document.createRange();
-		r.setStart(anc.firstChild, preOffset);
-		r.collapse(true);
-		sel.removeAllRanges();
-		sel.addRange(r);
-		return sel;
 	};
 
 	window.ZText = ZText;
