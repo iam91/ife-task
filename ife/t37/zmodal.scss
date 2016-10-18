@@ -1,7 +1,7 @@
 $mask-color: black;
 $content-color: white;
-$content-width: 60%;
-$content-height: 60%;
+$content-width: 30%;
+$content-height: 30%;
 
 div.z-modal{
 	position: fixed;
@@ -12,19 +12,24 @@ div.z-modal{
 	background-color: $mask-color;
 	opacity: 0.5;
 	visibility: hidden;
+	div.init{
+		
+	}
 	div.z-modal-content{
-		position: absolute;
 		top: 0;
 		bottom: 0;
 		left: 0;
 		right: 0;
 		margin: auto;
+
+		position: absolute;
 		padding: 10px;
 		border-radius: 5px;
 		max-width: $content-width;
 		height: $content-height;
 		background-color: $content-color;
 		overflow: auto;
+		cursor: move;
 	}
 }
 div.z-modal-show{

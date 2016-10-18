@@ -8,18 +8,19 @@ div.z-modal {
   opacity: 0.5;
   visibility: hidden; }
   div.z-modal div.z-modal-content {
-    position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
     margin: auto;
+    position: absolute;
     padding: 10px;
     border-radius: 5px;
-    max-width: 60%;
-    height: 60%;
+    max-width: 30%;
+    height: 30%;
     background-color: white;
-    overflow: auto; }
+    overflow: auto;
+    cursor: move; }
 
 div.z-modal-show {
   visibility: visible; }
