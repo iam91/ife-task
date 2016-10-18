@@ -1,9 +1,4 @@
-//处理多行被选中
-//paste事件
-//setStart当#text长度为0的问题
-//Range #text和其他的区别
-//Selection中返回的Node的类型
-
+//TODO add shortcut handle
 ;(function(window, document){
 
 	var $ = function(root, query){
@@ -45,14 +40,13 @@
 		this._win = null;
 
 		this._num = 0;
-		this._pre = '';
 	};
 
 	ZText.prototype._setCaret = function(anchor, index){
 		var r = document.createRange();
 		r.setStart(anchor, index);
 		r.collapse(true);
-		var sel = getSelection();
+		var sel = window.getSelection();
 		sel.removeAllRanges();
 		sel.addRange(r);
 		r.detach();
@@ -61,24 +55,32 @@
 	};
 
 	ZText.prototype._collapse = function(){
-		var sel = getSelection();
+		var sel = window.getSelection();
+		if(sel.isCollapsed){return;}
+
 		var anchor = sel.anchorNode;
 		var anchorOffset = sel.anchorOffset;
 		var focus = sel.focusNode;
-		var focusOffset = sel.anchorOffset;
-		if(sel.isCollapsed){return;}
+		var focusOffset = sel.focusOffset;
+
+		var curr = anchor.parentNode;
+		while(curr != focus.parentNode){
+			this._removeLine();
+			curr = curr.nextSibling;
+		}
+
 		sel.deleteFromDocument();
 
-		focus.insertData(0, anchor.data);
-		this._win.removeChild(anchor.parentNode);
+		if(anchor !== focus){
+			anchor.insertData(anchorOffset, focus.data);
+			this._win.removeChild(focus.parentNode);
+		}
 		
 		var r = document.createRange();
-		r.setStart(focus, anchorOffset);
+		r.setStart(anchor, anchorOffset);
 		r.collapse(true);
-		console.log(r);
 		sel.removeAllRanges();
 		sel.addRange(r);
-		console.log(sel);
 		r.detach();
 		r = null;
 		sel = null;
@@ -86,23 +88,69 @@
 
 	ZText.prototype.init = function(){
 		this._base.innerHTML = "<div class='ztext-serial'></div>" 
-			+ "<div class='ztext-win' contenteditable='true'><div><br></div></div>";
+			+ "<div class='ztext-win' contenteditable='true'></div>";
 
 		this._serial = $(this._base, '.ztext-serial');
 		this._win = $(this._base, '.ztext-win');
-
-		this._addLine();
-		//initialize editable area with an empty line
-		var initLine = $(this._win, 'div');
-		//little trick: add a text node before <br>
-		initLine.insertBefore($t('\b'), initLine.firstChild);
-		this._setCaret(initLine.firstChild, 1);
+		this._initLine();
 
 		addHandler(this._base, 'keydown', this._handlerWrapper(this._backspaceHandler));
 		addHandler(this._base, 'keydown', this._handlerWrapper(this._newLineHandler));
 		addHandler(this._base, 'keydown', this._handlerWrapper(this._normalKeyHandler));
 		addHandler(this._win, 'scroll', this._handlerWrapper(this._scrollHandler));
 		addHandler(this._win, 'paste', this._handlerWrapper(this._pasteHandler));
+	};
+
+	ZText.prototype.clear = function(){
+		this._win.innerHTML = '';
+		this._serial.innerHTML = '';
+		this._num = 0;
+		this._initLine();
+	};
+
+	ZText.prototype.lineValidate = function(validateFn){
+		this._win.contentEditable = 'false';
+		var lineCnt = this._win.childNodes.length;
+		var flag = true;
+		for(var i = 0; i < lineCnt; i++){
+			var lineWrapper = this._win.childNodes[i];
+			var line = lineWrapper.firstChild;
+			if(line.data.length > 1){
+				this._serial.childNodes[i].classList.remove('warn');
+				if(!validateFn(line.data.substring(1))){
+					flag = false;
+					this._serial.childNodes[i].classList.add('warn');
+				}
+			}
+		}
+		this._win.contentEditable = 'true';
+		return flag;
+	};
+
+	ZText.prototype.valueInLine = function(){
+		this._win.contentEditable = 'false';
+		var lineCnt = this._win.childNodes.length;
+		var ret = [];
+		for(var i = 0; i < lineCnt; i++){
+			var lineWrapper = this._win.childNodes[i];
+			var line = lineWrapper.firstChild;
+			//ignore empty line
+			if(line.data.length > 1){
+				ret.push(line.data.substring(1));
+			}
+		}
+		this._win.contentEditable = 'true';
+		return ret;
+	};
+
+	ZText.prototype._initLine = function(){
+		this._win.innerHTML = '<div><br></div>';
+		//initialize editable area with an empty line
+		var initLine = $(this._win, 'div');
+		//little trick: add a text node before <br>
+		initLine.insertBefore($t('\b'), initLine.firstChild);
+		this._setCaret(initLine.firstChild, 1);
+		this._addLine();
 	};
 
 	ZText.prototype._handlerWrapper = function(handler){
@@ -115,53 +163,44 @@
 	ZText.prototype._pasteHandler = function(e){
 		e.preventDefault();
 		var data = e.clipboardData.getData('text/plain');
+
+		if(data === ''){return;}
 		
 		var lines = data.split('\n');//todo: add newline for different system
 		var lineCnt = lines.length;
 
-		var sel = getSelection();
-		sel = this._multiLineCollapse(sel);
-
 		var newLines = [];
 		for(var i = 0; i < lineCnt; i++){
 			var ne = $e('div');
-			ne.innerHTML = lines[i] === ''?'<br>':lines[i];
+			var br = $e('br');
+			var t = $t('\b' + lines[i]);
+			ne.appendChild(t);
+			ne.appendChild(br);
 			newLines.push(ne);
 		}
 
+		this._collapse();
+
+		var sel = window.getSelection();
 		var anchor = sel.anchorNode;
-		var parAnchor = anchor.nodeName === 'DIV'?anchor:anchor.parentNode;
-		if(anchor.nodeName === '#text'){
-			var oldText = parAnchor.innerHTML;
-			var lNode = $e('div');
-			var rNode = $e('div');
-			lNode.innerHTML = oldText.substring(0, offset);
-			rNode.innerHTML = oldText.substring(offset);
-			this._win.insertBefore(lNode, parAnchor);
-			this._win.insertBefore(rNode, parAnchor);
+		var parAnchor = anchor.parentNode;
+		var anchorOffset = sel.anchorOffset;
 
-			sel = _(sel, rNode.firstChild);
+		var firstNew = newLines[0].firstChild;
+		var lastNew = newLines[lineCnt - 1].firstChild;
 
-			this._win.removeChild(parAnchor);
-		}
-		/*
-		var anchor = sel.anchorNode;
-		var focus = sel.focusNode;
-		var parAnchor = anchor.nodeName === 'DIV'?anchor:anchor.parentNode;
-		var parFocus = focus.nodeName === 'DIV'?focus:focus.parentNode;
-		parFocus = parFocus === this._win?null:parFocus;
+		//concate
+		firstNew.insertData(1, anchor.data.substring(1, anchorOffset));
+		lastNew.insertData(lastNew.data.length, anchor.data.substring(anchorOffset));
 
-
-		for(var i = newLines.length - 1, curr = parFocus; i >= 0; i--){
-			this._win.insertBefore(newLines[i], curr);
-			curr = newLines[i];
-		}
-
-		
-
-		while(lineCnt-- > 0){
+		var frag = document.createDocumentFragment();
+		for(var i = 0; i < lineCnt; i++){
+			frag.appendChild(newLines[i]);
 			this._addLine();
-		}*/
+		}
+		this._win.insertBefore(frag, parAnchor);
+		this._win.removeChild(parAnchor);
+		this._removeLine();
 	};
 
 	ZText.prototype._scrollHandler = function(e){
@@ -175,6 +214,7 @@
 
 		if(e.ctrlKey && code == 86){
 			//ctrl+v shortcut
+			//TODO add shortcut handle
 			return;
 		}
 
@@ -187,7 +227,7 @@
 			|| (code >= 219 && code <= 221)){
 			e.preventDefault();
 			this._collapse();
-			var sel = getSelection();
+			var sel = window.getSelection();
 			var anchor = sel.anchorNode;
 			var offset = sel.anchorOffset;
 			anchor.insertData(offset, key)
@@ -202,7 +242,8 @@
 			//when enter pressed, different browsers execute differently.
 			e.preventDefault();
 			this._collapse();
-			var sel = getSelection();
+
+			var sel = window.getSelection();
 			var anchor = sel.anchorNode;
 			var parAnchor = anchor.parentNode;
 			var offset = sel.anchorOffset;
@@ -229,24 +270,26 @@
 
 		if(code === 8){
 			e.preventDefault();
-			this._collapse();
-			var sel = getSelection();
+			var sel = window.getSelection();
 			if(sel.isCollapsed){
 				var anchor = sel.anchorNode;
 				var offset = sel.anchorOffset;
-				console.log(offset);
 				if(offset == 1){
-					if(anchor.parentNode.previousSibling)
-					var preText = anchor.parentNode.previousSibling.firstChild;
-					var preOff = preText.data.length;
-					preText.insertData(preOff, anchor.data.substring(1));
-					this._win.removeChild(anchor.parentNode);
-					this._removeLine();
-					this._setCaret(preText, preOff);
+					if(anchor.parentNode.previousSibling){
+						var preText = anchor.parentNode.previousSibling.firstChild;
+						var preOff = preText.data.length;
+						preText.insertData(preOff, anchor.data.substring(1));
+						this._win.removeChild(anchor.parentNode);
+						this._removeLine();
+						this._setCaret(preText, preOff);
+					}
 				}
 				else{
 					anchor.deleteData(offset - 1, 1);
 				}
+			}
+			else{
+				this._collapse();
 			}
 		}
 	};
@@ -264,19 +307,3 @@
 
 	window.ZText = ZText;
 })(window, document);
-
-
-window.onload = function(e){
-
-	var $ = function(query){
-		return document.querySelectorAll(query);
-	};
-	
-	var $$ = function(elem){
-		return document.createElement(elem);
-	};
-
-	var t = $('.ztext');
-	var zt = new ZText(t[0]);
-	zt.init();
-};
