@@ -7,20 +7,18 @@ div.z-modal {
   visibility: hidden !important;
   background-color: black;
   opacity: 0.5 !important; }
-  div.z-modal div.z-m-c-fixed {
-    top: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    margin: auto !important; }
   div.z-modal div.z-modal-content {
     position: absolute !important;
     padding: 10px;
     border-radius: 5px;
-    max-width: 30%;
+    width: 30%;
     height: 30%;
     background-color: white;
     overflow: auto; }
+  div.z-modal div.z-m-c-fixed {
+    top: 50% !important;
+    left: 50% !important;
+    margin: -5% 0 0 -15% !important; }
 
 div.z-modal-show {
   visibility: visible !important; }

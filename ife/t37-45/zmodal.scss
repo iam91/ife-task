@@ -13,21 +13,21 @@ div.z-modal{
 
 	background-color: $mask-color;
 	opacity: 0.5 !important;
-	div.z-m-c-fixed{
-		top: 0 !important;
-		bottom: 0 !important;
-		left: 0 !important;
-		right: 0 !important;
-		margin: auto !important;
-	}
 	div.z-modal-content{
 		position: absolute !important;
 		padding: 10px;
 		border-radius: 5px;
-		max-width: $content-width;
+		width: $content-width;
 		height: $content-height;
 		background-color: $content-color;
 		overflow: auto;
+	}
+	div.z-m-c-fixed{
+		top: 50% !important;
+		//bottom: 0 !important;
+		left: 50% !important;
+		//right: 0 !important;
+		margin: -5% 0 0 (-$content-width / 2) !important;
 	}
 }
 div.z-modal-show{
