@@ -44,6 +44,7 @@
 
 	ZModal.prototype._init = function(){
 		this._content = this._base.querySelector('.z-modal-content');
+		this._content.classList.add('z-m-c-fixed');
 		addHandler(this._base, 'click', this._randomClickHandler = this._handlerWrapper(this._randomClick));
 		addHandler(this._content, 'mousedown', this._dragStartHandler = this._handlerWrapper(this._dragStart));
 		addHandler(this._content, 'mouseup', this._dragStopHandler = this._handlerWrapper(this._dragStop));
@@ -57,7 +58,11 @@
 	ZModal.prototype._dragStart = function(e){
 		this._content.style.left = this._content.offsetLeft + 'px';
 		this._content.style.top = this._content.offsetTop + 'px';
+		this._content.style.right = '0';
+		this._content.style.bottom = '0';
 		this._content.style.margin = '0';
+		//.z-m-c-fixed must be moved after reading offsetLeft and offsetTop
+		this._content.classList.remove('z-m-c-fixed');
 		this._innerOffsetX = e.pageX - this._content.offsetLeft;
 		this._innerOffsetY = e.pageY - this._content.offsetTop;
 		addHandler(this._content, 'mousemove', this._dragHandler = this._handlerWrapper(this._drag));
@@ -100,7 +105,7 @@
 		else{
 			return null;
 		}
-		return new ZModal(m);
+		return m ? new ZModal(m) : null;
 	}
 
 	window.zm = zm;

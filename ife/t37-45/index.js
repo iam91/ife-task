@@ -19,4 +19,33 @@ window.onload = function(e){
 	addHandler(s2, 'click', function(e){
 		m2.show();
 	});
+
+	var tableParams = {
+		cols: [
+			{index: 'name', title: '姓名'},
+			{index: 'chi', title:'语文', sortable: null},
+			{index: 'math', title: '数学', sortable: function(a, b){return b - a;}},
+			{index: 'eng', title: '英语', sortable: null},
+			{index: 'tot', title: '总分', sortable: null}
+		],
+		data: [
+			{name: '小明', chi: 80, math: 90, eng: 70, tot: 240},
+			{name: '小红', chi: 90, math: 70, eng: 100, tot: 260},
+			{name: '小亮', chi: 60, math: 80, eng: 80, tot: 220}
+		]
+	}
+
+	var t = zt('.z-table', tableParams);
+	console.log(t);
+
+	var s3 = $('#s3');
+	var s4 = $('#s4');
+
+	addHandler(s3, 'click', function(e){
+		t.sortCol('chi');
+	});
+
+	addHandler(s4, 'click', function(e){
+		t.sortCol('math');
+	});
 };
