@@ -46,7 +46,7 @@
 		var r = document.createRange();
 		r.setStart(anchor, index);
 		r.collapse(true);
-		var sel = getSelection();
+		var sel = window.getSelection();
 		sel.removeAllRanges();
 		sel.addRange(r);
 		r.detach();
@@ -55,7 +55,7 @@
 	};
 
 	ZText.prototype._collapse = function(){
-		var sel = getSelection();
+		var sel = window.getSelection();
 		if(sel.isCollapsed){return;}
 
 		var anchor = sel.anchorNode;
@@ -181,7 +181,7 @@
 
 		this._collapse();
 
-		var sel = getSelection();
+		var sel = window.getSelection();
 		var anchor = sel.anchorNode;
 		var parAnchor = anchor.parentNode;
 		var anchorOffset = sel.anchorOffset;
@@ -227,7 +227,7 @@
 			|| (code >= 219 && code <= 221)){
 			e.preventDefault();
 			this._collapse();
-			var sel = getSelection();
+			var sel = window.getSelection();
 			var anchor = sel.anchorNode;
 			var offset = sel.anchorOffset;
 			anchor.insertData(offset, key)
@@ -243,7 +243,7 @@
 			e.preventDefault();
 			this._collapse();
 
-			var sel = getSelection();
+			var sel = window.getSelection();
 			var anchor = sel.anchorNode;
 			var parAnchor = anchor.parentNode;
 			var offset = sel.anchorOffset;
@@ -270,7 +270,7 @@
 
 		if(code === 8){
 			e.preventDefault();
-			var sel = getSelection();
+			var sel = window.getSelection();
 			if(sel.isCollapsed){
 				var anchor = sel.anchorNode;
 				var offset = sel.anchorOffset;

@@ -1,3 +1,4 @@
+//TODO: instructions validation
 window.onload = function(){
 	var $ = function(query){
 		return document.querySelector(query);
