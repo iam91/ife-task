@@ -58,8 +58,6 @@
 	ZModal.prototype._dragStart = function(e){
 		this._content.style.left = this._content.offsetLeft + 'px';
 		this._content.style.top = this._content.offsetTop + 'px';
-		this._content.style.right = '0';
-		this._content.style.bottom = '0';
 		this._content.style.margin = '0';
 		//.z-m-c-fixed must be moved after reading offsetLeft and offsetTop
 		this._content.classList.remove('z-m-c-fixed');
@@ -75,6 +73,10 @@
 
 	ZModal.prototype._randomClick = function(e){
 		if(e.target === e.currentTarget){
+			this._content.style.left = '';
+			this._content.style.top = '';
+			this._content.style.margin = '';
+			this._content.classList.add('z-m-c-fixed');
 			this.hide();
 		}
 	};
