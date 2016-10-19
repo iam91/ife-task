@@ -23,10 +23,8 @@ div.z-modal{
 		overflow: auto;
 	}
 	div.z-m-c-fixed{
-		top: 0 !important;
-		bottom: 0 !important;
-		left: 50% !important;
-		margin: auto 0 auto (-$content-width/2) !important;
+		top: (100% - $content-height) / 2 !important;
+		left: (100% - $content-width) / 2 !important;
 	}
 }
 div.z-modal-show{

@@ -16,10 +16,9 @@ div.z-modal {
     background-color: white;
     overflow: auto; }
   div.z-modal div.z-m-c-fixed {
-    top: 0 !important;
-    bottom: 0 !important;
-    left: 50% !important;
-    margin: auto 0 auto -15% !important; }
+    top: 35% !important;
+    left: 35% !important;
+    right: 35% !important; }
 
 div.z-modal-show {
   visibility: visible !important; }
