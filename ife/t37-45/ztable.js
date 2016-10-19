@@ -59,6 +59,9 @@
 		this._loadData();
 	};
 
+	/**
+	 * @param {string} col - property name of that column in a data object
+	 */
 	ZTable.prototype._sortWrapper = function(sort, col){
 		return function(a, b){
 			return sort(a[col], b[col]);
@@ -92,6 +95,9 @@
 		this._tbody.appendChild(frag);
 	};
 
+	/**
+	 * @param {string} col - property name of that column in a data object
+	 */
 	ZTable.prototype.sortCol = function(col){
 		var sortFn = this._sortFn[col];
 		this._data.sort(sortFn);

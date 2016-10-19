@@ -5,8 +5,7 @@ div.z-modal {
   width: 100% !important;
   height: 100% !important;
   visibility: hidden !important;
-  background-color: black;
-  opacity: 0.5 !important; }
+  background-color: rgba(0, 0, 0, 0.5); }
   div.z-modal div.z-modal-content {
     position: absolute !important;
     padding: 10px;
@@ -17,8 +16,7 @@ div.z-modal {
     overflow: auto; }
   div.z-modal div.z-m-c-fixed {
     top: 35% !important;
-    left: 35% !important;
-    right: 35% !important; }
+    left: 35% !important; }
 
 div.z-modal-show {
   visibility: visible !important; }

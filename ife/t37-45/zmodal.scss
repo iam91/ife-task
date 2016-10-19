@@ -10,16 +10,14 @@ div.z-modal{
 	width: 100% !important;
 	height: 100% !important;
 	visibility: hidden !important;
-
-	background-color: $mask-color;
-	opacity: 0.5 !important;
+	background-color: rgba(0,0,0,0.5);
 	div.z-modal-content{
 		position: absolute !important;
 		padding: 10px;
 		border-radius: 5px;
 		width: $content-width;
 		height: $content-height;
-		background-color: $content-color;
+		background-color: rgba(255, 255, 255, 1);
 		overflow: auto;
 	}
 	div.z-m-c-fixed{
