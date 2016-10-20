@@ -9,8 +9,8 @@ window.onload = function(e){
 	var s1 = $('#s1');
 	var s2 = $('#s2');
 
-	console.log(m1);
-	console.log(m2);
+	//console.log(m1);
+	//console.log(m2);
 
 	addHandler(s1, 'click', function(e){
 		m1.show();
@@ -35,8 +35,11 @@ window.onload = function(e){
 		]
 	}
 
-	var t = zt('.z-table', tableParams);
-	console.log(t);
+	var ts = document.querySelectorAll('.z-table');
+	for(var i = 0; i < ts.length; i++){
+		var t = zt(ts[i], tableParams);
+		//console.log(t);
+	}
 
 	var s3 = $('#s3');
 	var s4 = $('#s4');

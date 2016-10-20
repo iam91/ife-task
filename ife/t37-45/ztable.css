@@ -1,34 +1,32 @@
 table.z-table {
-  padding: 0 1em; }
+  padding: 0 1em;
+  position: relative !important; }
+  table.z-table * {
+    background-color: white; }
   table.z-table td {
     padding: 0 1em;
     border: 1px solid black;
     font-size: 1.5em; }
-  table.z-table thead span {
-    line-height: 1em;
-    display: inline-block;
-    vertical-align: middle; }
-    table.z-table thead span.sort div {
-      width: 0;
-      height: 0;
-      padding: 0;
-      border-left: 0.3em;
-      border-right: 0.3em; }
-      table.z-table thead span.sort div.arrow-u {
-        margin: 0.15em 0 0.1em 0;
-        border-bottom: 0.3em;
-        border-top: 0;
-        border-style: solid;
-        border-color: transparent transparent black transparent; }
-        table.z-table thead span.sort div.arrow-u:hover {
-          border-color: transparent transparent grey transparent; }
-      table.z-table thead span.sort div.arrow-d {
-        margin: 0.1em 0 0.15em 0;
-        border-top: 0.3em;
-        border-bottom: 0;
-        border-style: solid;
-        border-color: black transparent transparent transparent; }
-        table.z-table thead span.sort div.arrow-d:hover {
-          border-color: grey transparent transparent transparent; }
+  table.z-table thead.z-table-head span {
+    line-height: 1em !important;
+    display: inline-block !important;
+    vertical-align: middle !important; }
+    table.z-table thead.z-table-head span.sort div {
+      width: 0 !important;
+      height: 0 !important;
+      padding: 0 !important;
+      border-left: 0.3em solid !important;
+      border-right: 0.3em solid !important;
+      border-color: transparent !important; }
+      table.z-table thead.z-table-head span.sort div.arrow-u {
+        margin: 0.15em 0 0.1em 0 !important;
+        border-bottom: 0.3em solid black !important; }
+        table.z-table thead.z-table-head span.sort div.arrow-u:hover {
+          border-bottom-color: grey !important; }
+      table.z-table thead.z-table-head span.sort div.arrow-d {
+        margin: 0.1em 0 0.15em 0 !important;
+        border-top: 0.3em solid black !important; }
+        table.z-table thead.z-table-head span.sort div.arrow-d:hover {
+          border-top-color: grey !important; }
 
 /*# sourceMappingURL=ztable.css.map */

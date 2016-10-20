@@ -48,15 +48,52 @@
 		this._thead = $$('thead');
 		this._tbody = $$('tbody');
 
+		this._floathead = null;
+		this._floatStart = 0;
+
 		this._init();
 	}
 
 	ZTable.prototype._init = function(){
+		this._thead.classList.add('z-table-head');
 		this._base.appendChild(this._thead);
 		this._base.appendChild(this._tbody);
 
 		this._loadTitle();
 		this._loadData();
+
+		function f(e){/*
+			var y = (window.pageYOffset !== undefined) ? window.pageYOffset 
+				: (document.documentElement || document.body.parentNode || document.body).scrollTop;*/
+			var rec = this._base.getBoundingClientRect();
+			if(rec.top < 0){
+				if(!this._floathead){
+					this._floatStart = rec.top;
+					var h = this._thead.cloneNode(true);
+					h.classList.add('z-table-head');
+					this._base.appendChild(h);
+					h.style.position = 'fixed';
+					h.style.top = '0';
+					this._floathead = h;
+				}
+				else{
+					var displace = this._floatStart - rec.top;
+						console.log(displace + ',' + this._base.offsetHeight);
+					if(displace > (this._base.offsetHeight - this._thead.offsetHeight)){
+						this._floathead.style.visibility = 'hidden';
+					}
+					else{
+						this._floathead.style.visibility = 'visible';
+					}
+				}
+			}
+			else if(rec.top > 0 && this._floathead){
+				this._base.removeChild(this._floathead);
+				this._floathead = null;
+			}
+		}
+
+		addHandler(document, 'scroll', this._handlerWrapper(f));
 	};
 
 	/**
@@ -73,7 +110,6 @@
 		'<span class="sort"><div class="arrow-u"></div><div class="arrow-d"></div></span>';
 
 	ZTable.prototype._loadTitle = function(){
-
 		var frag = document.createDocumentFragment();
 
 		for(var i = 0; i < this._cols.length; i++){
@@ -81,16 +117,23 @@
 
 			var title = $$('td');
 
+			//if(col.index === 'name')
+				//console.log(col.sortable);
+
 			title.innerHTML = '<span>' + col.title + '</span>' 
 				+ (col.sortable !== undefined ? this._sortArrow : '');
 
 			var asc = title.querySelector('.arrow-u');
 			var des = title.querySelector('.arrow-d');
 
-			this._cols[i].sortable = col.sortable || sort, col.index;
+			/**
+			 * !!! Do not modify this._cols like this: `this._cols[i].sortable = col.sortable || sort;`,
+			 * since it refers to params.cols
+			 */
+			var sortFn = col.sortable || sort;
 			this._sortFn[col.index] = {};
-			this._sortFn[col.index]['asc'] = this._sortWrapper(this._cols[i].sortable, col.index, true);
-			this._sortFn[col.index]['des'] = this._sortWrapper(this._cols[i].sortable, col.index, false);
+			this._sortFn[col.index]['asc'] = this._sortWrapper(sortFn, col.index, true);
+			this._sortFn[col.index]['des'] = this._sortWrapper(sortFn, col.index, false);
 
 			if(asc){
 				addHandler(asc, 'click', this._getSortHandler(col.index, true));
@@ -102,6 +145,13 @@
 			frag.appendChild(title);
 		}
 		this._thead.appendChild(frag);
+	};
+
+	ZTable.prototype._handlerWrapper = function(handler){
+		var _this = this;
+		return function(e){
+			handler.call(_this, e);
+		};
 	};
 
 	ZTable.prototype._getSortHandler = function(col, asc){

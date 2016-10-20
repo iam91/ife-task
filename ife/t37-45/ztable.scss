@@ -1,43 +1,41 @@
 table.z-table{
 	padding: 0 1em;
+	position: relative !important;
+	*{
+		background-color: white;
+	} 
 	td{
 		padding: 0 1em;
 		border: 1px solid black;
 		font-size: 1.5em;
 	}
-	thead{
+	thead.z-table-head{
 		span{
-			line-height: 1em;
-			display: inline-block;
-			vertical-align: middle;
+			line-height: 1em !important;
+			display: inline-block !important;
+			vertical-align: middle !important;
 
 			&.sort{
 				div{
-					width: 0;
-					height: 0;
-					padding: 0;
-					border-left: 0.3em;
-					border-right: 0.3em;
-
+					width: 0 !important;
+					height: 0 !important;
+					padding: 0 !important;
+					border-left: 0.3em solid !important;
+					border-right: 0.3em solid !important;
+					border-color: transparent !important;
 					&.arrow-u{
-						margin: 0.15em 0 0.1em 0;
-						border-bottom: 0.3em;
-						border-top: 0;
-						border-style: solid;
-						border-color: transparent transparent black transparent;
+						margin: 0.15em 0 0.1em 0 !important;
+						border-bottom: 0.3em solid black !important;
 						&:hover{
-							border-color: transparent transparent grey transparent;
+							border-bottom-color: grey !important;
 						}
 					}
 
 					&.arrow-d{
-						margin: 0.1em 0 0.15em 0;
-						border-top: 0.3em;
-						border-bottom: 0;
-						border-style: solid;
-						border-color: black transparent transparent transparent;
+						margin: 0.1em 0 0.15em 0 !important;
+						border-top: 0.3em solid black !important;
 						&:hover{
-							border-color: grey transparent transparent transparent;
+							border-top-color: grey !important;
 						}
 					}
 				}
