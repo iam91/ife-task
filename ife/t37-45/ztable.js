@@ -48,11 +48,51 @@
 		this._thead = $$('thead');
 		this._tbody = $$('tbody');
 
-		this._floathead = null;
-		this._floatStart = 0;
+		this._floathead = {
+			dom: null,
+			_floatStart: 0,
+			_inTableDisplace: 0,
+			show: function(){
+				this.dom.style.visibility = 'visible';
+			},
+			hide: function(){
+				this.dom.style.visibility = 'hidden';
+			},
+			isInTable: function(top){
+				var displace = this._floatStart - top;
+				return displace < this._inTableDisplace;
+			}
+		};
 
 		this._init();
 	}
+
+	ZTable.prototype._createFloatHead = function(floatStart){
+		if(!this._floathead.dom){
+			var h = this._thead.cloneNode(true);
+			h.classList.add('z-table-head');
+			h.style.position = 'fixed';
+			h.style.top = '0';
+			this._base.appendChild(h);
+			this._floathead._floatStart = floatStart;
+			this._floathead.dom = h;
+			this._floathead._inTableDisplace = this._base.offsetHeight - this._thead.offsetHeight;
+		
+			for(var i = 0; i < this._thead.children.length; i++){
+				var title = h.children[i];
+				var colIndex = this._cols[i].index;
+				var asc = title.querySelector('.arrow-u');
+				var des = title.querySelector('.arrow-d');
+
+				if(asc){
+					addHandler(asc, 'click', this._getSortHandler(colIndex, true));
+				}
+				if(des){
+					addHandler(des, 'click', this._getSortHandler(colIndex, false));
+				}
+			}
+		}
+	};
 
 	ZTable.prototype._init = function(){
 		this._thead.classList.add('z-table-head');
@@ -62,38 +102,29 @@
 		this._loadTitle();
 		this._loadData();
 
-		function f(e){/*
-			var y = (window.pageYOffset !== undefined) ? window.pageYOffset 
-				: (document.documentElement || document.body.parentNode || document.body).scrollTop;*/
-			var rec = this._base.getBoundingClientRect();
-			if(rec.top < 0){
-				if(!this._floathead){
-					this._floatStart = rec.top;
-					var h = this._thead.cloneNode(true);
-					h.classList.add('z-table-head');
-					this._base.appendChild(h);
-					h.style.position = 'fixed';
-					h.style.top = '0';
-					this._floathead = h;
+		addHandler(document, 'scroll', this._handlerWrapper(this._floatHeadHandler));
+	};
+
+	ZTable.prototype._floatHeadHandler = function(e){
+		var rec = this._base.getBoundingClientRect();
+		if(rec.top < 0){
+			if(!this._floathead.dom){
+				this._createFloatHead(rec.top);
+			}
+			else{
+				if(this._floathead.isInTable(rec.top)){
+					this._floathead.show();
 				}
 				else{
-					var displace = this._floatStart - rec.top;
-						console.log(displace + ',' + this._base.offsetHeight);
-					if(displace > (this._base.offsetHeight - this._thead.offsetHeight)){
-						this._floathead.style.visibility = 'hidden';
-					}
-					else{
-						this._floathead.style.visibility = 'visible';
-					}
+					this._floathead.hide();
 				}
 			}
-			else if(rec.top > 0 && this._floathead){
-				this._base.removeChild(this._floathead);
-				this._floathead = null;
+		}
+		else{
+			if(this._floathead.dom){
+				this._floathead.hide();
 			}
 		}
-
-		addHandler(document, 'scroll', this._handlerWrapper(f));
 	};
 
 	/**
