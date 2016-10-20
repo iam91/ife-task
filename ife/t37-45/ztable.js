@@ -68,16 +68,32 @@
 		};
 	};
 
+	ZTable.prototype._sortArrow = 
+		'<span class="sort"><div class="arrow-u"></div><div class="arrow-d"></div></span>';
+
 	ZTable.prototype._loadTitle = function(){
-		var title = '';
+
+		var frag = document.createDocumentFragment();
+
 		for(var i = 0; i < this._cols.length; i++){
 			var col = this._cols[i];
-			var t = '<td>' + col.title + (col.sortable !== undefined ? 'a' : '') + '</td>';
+
+			var title = $$('td');
+
+			title.innerHTML = '<span>' + col.title + '</span>' 
+				+ (col.sortable !== undefined ? this._sortArrow : '');
+
+			var asc = title.querySelector('.arrow-u');
+			var des = title.querySelector('.arrow-d');
+
+			//bind sort event
+
 			this._cols[i].sortable = this._sortWrapper(col.sortable || sort, col.index);
 			this._sortFn[col.index] = this._cols[i].sortable;
-			title += t;
+
+			frag.appendChild(title);
 		}
-		this._thead.innerHTML = '<tr>' + title + '</tr>';
+		this._thead.appendChild(frag);
 	};
 
 	ZTable.prototype._loadData = function(){

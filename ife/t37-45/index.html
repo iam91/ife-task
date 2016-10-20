@@ -5,6 +5,38 @@
 		<meta charset='utf-8'>
 		<link rel="stylesheet" href="zmodal.css" type="text/css">
 		<link rel="stylesheet" href="ztable.css" type="text/css">
+		<style type="text/css">
+			table.t td{
+				padding: 0 1em;
+				border: 1px solid black;
+			}
+			table.t thead span{
+				line-height: 1em;
+				display: inline-block;
+				vertical-align: middle;
+			}
+			table.t span.sort div{
+				width: 0;
+				height: 0;
+				padding: 0;
+				border-left: 0.3em;
+				border-right: 0.3em;
+			}
+			table.t span.sort div.arrow-u{
+				margin: 0.15em 0 0.1em 0;
+				border-bottom: 0.3em;
+				border-top: 0;
+				border-style: solid;
+				border-color: transparent transparent black transparent;
+			}
+			table.t span.sort div.arrow-d{
+				margin: 0.1em 0 0.15em 0;
+				border-top: 0.3em;
+				border-bottom: 0;
+				border-style: solid;
+				border-color: black transparent transparent transparent;
+			}
+		</style>
 		<script src="../lib/util.js" type="text/javascript" defer></script>
 		<script src="zmodal.js" type="text/javascript"></script>
 		<script src="ztable.js" type="text/javascript"></script>
@@ -19,7 +51,13 @@
 		<table class='t'>
 			<thead>
 				<tr>
-					<td>001</td>
+					<td>
+						<span>001</span>
+						<span class="sort">
+							<div class="arrow-u"></div>
+							<div class="arrow-d"></div>
+						</span>
+					</td>
 					<td>002</td>
 					<td>003</td>
 					<td>004</td>
