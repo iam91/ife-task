@@ -1,12 +1,11 @@
 table.z-table {
-  padding: 0 1em;
-  position: relative !important; }
+  border-collapse: collapse; }
   table.z-table * {
     background-color: white; }
   table.z-table td {
     padding: 0 1em;
     border: 1px solid black;
-    font-size: 1.5em; }
+    font-size: 1em; }
   table.z-table thead.z-table-head span {
     line-height: 1em !important;
     display: inline-block !important;

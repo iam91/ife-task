@@ -106,7 +106,7 @@
 	};
 
 	ZTable.prototype._floatHeadHandler = function(e){
-		var rec = this._base.getBoundingClientRect();
+		var rec = this._thead.getBoundingClientRect();
 		if(rec.top < 0){
 			if(!this._floathead.dom){
 				this._createFloatHead(rec.top);

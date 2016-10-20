@@ -31,6 +31,21 @@ window.onload = function(e){
 		data: [
 			{name: '小明', chi: 80, math: 90, eng: 70, tot: 240},
 			{name: '小红', chi: 90, math: 70, eng: 100, tot: 260},
+			{name: '小亮', chi: 60, math: 80, eng: 80, tot: 220},
+			{name: '小明', chi: 80, math: 90, eng: 70, tot: 240},
+			{name: '小红', chi: 90, math: 70, eng: 100, tot: 260},
+			{name: '小亮', chi: 60, math: 80, eng: 80, tot: 220},
+			{name: '小明', chi: 80, math: 90, eng: 70, tot: 240},
+			{name: '小红', chi: 90, math: 70, eng: 100, tot: 260},
+			{name: '小亮', chi: 60, math: 80, eng: 80, tot: 220},
+			{name: '小明', chi: 80, math: 90, eng: 70, tot: 240},
+			{name: '小红', chi: 90, math: 70, eng: 100, tot: 260},
+			{name: '小亮', chi: 60, math: 80, eng: 80, tot: 220},
+			{name: '小明', chi: 80, math: 90, eng: 70, tot: 240},
+			{name: '小红', chi: 90, math: 70, eng: 100, tot: 260},
+			{name: '小亮', chi: 60, math: 80, eng: 80, tot: 220},
+			{name: '小明', chi: 80, math: 90, eng: 70, tot: 240},
+			{name: '小红', chi: 90, math: 70, eng: 100, tot: 260},
 			{name: '小亮', chi: 60, math: 80, eng: 80, tot: 220}
 		]
 	}

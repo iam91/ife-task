@@ -1,13 +1,15 @@
+$arrow-color: black;
+$arrow-color-hover: grey;
+
 table.z-table{
-	padding: 0 1em;
-	position: relative !important;
+	border-collapse: collapse;
 	*{
 		background-color: white;
 	} 
 	td{
 		padding: 0 1em;
 		border: 1px solid black;
-		font-size: 1.5em;
+		font-size: 1em;
 	}
 	thead.z-table-head{
 		span{
@@ -25,17 +27,17 @@ table.z-table{
 					border-color: transparent !important;
 					&.arrow-u{
 						margin: 0.15em 0 0.1em 0 !important;
-						border-bottom: 0.3em solid black !important;
+						border-bottom: 0.3em solid $arrow-color !important;
 						&:hover{
-							border-bottom-color: grey !important;
+							border-bottom-color: $arrow-color-hover !important;
 						}
 					}
 
 					&.arrow-d{
 						margin: 0.1em 0 0.15em 0 !important;
-						border-top: 0.3em solid black !important;
+						border-top: 0.3em solid $arrow-color !important;
 						&:hover{
-							border-top-color: grey !important;
+							border-top-color: $arrow-color-hover !important;
 						}
 					}
 				}
