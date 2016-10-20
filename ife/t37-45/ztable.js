@@ -35,7 +35,7 @@
 	}
 
 	function sort(a, b){
-		return a - b;
+		return b - a;
 	}
 
 	function ZTable(base, param){
@@ -62,9 +62,10 @@
 	/**
 	 * @param {string} col - property name of that column in a data object
 	 */
-	ZTable.prototype._sortWrapper = function(sort, col){
+	ZTable.prototype._sortWrapper = function(sort, col, asc){
 		return function(a, b){
-			return sort(a[col], b[col]);
+			var s = sort(a[col], b[col]);
+			return asc ? s : -s;
 		};
 	};
 
@@ -86,14 +87,28 @@
 			var asc = title.querySelector('.arrow-u');
 			var des = title.querySelector('.arrow-d');
 
-			//bind sort event
+			this._cols[i].sortable = col.sortable || sort, col.index;
+			this._sortFn[col.index] = {};
+			this._sortFn[col.index]['asc'] = this._sortWrapper(this._cols[i].sortable, col.index, true);
+			this._sortFn[col.index]['des'] = this._sortWrapper(this._cols[i].sortable, col.index, false);
 
-			this._cols[i].sortable = this._sortWrapper(col.sortable || sort, col.index);
-			this._sortFn[col.index] = this._cols[i].sortable;
+			if(asc){
+				addHandler(asc, 'click', this._getSortHandler(col.index, true));
+			}
+			if(des){
+				addHandler(des, 'click', this._getSortHandler(col.index, false));
+			}
 
 			frag.appendChild(title);
 		}
 		this._thead.appendChild(frag);
+	};
+
+	ZTable.prototype._getSortHandler = function(col, asc){
+		var _this = this;
+		return function(e){
+			return _this.sortCol(col, asc);
+		};
 	};
 
 	ZTable.prototype._loadData = function(){
@@ -114,8 +129,9 @@
 	/**
 	 * @param {string} col - property name of that column in a data object
 	 */
-	ZTable.prototype.sortCol = function(col){
-		var sortFn = this._sortFn[col];
+	ZTable.prototype.sortCol = function(col, asc){
+		var order = asc ? 'asc' : 'des';
+		var sortFn = this._sortFn[col][order];
 		this._data.sort(sortFn);
 		this._loadData();
 	}
