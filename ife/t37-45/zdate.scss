@@ -1,0 +1,46 @@
+$arrow-color: black;
+$arrow-hover-color: grey;
+$arrow-h: 5px;
+
+div.z-date{
+	div.z-d-head{
+		*{
+			display: inline-block;
+		}
+		span{
+			width: 0;
+			height: 0;
+			border: none;
+			border-top: $arrow-h solid transparent;
+			border-bottom: $arrow-h solid transparent;
+		}
+		span.z-d-prev{
+			border-right: $arrow-h solid $arrow-color;
+			&:hover{
+				border-right-color: $arrow-hover-color;
+			}
+		}
+		span.z-d-next{
+			border-left: $arrow-h solid $arrow-color;
+			&:hover{
+				border-left-color: $arrow-hover-color;
+			}
+		}
+		input{
+			outline: none;
+			border: 1px solid black;
+			padding: 0;
+		}
+		input.z-d-m{
+			width: 1.5em;
+		}
+		input.z-d-y{
+			width: 3em;
+		}
+	}
+	div.z-d-cal{
+		.z-d-notin{
+			color: grey;
+		}
+	}
+}

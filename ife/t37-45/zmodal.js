@@ -14,7 +14,7 @@
 		}
 	}
 	/**
-	 * function for remove event handler
+	 * Remove event handler
 	 */
 	function removeHandler(element, type, handler){
 		if(element.removeEventListener){

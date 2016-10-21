@@ -66,4 +66,7 @@ window.onload = function(e){
 	addHandler(s4, 'click', function(e){
 		t.sortCol('math');
 	});
+
+	var d = zd(document.querySelectorAll('.z-date')[0]);
+	console.log(d);
 };
