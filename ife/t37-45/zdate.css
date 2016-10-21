@@ -22,7 +22,13 @@ div.z-date div.z-d-head input.z-d-m {
   width: 1.5em; }
 div.z-date div.z-d-head input.z-d-y {
   width: 3em; }
-div.z-date div.z-d-cal .z-d-notin {
-  color: grey; }
+div.z-date div.z-d-cal {
+  cursor: pointer; }
+  div.z-date div.z-d-cal .z-d-notin {
+    color: grey; }
+  div.z-date div.z-d-cal .z-d-sel {
+    background-color: green; }
+  div.z-date div.z-d-cal .z-d-sel-term {
+    background-color: blue; }
 
 /*# sourceMappingURL=zdate.css.map */

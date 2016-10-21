@@ -2,6 +2,9 @@ $arrow-color: black;
 $arrow-hover-color: grey;
 $arrow-h: 5px;
 
+$d-sel-term: blue;
+$d-sel: green;
+
 div.z-date{
 	div.z-d-head{
 		*{
@@ -39,8 +42,15 @@ div.z-date{
 		}
 	}
 	div.z-d-cal{
+		cursor: pointer;
 		.z-d-notin{
 			color: grey;
+		}
+		.z-d-sel{
+			background-color: $d-sel;
+		}
+		.z-d-sel-term{
+			background-color: $d-sel-term;
 		}
 	}
 }

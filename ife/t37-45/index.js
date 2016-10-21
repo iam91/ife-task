@@ -59,14 +59,14 @@ window.onload = function(e){
 	var s3 = $('#s3');
 	var s4 = $('#s4');
 
+	var d = zd(document.querySelectorAll('.z-date')[0]);
+	//console.log(d);
+
 	addHandler(s3, 'click', function(e){
-		t.sortCol('chi');
+		d.prevMonth();
 	});
 
 	addHandler(s4, 'click', function(e){
-		t.sortCol('math');
+		d.nextMonth();
 	});
-
-	var d = zd(document.querySelectorAll('.z-date')[0]);
-	console.log(d);
 };
