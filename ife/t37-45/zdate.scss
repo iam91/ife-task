@@ -5,58 +5,66 @@ $arrow-h: 5px;
 $d-sel-term: blue;
 $d-sel: green;
 
+$pad-color: white;
+
 div.z-date{
-	div.z-d-head{
-		*{
-			display: inline-block;
-		}
-		span{
-			width: 0;
-			height: 0;
-			border: none;
-			border-top: $arrow-h solid transparent;
-			border-bottom: $arrow-h solid transparent;
-		}
-		span.z-d-prev{
-			border-right: $arrow-h solid $arrow-color;
-			&:hover{
-				border-right-color: $arrow-hover-color;
+	position: relative;
+	div.z-d-pad{
+		position: absolute;
+		z-index: 999;
+		background-color: $pad-color;
+		div.z-d-head{
+			*{
+				display: inline-block;
+			}
+			span{
+				width: 0;
+				height: 0;
+				border: none;
+				border-top: $arrow-h solid transparent;
+				border-bottom: $arrow-h solid transparent;
+			}
+			span.z-d-prev{
+				border-right: $arrow-h solid $arrow-color;
+				&:hover{
+					border-right-color: $arrow-hover-color;
+				}
+			}
+			span.z-d-next{
+				border-left: $arrow-h solid $arrow-color;
+				&:hover{
+					border-left-color: $arrow-hover-color;
+				}
+			}
+			input{
+				outline: none;
+				border: 1px solid black;
+				padding: 0;
+			}
+			input.z-d-m{
+				width: 1.5em;
+			}
+			input.z-d-y{
+				width: 3em;
 			}
 		}
-		span.z-d-next{
-			border-left: $arrow-h solid $arrow-color;
-			&:hover{
-				border-left-color: $arrow-hover-color;
+		div.z-d-cal{
+			cursor: pointer;
+			span{
+				user-select: none;
+				-ms-user-select: none;
+				-moz-user-select: none;
+				-webkit-user-select: none;
 			}
-		}
-		input{
-			outline: none;
-			border: 1px solid black;
-			padding: 0;
-		}
-		input.z-d-m{
-			width: 1.5em;
-		}
-		input.z-d-y{
-			width: 3em;
-		}
-	}
-	div.z-d-cal{
-		cursor: pointer;
-		span{
-			user-select: none;
-			-ms-user-select: none;
-			-moz-user-select: none;
-			-webkit-user-select: none;
-		}
-		.z-d-not-in{
-			color: grey;
-		}
-		.z-d-ran{
-			background-color: $d-sel;
-		}
-		.z-d-ter{
-			background-color: $d-sel-term;
+			.z-d-not-in{
+				color: grey;
+			}
+			.z-d-ran{
+				background-color: $d-sel;
+			}
+			.z-d-ter{
+				background-color: $d-sel-term;
+			}
 		}
 	}
 }

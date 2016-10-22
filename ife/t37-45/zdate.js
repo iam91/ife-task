@@ -1,6 +1,9 @@
 /**
  * Depends on jQuery
  */
+ /*
+  * TODO solve bug: div can be clicked
+  */ 
 ;(function($, window, document){
 
 	function $$(elem){
@@ -14,7 +17,8 @@
 	};
 
 	var Selector = {
-		BASE          : '.z-date',
+		SHOW          : '.z-d-show input',
+		PAD           : '.z-d-pad',
 		HEAD          : '.z-d-head',
 		PREV_ARROW    : '.z-d-prev',
 		NEXT_ARROW    : '.z-d-next',
@@ -28,16 +32,20 @@
 		SEL_RANGE     : '.z-d-ran'
 	};
 
-	var frame = '<div class="z-d-head">'
-			  	+ '<span class="z-d-prev"></span>'
-				+ '<input class="z-d-y">'
-				+ '<input class="z-d-m">'
-				+ '<span class="z-d-next"></span>'
-			  + '</div>' 
-			  + '<div class="z-d-cal">'
-			  	+ '<div class="z-d-cal-h"></div>'
-				+ '<div class="z-d-cal-b"></div>'
-			  + '</div>';
+	var frame =     '<div class="z-d-show"><input type="text"></div>'
+				  + '<div class="z-d-pad">'
+				   	+'<div class="z-d-head">'
+				  	+ '<span class="z-d-prev"></span>'
+					+ '<input class="z-d-y">'
+					+ '<input class="z-d-m">'
+					+ '<span class="z-d-next"></span>'
+				  + '</div>' 
+				  + '<div class="z-d-cal">'
+				  	+ '<div class="z-d-cal-h"></div>'
+					+ '<div class="z-d-cal-b"></div>'
+				  + '</div>'
+				  + '<button>Confirm</button><button>Cancel</button>'
+				  +'</div>';
 
 	var week = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
@@ -54,6 +62,10 @@
 		dateBackward: function(d){
 			d.setDate(d.getDate() - 1);
 			return d;
+		},
+
+		dateFormat: function(d){
+			return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
 		}
 	};
 
@@ -75,6 +87,8 @@
 		this._month = null;
 		this._year = null;
 		this._calbody = null;
+		this._show = null;
+		this._pad = null;
 
 		this._init();
 	}
@@ -88,21 +102,23 @@
 
 		var e_month = $(base).find(Selector.MONTH);
 		var e_year = $(base).find(Selector.YEAR);
-		var e_cal = $(base).find(Selector.CALENDAR);
-		var e_prev = $(base).find(Selector.PREV_ARROW);
-		var e_next = $(base).find(Selector.NEXT_ARROW);
 		var e_calbody = $(base).find(Selector.CALENDAR_BODY);
+		var e_show = $(base).find(Selector.SHOW);
+		var e_pad = $(base).find(Selector.PAD);
 
 		this._month = e_month;
 		this._year = e_year;
 		this._calbody = e_calbody;
+		this._show = e_show;
+		this._pad = e_pad;
 
 		var month = this._currCal.getMonth();
 		var year = this._currCal.getFullYear();
 
 		$(e_month).val(month + 1);
 		$(e_year).val(year);
-
+		e_pad.hide();
+		this._renderShow();
 		this._renderCalendar();
 
 		//events binding
@@ -115,13 +131,21 @@
 
 		var fix = {that: this};
 
-		$(e_prev).bind('click', fix, handlerWrapper(this.prevMonth));
-		$(e_next).bind('click', fix, handlerWrapper(this.nextMonth));
+		$($(base).find(Selector.PREV_ARROW))
+			.bind('click', fix, handlerWrapper(this.prevMonth));
+		$($(base).find(Selector.NEXT_ARROW))
+			.bind('click', fix, handlerWrapper(this.nextMonth));
 		$(e_calbody).bind('dblclick', fix, handlerWrapper(this.setSingleSel));
 		$(e_calbody).bind('click', fix, handlerWrapper(this.setRangeSel));
+		$(e_show).bind('click', fix, handlerWrapper(this.togglePad));
 	};
 
 	//rendering
+	ZDate.prototype._renderShow = function(){
+		//render show text box
+		$(this._show).val(Util.dateFormat(this._selStart) + '~' + Util.dateFormat(this._selEnd));
+	};
+
 	ZDate.prototype._renderCalendar = function(){
 		//render calendar head
 		var inner = '<div>';
@@ -175,11 +199,6 @@
 		this._calStartElem = $(frag).children().first().children().first();
 		this._calEndElem = $(frag).children().last().children().last();
 
-		this._selStartElem = this._selStart.getTime() < this._calStart.getTime() 
-			? this._calStartElem : this._selStartElem;
-		this._selEndElem = this._selEnd.getTime() > this._calEnd.getTime() 
-			? this._calEndElem : this._selEndElem;
-
 		$(frag).appendTo(this._calbody);
 	};
 
@@ -192,8 +211,12 @@
 	};
 
 	ZDate.prototype._renderSel = function(){
-		var cur = this._selStartElem;
-		var end = this._selEndElem;
+		if(!this._selStartElem && !this._selEndElem){
+			return;
+		}
+
+		var cur = this._selStartElem ? this._selStartElem : this._calStartElem;
+		var end = this._selEndElem ? this._selEndElem : this._calStartElem;
 
 		$(cur).addClass(
 			this._selStart.getTime() >= this._calStart.getTime() ? 
@@ -275,6 +298,7 @@
 		this._selStart = curTime <= midTime ? sel : this._selStart;
 		this._selEnd = curTime > midTime ? sel : this._selEnd;
 
+		this._renderShow();
 		this._renderSel();
 	}
 
@@ -286,8 +310,13 @@
 		var sel = this._getSelDate(target);
 		this._selEnd = this._selStart = sel;
 		this._selStartElem = this._selEndElem = target;
+		this._renderShow();
 		this._renderSel();
 	};
+
+	ZDate.prototype.togglePad = function(e){
+		$(this._pad).toggle();
+	}
 
 	/**
 	 * Expose it to global environment

@@ -67,7 +67,7 @@ window.onload = function(e){
 	});
 
 	addHandler(s4, 'click', function(e){
-		d.nextMonth();
+		d.togglePad();
 	});
 	var t0 = $(document);
 	var t1 = $(document.querySelector('.a'));
