@@ -1,13 +1,13 @@
 window.onload = function(e){
-	var $ = function(query){
+	var _ = function(query){
 		return document.querySelector(query);
 	};
 
-	var m1 = zm($('#m1'));
+	var m1 = zm(_('#m1'));
 	var m2 = zm('#m2');
 
-	var s1 = $('#s1');
-	var s2 = $('#s2');
+	var s1 = _('#s1');
+	var s2 = _('#s2');
 
 	//console.log(m1);
 	//console.log(m2);
@@ -56,9 +56,9 @@ window.onload = function(e){
 		//console.log(t);
 	}
 
-	var s3 = $('#s3');
-	var s4 = $('#s4');
-
+	var s3 = _('#s3');
+	var s4 = _('#s4');
+	
 	var d = zd(document.querySelectorAll('.z-date')[0]);
 	//console.log(d);
 

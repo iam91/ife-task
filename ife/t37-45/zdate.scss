@@ -43,13 +43,19 @@ div.z-date{
 	}
 	div.z-d-cal{
 		cursor: pointer;
-		.z-d-notin{
+		span{
+			user-select: none;
+			-ms-user-select: none;
+			-moz-user-select: none;
+			-webkit-user-select: none;
+		}
+		.z-d-not-in{
 			color: grey;
 		}
-		.z-d-sel{
+		.z-d-ran{
 			background-color: $d-sel;
 		}
-		.z-d-sel-term{
+		.z-d-ter{
 			background-color: $d-sel-term;
 		}
 	}
