@@ -69,4 +69,11 @@ window.onload = function(e){
 	addHandler(s4, 'click', function(e){
 		d.nextMonth();
 	});
+	var t0 = $(document);
+	var t1 = $(document.querySelector('.a'));
+	var t2 = $('.a').first();
+	var t3 = document.querySelector('.a');
+	console.log(t0);
+	console.log(!t1.is(t3));
+	console.log(t2);
 };
