@@ -229,12 +229,13 @@
 	ZDate.prototype._getSelDate = function(target){
 		var selDate = parseInt($(target).text());
 		var sel = Util.dateClone(this._currCal);
-		sel.setDate(selDate - 1);
+		sel.setDate(selDate);
 
-		if(selDate < 7 && $(target).parent()[0] == $(this._calEndElem).parent()[0]){
+
+		if(selDate < 7 && $(target).parent().is($(this._calEndElem).parent())){
 			sel.setMonth(sel.getMonth() + 1);
 		}
-		if(selDate > 22 && $(target).parent()[0] == $(this._calStartElem).parent()[0]){
+		if(selDate > 22 && $(target).parent().is($(this._calStartElem).parent())){
 			sel.setMonth(sel.getMonth() - 1);
 		}
 
@@ -268,10 +269,10 @@
 		var midTime = (startTime + endTime) / 2;
 		var curTime = sel.getTime();
 		
-		this._selStartElem = curTime < midTime ? target : this._selStartElem;
+		this._selStartElem = curTime <= midTime ? target : this._selStartElem;
 		this._selEndElem = curTime > midTime ? target : this._selEndElem;
 		//reset time
-		this._selStart = curTime < midTime ? sel : this._selStart;
+		this._selStart = curTime <= midTime ? sel : this._selStart;
 		this._selEnd = curTime > midTime ? sel : this._selEnd;
 
 		this._renderSel();
