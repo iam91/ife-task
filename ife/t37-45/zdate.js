@@ -27,12 +27,16 @@
 		CALENDAR_BODY : '.z-d-cal-b',
 		YEAR          : '.z-d-y',
 		MONTH         : '.z-d-m',
-		DATE          : 'span',
 		SEL_TERMINAL  : '.z-d-ter',
 		SEL_RANGE     : '.z-d-ran'
 	};
 
-	var frame =     '<div class="z-d-show"><input type="text"></div>'
+	var CAL_HEAD_VALIDATOR = {
+		y: /^[1-9]\d{0,3}$/, 
+		m: /^([1-9]{1}|1[0-2]{1})$/
+	}
+
+	var frame =     '<div class="z-d-show"><input type="text" readonly="true"></div>'
 				  + '<div class="z-d-pad">'
 				   	+'<div class="z-d-head">'
 				  	+ '<span class="z-d-prev"></span>'
@@ -43,11 +47,11 @@
 				  + '<div class="z-d-cal">'
 				  	+ '<div class="z-d-cal-h"></div>'
 					+ '<div class="z-d-cal-b"></div>'
-				  + '</div>'
-				  + '<button>Confirm</button><button>Cancel</button>'
-				  +'</div>';
+				  + '</div>';
 
 	var week = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+	var MILLISECOND_DAY = 24 * 3600 * 1000;
 
 	var Util = {
 		dateClone: function(d){
@@ -66,10 +70,22 @@
 
 		dateFormat: function(d){
 			return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+		},
+
+		dateStandardize: function(d, standard){
+			var r = null;
+			if(d && standard){
+				r = this.dateClone(standard);
+				r.setDate(d.getDate());
+				r.setMonth(d.getMonth());
+				r.setFullYear(d.getFullYear());
+			}
+			d = null;
+			return r;
 		}
 	};
 
-	function ZDate(base){
+	function ZDate(base, param){
 		//store current year and month showing
 		this._currCal = new Date();
 		this._calStart = 0;
@@ -77,11 +93,22 @@
 		this._calStartElem = null;
 		this._calEndElem = null;
 
-		this._selStart = Util.dateClone(this._currCal);
-		this._selEnd = Util.dateClone(this._currCal);
+		this._selStart = param 
+			&& (
+					Util.dateStandardize(param.sel, this._currCal) 
+					|| Util.dateStandardize(param.selStart, this._currCal)
+				)
+			|| Util.dateClone(this._currCal);
+		this._selEnd = param 
+			&& (
+					Util.dateStandardize(param.sel, this._currCal) 
+					|| Util.dateStandardize(param.selEnd, this._currCal)
+				)
+			|| Util.dateClone(this._currCal);
+		this._min = param && param.min || 0;
+		this._max = param && param.max || 0
 		this._selStartElem = null;
 		this._selEndElem = null;
-		this._selSingleDay = true;
 
 		this._base = base;
 		this._month = null;
@@ -135,15 +162,20 @@
 			.bind('click', fix, handlerWrapper(this.prevMonth));
 		$($(base).find(Selector.NEXT_ARROW))
 			.bind('click', fix, handlerWrapper(this.nextMonth));
-		$(e_calbody).bind('dblclick', fix, handlerWrapper(this.setSingleSel));
-		$(e_calbody).bind('click', fix, handlerWrapper(this.setRangeSel));
+		$(e_calbody).bind('dblclick', fix, handlerWrapper(this._setSingleSel));
+		$(e_calbody).bind('click', fix, handlerWrapper(this._setRangeSel));
 		$(e_show).bind('click', fix, handlerWrapper(this.togglePad));
+		
+		$(e_year).focusout(fix, handlerWrapper(this._changeCalHead));
+		$(e_month).focusout(fix, handlerWrapper(this._changeCalHead));
 	};
 
 	//rendering
 	ZDate.prototype._renderShow = function(){
 		//render show text box
-		$(this._show).val(Util.dateFormat(this._selStart) + '~' + Util.dateFormat(this._selEnd));
+		var t = this._selStart.getTime() == this._selEnd.getTime() ? '' 
+			: ' ~ ' + Util.dateFormat(this._selEnd)
+		$(this._show).val(Util.dateFormat(this._selStart) + t);
 	};
 
 	ZDate.prototype._renderCalendar = function(){
@@ -160,6 +192,7 @@
 	};
 
 	ZDate.prototype._renderCalBody = function(){
+		$(this._calbody).html('');
 		//create cursor for calendar body rendering
 		var currMonth = this._currCal.getMonth();
 		var nextMonth = (currMonth + 1) % 12;
@@ -203,11 +236,8 @@
 	};
 
 	ZDate.prototype._setHead = function(){
-		var e_month = this._month;
-		var e_year = this._year;
-		$(e_month).val('').val(this._currCal.getMonth() + 1);
-		$(e_year).val('').val(this._currCal.getFullYear());
-		$(this._calbody).html('');
+		$(this._month).val('').val(this._currCal.getMonth() + 1);
+		$(this._year).val('').val(this._currCal.getFullYear());
 	};
 
 	ZDate.prototype._renderSel = function(){
@@ -216,7 +246,7 @@
 		}
 
 		var cur = this._selStartElem ? this._selStartElem : this._calStartElem;
-		var end = this._selEndElem ? this._selEndElem : this._calStartElem;
+		var end = this._selEndElem ? this._selEndElem : this._calEndElem;
 
 		$(cur).addClass(
 			this._selStart.getTime() >= this._calStart.getTime() ? 
@@ -249,6 +279,26 @@
 	};
 
 	//private
+	ZDate.prototype._changeCalHead = function(e){
+		var target = e.target;
+		var g = $(target).is(this._year) ? 'y' : 'm'
+		var t = g === 'y' ? this._currCal.getFullYear() : this._currCal.getMonth();
+		var va = CAL_HEAD_VALIDATOR[g];
+		var v = $(target).val().trim();
+		if(va.test(v)){
+			if(g === 'y'){
+				this._currCal.setFullYear(parseInt(v));
+			}else{
+				this._currCal.setMonth(parseInt(v - 1));
+			}
+			this._setHead();
+			this._renderCalBody();
+			this._renderSel();
+		}else{
+			this._setHead();
+		}
+	};
+
 	ZDate.prototype._getSelDate = function(target){
 		var selDate = parseInt($(target).text());
 		var sel = Util.dateClone(this._currCal);
@@ -263,6 +313,48 @@
 		}
 
 		return sel;
+	};
+
+	ZDate.prototype._setRangeSel = function(e){
+		var target = e.target;
+		var sel = this._getSelDate(target);
+		var startTime = this._selStart.getTime();
+		var endTime = this._selEnd.getTime();
+		var midTime = (startTime + endTime) / 2;
+		var curTime = sel.getTime();
+		//reset time
+		var selStart = curTime <= midTime ? sel : this._selStart;
+		var selEnd = curTime > midTime ? sel : this._selEnd;
+		
+		var dayRange = (selEnd.getTime() - selStart.getTime()) / MILLISECOND_DAY + 1;
+		if(this._max > 0 && dayRange > this._max){
+			alert('Should be no more than ' + this._max + '!');
+			return;
+		}
+		if(dayRange < this._min){
+			alert('Should be no less than ' + this._min + '!');
+			return;
+		}
+
+		this._selStart = selStart;
+		this._selEnd = selEnd;
+
+		this._selStartElem = curTime <= midTime ? target : this._selStartElem;
+		this._selEndElem = curTime > midTime ? target : this._selEndElem;
+
+		this._renderShow();
+		this._clearSel();
+		this._renderSel();
+	}
+
+	ZDate.prototype._setSingleSel = function(e){
+		var target = e.target;
+		var sel = this._getSelDate(target);
+		this._selEnd = this._selStart = sel;
+		this._selStartElem = this._selEndElem = target;
+		this._renderShow();
+		this._clearSel();
+		this._renderSel();
 	};
 
 	//public
@@ -280,53 +372,27 @@
 		this._renderSel();
 	};
 
-	ZDate.prototype.setRangeSel = function(e){
-		var target = e.target;
-
-		this._clearSel();
-		
-		var sel = this._getSelDate(target);
-
-		var startTime = this._selStart.getTime();
-		var endTime = this._selEnd.getTime();
-		var midTime = (startTime + endTime) / 2;
-		var curTime = sel.getTime();
-		
-		this._selStartElem = curTime <= midTime ? target : this._selStartElem;
-		this._selEndElem = curTime > midTime ? target : this._selEndElem;
-		//reset time
-		this._selStart = curTime <= midTime ? sel : this._selStart;
-		this._selEnd = curTime > midTime ? sel : this._selEnd;
-
-		this._renderShow();
-		this._renderSel();
-	}
-
-	ZDate.prototype.setSingleSel = function(e){
-		var target = e.target;
-		
-		this._clearSel();
-
-		var sel = this._getSelDate(target);
-		this._selEnd = this._selStart = sel;
-		this._selStartElem = this._selEndElem = target;
-		this._renderShow();
-		this._renderSel();
-	};
-
-	ZDate.prototype.togglePad = function(e){
+	ZDate.prototype.togglePad = function(){
 		$(this._pad).toggle();
 	}
+
+	ZDate.prototype.getDates = function(){
+		if(this._selStart.getTime() ==  this._selEnd.getTime()){
+			return {sel: this._selStart};
+		}else{
+			return {selStart: this._selStart, selEnd: this._selEnd};
+		}
+	};
 
 	/**
 	 * Expose it to global environment
 	 */
-	function zd(q){
+	function zd(q, param){
 		var d = $(q);
 		/**
 		 * Multiple z-dates found, wrap the first one.
 		 */
-		return d.length == 0 ? null : new ZDate(d[0]);
+		return d.length == 0 ? null : new ZDate(d[0], param);
 	}
 
 	window.zd = zd;

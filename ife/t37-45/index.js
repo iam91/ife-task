@@ -58,8 +58,18 @@ window.onload = function(e){
 
 	var s3 = _('#s3');
 	var s4 = _('#s4');
+
+	var d1 = new Date();
+	d1.setDate(d1.getDate() - 1);
+	var d2 = new Date();
+	d2.setDate(d2.getDate() + 1);
 	
-	var d = zd(document.querySelectorAll('.z-date')[0]);
+	var d = zd(document.querySelectorAll('.z-date')[0], {
+		min: 3,
+		max: 6,
+		selStart: d1,
+		selEnd : d2
+	});
 	//console.log(d);
 
 	addHandler(s3, 'click', function(e){
