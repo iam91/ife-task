@@ -27,6 +27,7 @@
 		CALENDAR_BODY : '.z-d-cal-b',
 		YEAR          : '.z-d-y',
 		MONTH         : '.z-d-m',
+		DATE         : 'span',
 		SEL_TERMINAL  : '.z-d-ter',
 		SEL_RANGE     : '.z-d-ran'
 	};
@@ -162,8 +163,8 @@
 			.bind('click', fix, handlerWrapper(this.prevMonth));
 		$($(base).find(Selector.NEXT_ARROW))
 			.bind('click', fix, handlerWrapper(this.nextMonth));
-		$(e_calbody).bind('dblclick', fix, handlerWrapper(this._setSingleSel));
-		$(e_calbody).bind('click', fix, handlerWrapper(this._setRangeSel));
+		$(e_calbody).bind('dblclick', Selector.DATE, fix, handlerWrapper(this._setSingleSel));
+		$(e_calbody).on('click', Selector.DATE, fix, handlerWrapper(this._setRangeSel));
 		$(e_show).bind('click', fix, handlerWrapper(this.togglePad));
 		
 		$(e_year).focusout(fix, handlerWrapper(this._changeCalHead));

@@ -65,8 +65,6 @@ window.onload = function(e){
 	d2.setDate(d2.getDate() + 1);
 	
 	var d = zd(document.querySelectorAll('.z-date')[0], {
-		min: 3,
-		max: 6,
 		selStart: d1,
 		selEnd : d2
 	});
