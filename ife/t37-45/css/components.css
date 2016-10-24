@@ -134,4 +134,32 @@ table.z-table thead.z-table-head td {
   background-color: #202020;
   color: white; }
 
-/*# sourceMappingURL=t.css.map */
+div.z-modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  visibility: hidden;
+  z-index: 2147483647; }
+  div.z-modal div.z-modal-content {
+    position: absolute;
+    padding: 10px;
+    width: 50%; }
+  div.z-modal div.z-m-c-fixed {
+    margin: 8% auto;
+    left: 25%; }
+
+div.z-modal-show {
+  visibility: visible; }
+
+div.z-modal {
+  font-family: "Microsoft YaHei";
+  background-color: rgba(0, 0, 0, 0.5); }
+  div.z-modal div.z-modal-content {
+    border: 1px solid #202020;
+    border-radius: 5px;
+    box-shadow: 0 0 10px 0 #202020;
+    background-color: white; }
+
+/*# sourceMappingURL=components.css.map */

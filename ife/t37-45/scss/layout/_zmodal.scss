@@ -1,0 +1,23 @@
+$content-width: 50%;
+
+div.z-modal{
+	position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+	visibility: hidden;
+	z-index: $zindex-max;
+	div.z-modal-content{
+		position: absolute;
+		padding: 10px;
+		width: $content-width;
+	}
+	div.z-m-c-fixed{
+		margin: 8% auto;
+		left: (100% - $content-width) / 2;
+	}
+}
+div.z-modal-show{
+	visibility: visible;
+}
