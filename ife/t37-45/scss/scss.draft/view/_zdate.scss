@@ -3,7 +3,7 @@
 	//text box showing selected dates
 	div.z-d-show{
 		input{
-			@include main_border(5px);
+			@include main_border($main-grey, 5px);
 			font-size: 16px;
 			outline: none;
 			color: $main-grey;
@@ -17,30 +17,18 @@
 
 	//calendar pad
 	div.z-d-pad{
-		@include main_border(5px);
+		@include main_border($main-grey, 5px);
 		background-color: white;
 		box-shadow: 0 0 1px 1px $main-grey;
 		div.z-d-head{
-
-			$arrow-w: 12px;
-			$arrow-h: 8px;
-
-			span.z-d-prev{
-				@include arrow($arrow-w, $arrow-h, $main-grey, $main-black, right);
-				float: left;
-			}
-			span.z-d-next{
-				@include arrow($arrow-w, $arrow-h, $main-grey, $main-black, left);
-				float: right;
-			}
 			input{
 				outline: none;
 				border: 1px solid transparent;
 				font-size: 12px;
 				font-weight: lighter;
-				font-color: $main-grey;
+				color: $main-grey;
 				&:hover{
-					@include main_border(2px);
+					@include main_border($main-grey, 2px);
 				}
 			}
 		}

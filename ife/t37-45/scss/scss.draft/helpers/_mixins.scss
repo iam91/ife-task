@@ -6,7 +6,6 @@
 }
 
 @mixin arrow($w, $h, $c, $hc, $d){
-	display: inline-block;
 	width: 0;
 	height: 0;
 	border: $w/2 solid transparent;
@@ -16,7 +15,7 @@
 	}
 }
 
-@mixin main_border($radius){
-	border: 1px solid $main-grey;
+@mixin main_border($color, $radius){
+	border: 1px solid $color;
 	border-radius: $radius;
 }
