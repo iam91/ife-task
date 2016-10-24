@@ -148,9 +148,6 @@
 
 			var title = $$('td');
 
-			//if(col.index === 'name')
-				//console.log(col.sortable);
-
 			title.innerHTML = '<span>' + col.title + '</span>' 
 				+ (col.sortable !== undefined ? this._sortArrow : '');
 

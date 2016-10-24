@@ -14,8 +14,8 @@ div.z-date {
       padding: 0 0.5em;
       transition: box-shadow 0.2s linear; }
       div.z-date div.z-d-show input:hover {
-        border-color: #3399FF;
-        box-shadow: 0 0 3px 2px #33CCFF; }
+        border-color: #404040;
+        box-shadow: 0 0 3px 2px #989898; }
   div.z-date div.z-d-pad {
     position: absolute;
     z-index: 999;

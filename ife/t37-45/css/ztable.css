@@ -4,8 +4,9 @@ table.z-table {
     background-color: white; }
   table.z-table td {
     padding: 0 1em;
-    border: 1px solid black;
-    font-size: 1em; }
+    border: 1px solid #202020;
+    font-size: 1em;
+    text-align: center; }
   table.z-table thead.z-table-head span {
     line-height: 1em !important;
     display: inline-block !important;

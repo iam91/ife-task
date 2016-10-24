@@ -1,0 +1,50 @@
+.z-date{
+	position: relative;
+	
+	//text box showing selected dates
+	div.z-d-show{
+		padding: 5px;
+		input{
+			width: 12em;
+			height: 1.2em;
+			padding: 0 0.5em;
+		}
+	}
+
+	//calendar pad
+	div.z-d-pad{
+		position: absolute;
+		z-index: $zindex-max;
+		padding: 0 1em;
+		margin: 5px 0;
+		text-align: center;
+		background-color: white;
+		div.z-d-head{
+			*{
+				display: inline-block;
+			}
+			padding: 2px;
+			input{
+				padding: 0 2px;
+				margin: 0 5px;
+				&.z-d-m{
+					width: 1.5em;
+				}
+				&.z-d-y{
+					width: 3em;
+				}
+			}
+		}
+		div.z-d-cal{
+			cursor: pointer;
+			div{
+				margin: 1em 0;
+				span{
+					@include user-select(none);
+					width: 2em;
+					display: inline-block;
+				}
+			}
+		}
+	}
+}

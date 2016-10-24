@@ -1,0 +1,74 @@
+.z-date{
+	font-family: $font-stack;
+	//text box showing selected dates
+	div.z-d-show{
+		input{
+			@include main_border(5px);
+			font-size: 16px;
+			outline: none;
+			color: $main-grey;
+			transition: box-shadow 0.2s linear;
+			&:hover{
+				border-color: $main-black;
+				box-shadow: 0 0 2px 2px $main-grey;
+			}
+		}
+	}
+
+	//calendar pad
+	div.z-d-pad{
+		@include main_border(5px);
+		background-color: white;
+		box-shadow: 0 0 1px 1px $main-grey;
+		div.z-d-head{
+
+			$arrow-w: 12px;
+			$arrow-h: 8px;
+
+			span.z-d-prev{
+				@include arrow($arrow-w, $arrow-h, $main-grey, $main-black, right);
+				float: left;
+			}
+			span.z-d-next{
+				@include arrow($arrow-w, $arrow-h, $main-grey, $main-black, left);
+				float: right;
+			}
+			input{
+				outline: none;
+				border: 1px solid transparent;
+				font-size: 12px;
+				font-weight: lighter;
+				font-color: $main-grey;
+				&:hover{
+					@include main_border(2px);
+				}
+			}
+		}
+		div.z-d-cal{
+			div{
+				font-size: 14px;
+				span{
+					color: $main-black;
+					transition: background-color 0.2s linear;
+				}
+				&.z-d-cal-h span{
+					color: #d81d18;
+				}
+				&.z-d-cal-b span:hover{
+					font-weight: bold;
+				}
+			}
+			.z-d-not-in{
+				color: $main-grey;
+			}
+			.z-d-ran{
+				background-color: #93b1c6;
+			}
+			.z-d-ter{
+				border-radius: 2px;
+				background-color: #004687;
+				color: white;
+			}
+		}
+	}
+}

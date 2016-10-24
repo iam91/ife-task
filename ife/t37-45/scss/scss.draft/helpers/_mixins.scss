@@ -1,0 +1,22 @@
+@mixin user-select($select){
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	    -ms-user-select: none;
+	        user-select: none;
+}
+
+@mixin arrow($w, $h, $c, $hc, $d){
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border: $w/2 solid transparent;
+	border-#{$d}: $h solid $c;
+	&:hover{
+		border-#{$d}-color: $hc;
+	}
+}
+
+@mixin main_border($radius){
+	border: 1px solid $main-grey;
+	border-radius: $radius;
+}

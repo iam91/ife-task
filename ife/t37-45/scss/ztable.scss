@@ -8,15 +8,15 @@ table.z-table{
 	} 
 	td{
 		padding: 0 1em;
-		border: 1px solid black;
+		border: 1px solid #202020;
 		font-size: 1em;
+		text-align: center;
 	}
 	thead.z-table-head{
 		span{
 			line-height: 1em !important;
 			display: inline-block !important;
 			vertical-align: middle !important;
-
 			&.sort{
 				div{
 					width: 0 !important;
