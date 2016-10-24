@@ -163,7 +163,7 @@
 			.bind('click', fix, handlerWrapper(this.prevMonth));
 		$($(base).find(Selector.NEXT_ARROW))
 			.bind('click', fix, handlerWrapper(this.nextMonth));
-		$(e_calbody).bind('dblclick', Selector.DATE, fix, handlerWrapper(this._setSingleSel));
+		$(e_calbody).on('dblclick', Selector.DATE, fix, handlerWrapper(this._setSingleSel));
 		$(e_calbody).on('click', Selector.DATE, fix, handlerWrapper(this._setRangeSel));
 		$(e_show).bind('click', fix, handlerWrapper(this.togglePad));
 		
