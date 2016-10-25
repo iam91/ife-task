@@ -30,6 +30,7 @@
 
 	function ZWaterfall(base, params){
 		this._base = base;
+		this._modal = null;
 
 		this._colCount = params && params.colCount || 4;
 		this._cols = new Array(this._colCount);
@@ -42,6 +43,7 @@
 
 	ZWaterfall.prototype._init = function(){
 		this._renderCols();
+		this._renderModal();
 		this._fetchPic();
 	};
 
@@ -60,6 +62,33 @@
 		}
 	};
 
+	ZWaterfall.prototype._renderModal = function(){
+		modal = document.createElement('div');
+		modal.classList.add('z-waterfall-modal');
+		modal.style.visibility = 'hidden';
+		this._modal = modal;
+		document.body.appendChild(modal);
+		addHandler(modal, 'click', this._handlerWrapper(this._hide));
+	};
+
+	ZWaterfall.prototype._show = function(e){
+		var t = e.target.cloneNode(true);
+		this._modal.appendChild(t);
+		var w = t.clientWidth;
+		var h = t.clientHeight;
+		t.style.marginLeft = '-' + w/2 + 'px';
+		t.style.marginTop = '-' + h/2 + 'px';
+		this._modal.style.visibility = 'visible';
+	};
+
+	ZWaterfall.prototype._hide = function(e){
+		var t = e.target;
+		if(t === this._modal){
+			this._modal.innerHTML = '';
+			this._modal.style.visibility = 'hidden';
+		}
+	};
+
 	ZWaterfall.prototype._fetchPic = function(e){
 		if(this._urlIndex < this._urls.length){
 			var url = this._urls[this._urlIndex++];
@@ -75,7 +104,8 @@
 		div.classList.add('z-waterfall-pic');
 		div.style.padding = this._gutter / 2 + 'px';
 
-		addHandler(img, 'load', t = this._handlerWrapper(this._fetchPic, true, 'load'));
+		addHandler(img, 'load', this._handlerWrapper(this._fetchPic, true, 'load'));
+		addHandler(img, 'click', this._handlerWrapper(this._show, false));
 		
 		//find the shortest column
 		var minPointer = this._cols[0];
