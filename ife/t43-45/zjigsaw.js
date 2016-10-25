@@ -30,12 +30,12 @@
 
 	ZJigsaw.prototype._init = function(){
 		//fix height
-		
 		var width = this._base.clientWidth;
 		this._base.style.height = width * ratio + 'px';
 		
 		this._base.classList.add('z-jigsaw-' + this._count);
 
+		//render pictures
 		var inner = '';
 		for(var i = 0; i < this._count; i++){
 			inner += '<img src="' + this._urls[i] + '" alt="">';
@@ -53,6 +53,7 @@
 		document.head.appendChild(s);
 		/*--------------------------------------------*/
 
+		//listen to resize event
 		function resizeHandlerGetter(context){
 			var _this = context;
 			return function(e){

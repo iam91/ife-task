@@ -1,0 +1,21 @@
+.z-waterfall{
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	box-sizing: border-box;
+	padding: 10px;
+}
+.z-waterfall-col{
+	float: left;
+	height: 100%;
+}
+.z-waterfall-pic{
+	width: 100%;
+	box-sizing: border-box;
+}
+.z-waterfall-pic:hover{
+	border: 1px solid black;
+}
+.z-waterfall-pic img{
+	width: 100%;
+}
