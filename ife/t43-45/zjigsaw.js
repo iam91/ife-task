@@ -16,6 +16,9 @@
 
 	var ratio = 9 / 16;
 
+	var clipPathInline = '<svg width="0" height="0"><defs><clipPath id="clip-shape" clipPathUnits="objectBoundingBox"><polygon points="0.666 0, 1 0, 1 1, 0.333 1" /></clipPath></defs></svg>'
+	var clipPathStyleInline = ".z-jigsaw-2 img:last-child{-webkit-clip-path: url('#clip-shape');clip-path: url('#clip-shape');}";
+
 	function ZJigsaw(base, params){
 		this._base = base;
 
@@ -31,13 +34,24 @@
 		var width = this._base.clientWidth;
 		this._base.style.height = width * ratio + 'px';
 		
-		this._base.classList.add('z-gallery-' + this._count);
+		this._base.classList.add('z-jigsaw-' + this._count);
 
 		var inner = '';
 		for(var i = 0; i < this._count; i++){
 			inner += '<img src="' + this._urls[i] + '" alt="">';
 		}
 		this._base.innerHTML = inner;
+
+		/*--------------------------------------------*/
+		//make clip-path usable for ff
+		var t = document.createElement('div');
+		var s = document.createElement('style');
+		t.innerHTML = clipPathInline;
+		s.innerHTML = clipPathStyleInline;
+		s.type = "text/css";
+		document.body.appendChild(t);
+		document.head.appendChild(s);
+		/*--------------------------------------------*/
 
 		function resizeHandlerGetter(context){
 			var _this = context;

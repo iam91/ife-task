@@ -1,5 +1,5 @@
 window.onload = function(){
-	var g = document.querySelector('.z-gallery');
+	var g = document.querySelector('.z-jigsaw');
 	var params = {
 		count: 1,
 		urls: [
