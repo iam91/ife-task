@@ -16,4 +16,16 @@ window.onload = function(){
 	};
 	var z = new zj(g, params);
 	var zz = new zw(w, params);
+
+	document.onscroll = function(e){
+		var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
+		//console.log(document.body.clientHeight);
+		
+		if(window.innerHeight + scrollTop >= document.body.clientHeight){
+			if(zz.allLoaded()){
+				zz.loadMore(params.urls);
+			}
+		}
+		//console.log(document.body.scrollTop + ',' + document.body.clientHeight + ',' + window.pageYOffset);
+	};
 };

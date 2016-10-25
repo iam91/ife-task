@@ -13,6 +13,7 @@
 			elem['on' + type] = handler;
 		}
 	}
+
 	/**
 	 * Remove event handler
 	 */
@@ -35,16 +36,25 @@
 		this._colCount = params && params.colCount || 4;
 		this._cols = new Array(this._colCount);
 		this._gutter = params && params.gutter || 16;
-		this._urls = params && params.urls || [];
+		//must use concat
+		this._urls = [];
 		this._urlIndex = 0;
 
-		this._init();
+		this._init(params);
 	}
 
-	ZWaterfall.prototype._init = function(){
+	ZWaterfall.prototype._init = function(params){
+		/**
+		 * Be careful of Array copy
+		 */
+		var t = params && params.urls || [];
+		for(var i = 0; i < t.length; i++){
+			this._urls.push(t[i]);
+		}
+
 		this._renderCols();
 		this._renderModal();
-		this._fetchPic();
+		this.fetchPic();
 	};
 
 	ZWaterfall.prototype._handlerWrapper = function(fn, once, eventType){
@@ -89,13 +99,6 @@
 		}
 	};
 
-	ZWaterfall.prototype._fetchPic = function(e){
-		if(this._urlIndex < this._urls.length){
-			var url = this._urls[this._urlIndex++];
-			this._renderPic(url);
-		}
-	};
-
 	ZWaterfall.prototype._renderPic = function(url){
 		var img = document.createElement('img');
 		var div = document.createElement('div');
@@ -104,7 +107,7 @@
 		div.classList.add('z-waterfall-pic');
 		div.style.padding = this._gutter / 2 + 'px';
 
-		addHandler(img, 'load', this._handlerWrapper(this._fetchPic, true, 'load'));
+		addHandler(img, 'load', this._handlerWrapper(this.fetchPic, true, 'load'));
 		addHandler(img, 'click', this._handlerWrapper(this._show, false));
 		
 		//find the shortest column
@@ -134,6 +137,28 @@
 			this._cols[i] = col;
 		}
 		this._base.appendChild(frag);
+	};
+
+	//public
+	ZWaterfall.prototype.fetchPic = function(){
+		if(this._urlIndex < this._urls.length){
+			var url = this._urls[this._urlIndex++];
+			this._renderPic(url);
+		}
+	};
+
+	ZWaterfall.prototype.loadMore = function(urls){
+		/**
+		 * Be careful of Array copy
+		 */
+		for(var i = 0; i < urls.length; i++){
+			this._urls.push(urls[i]);
+		}
+		this.fetchPic();
+	};
+
+	ZWaterfall.prototype.allLoaded = function(){
+		return this._urlIndex == this._urls.length;
 	};
 
 	function zw(q, params){
