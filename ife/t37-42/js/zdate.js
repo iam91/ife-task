@@ -239,7 +239,8 @@
 	};
 
 	ZDate.prototype._renderSel = function(){
-		if(!this._selStartElem && !this._selEndElem){
+		if(this._selStart.getTime() > this._calEnd.getTime()
+			|| this._selEnd.getTime() < this._calStart.getTime()){
 			return;
 		}
 
