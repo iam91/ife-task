@@ -120,7 +120,7 @@
 				}
 
 				var wiggle = 0.99;
-				var styleWidth = parseInt(styleHeight * img.width / img.height) * wiggle;
+				var styleWidth = styleHeight * img.width / img.height * wiggle ;
 
 				var imgWrapper = document.createElement('div');
 				imgWrapper.style.width = styleWidth + 'px';
