@@ -60,11 +60,6 @@
 			//Sometimes mouse moves too fast that mouse is up outside of content
 			addHandler(this._base, 'mouseup', this._dragStopHandler = this._handlerWrapper(this._dragStop));
 		}
-
-		var r = this._base.scrollHeight
-		var h = document.documentElement.clientHeight;
-		console.log(r);
-		console.log(h);
 	};
 
 	ZModal.prototype._drag = function(e){

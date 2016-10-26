@@ -28,6 +28,8 @@ window.onload = function(e){
 	var s0 = _('#s0');
 	var s1 = _('#s1');
 	var s2 = _('#s2');
+	var s3 = _('#s3');
+	var s4 = _('#s4');
 
 
 	addHandler(s0, 'click', function(e){
@@ -39,7 +41,31 @@ window.onload = function(e){
 	addHandler(s2, 'click', function(e){
 		m2.show();
 	});
-/*
+
+	/**
+	 * Init date
+	 */
+	var dd1 = new Date();
+	dd1.setDate(dd1.getDate() - 1);
+	var dd2 = new Date();
+	dd2.setDate(dd2.getDate() + 1);
+
+	var d0 = zd('#d0');
+	var d1 = zd('#d1', {
+		selStart: dd1,
+		selEnd : dd2
+	});
+	addHandler(s3, 'click', function(e){
+		var d = d0.getDates();
+		console.log('d0: ')
+		console.log(d);
+	});
+	addHandler(s4, 'click', function(e){
+		var d = d1.getDates();
+		console.log('d1: ')
+		console.log(d)
+	});
+
 	var tableParams = {
 		cols: [
 			{index: 'name', title: '姓名'},
@@ -75,26 +101,4 @@ window.onload = function(e){
 		var t = zt(ts[i], tableParams);
 		//console.log(t);
 	}
-
-	var s3 = _('#s3');
-	var s4 = _('#s4');
-
-	var d1 = new Date();
-	d1.setDate(d1.getDate() - 1);
-	var d2 = new Date();
-	d2.setDate(d2.getDate() + 1);
-	
-	var d = zd(document.querySelectorAll('.z-date')[0], {
-		selStart: d1,
-		selEnd : d2
-	});
-	//console.log(d);
-
-	addHandler(s3, 'click', function(e){
-		d.prevMonth();
-	});
-
-	addHandler(s4, 'click', function(e){
-		d.togglePad();
-	});*/
 };

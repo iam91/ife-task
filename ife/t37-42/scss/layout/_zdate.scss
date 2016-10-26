@@ -1,6 +1,6 @@
 .z-date{
 	position: relative;
-	
+	display: inline-block;
 	//text box showing selected dates
 	div.z-d-show{
 		padding: 5px;
@@ -13,6 +13,7 @@
 
 	//calendar pad
 	div.z-d-pad{
+		width: 14em;
 		position: absolute;
 		z-index: $zindex-max;
 		padding: 0 1em;

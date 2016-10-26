@@ -1,5 +1,6 @@
 .z-date {
-  position: relative; }
+  position: relative;
+  display: inline-block; }
   .z-date div.z-d-show {
     padding: 5px; }
     .z-date div.z-d-show input {
@@ -7,6 +8,7 @@
       height: 1.2em;
       padding: 0 0.5em; }
   .z-date div.z-d-pad {
+    width: 14em;
     position: absolute;
     z-index: 2147483647;
     padding: 0 1em;
