@@ -40,12 +40,12 @@
 		this._base = base;
 
 		this._minHeight = params && params.minHeight || 150;
-		this._minPerRow = params && params.minPerRow || 3;
 		this._maxPerRow = params && params.maxPerRow || 6
 
 		this._urls = [];
 		this._urlIndex = 0;
 		this._cache = [];
+		this._cacheRemain = false;
 
 		this._init(params);
 	}
@@ -75,7 +75,14 @@
 
 	ZBrick.prototype._tryRenderPic = function(e){
 		this._cache.push(e.target);
-		if(this._cache.length >= this._maxPerRow){
+		if(this._cache.length >= this._maxPerRow 
+			|| this._urlIndex == this._urls.length){
+			
+			if(this._cache.length >= this._maxPerRow && this._cacheRemain){
+				this._cacheRemain = false;
+				this._base.removeChild(this._base.lastChild);
+			}
+			
 			var totWidth = this._base.clientWidth;
 			var totPicWidth = 0;
 			var id = 0;
@@ -91,18 +98,31 @@
 				}
 			}
 
-			var styleHeight = parseInt(this._minHeight * totWidth / totPicWidth);
+			if(this._urlIndex == this._urls.length 
+				&& id == this._cache.length){
+				//The last row should be of height this._minHeight
+				var styleHeight = this._minHeight;
+			}
+			else{
+				var styleHeight = parseInt(this._minHeight * totWidth / totPicWidth);
+			}
+
 
 			var row = document.createElement('div');
 			row.classList.add('z-brick-row');
 			for(var i = 0; i < id; i++){
-				var img = this._cache.shift();
+				if(this._urlIndex == this._urls.length){
+					this._cacheRemain = true;
+					var img = this._cache[i];
+				}
+				else{
+					var img = this._cache.shift();
+				}
 
-				var wiggle = 0.98;
+				var wiggle = 0.99;
 				var styleWidth = parseInt(styleHeight * img.width / img.height) * wiggle;
 
 				var imgWrapper = document.createElement('div');
-
 				imgWrapper.style.width = styleWidth + 'px';
 				imgWrapper.style.height = styleHeight + 'px';
 
@@ -111,7 +131,6 @@
 			}
 			this._base.appendChild(row);
 		}
-		console.log(this._cache.length);
 		this.fetchPic();
 	};
 
@@ -123,6 +142,18 @@
 			addHandler(img, 'load', 
 				this._handlerWrapper(this._tryRenderPic, true, 'load'));
 		}
+	};
+
+	ZBrick.prototype.loadMore = function(urls){
+		/**
+		 * Be careful of Array copy
+		 */
+		arrayAppend(this._urls, urls);
+		this.fetchPic();
+	};
+
+	ZBrick.prototype.allLoaded = function(){
+		return this._urlIndex == this._urls.length;
 	};
 
 

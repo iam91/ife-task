@@ -27,14 +27,14 @@ window.onload = function(){
 	var zz = new zw(w, params);
 	var zzz = new zb(b, params);
 	zzz.fetchPic();
-	/*
+	
 	document.onscroll = function(e){
 		var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
 		
 		if(window.innerHeight + scrollTop >= document.body.clientHeight){
-			if(zz.allLoaded()){
-				zz.loadMore(params.urls);
+			if(zzz.allLoaded()){
+				zzz.loadMore(params.urls);
 			}
 		}
-	};*/
+	};
 };
