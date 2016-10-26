@@ -29,6 +29,13 @@
 		}
 	}
 
+	function arrayAppend(r, arr){
+		for(var i = 0; i < arr.length; i++){
+			r.push(arr[i]);
+		}
+		return r;
+	}
+
 	function ZWaterfall(base, params){
 		this._base = base;
 		this._modal = null;
@@ -48,9 +55,7 @@
 		 * Be careful of Array copy
 		 */
 		var t = params && params.urls || [];
-		for(var i = 0; i < t.length; i++){
-			this._urls.push(t[i]);
-		}
+		arrayAppend(this._urls, t);
 
 		this._renderCols();
 		this._renderModal();
@@ -151,9 +156,7 @@
 		/**
 		 * Be careful of Array copy
 		 */
-		for(var i = 0; i < urls.length; i++){
-			this._urls.push(urls[i]);
-		}
+		arrayAppend(this._urls, urls);
 		this.fetchPic();
 	};
 
