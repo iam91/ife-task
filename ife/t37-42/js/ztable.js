@@ -38,6 +38,15 @@
 		return b - a;
 	}
 
+	var ClassName = {
+		TABLE_HEAD: 'z-table-head'
+	};
+
+	var Selector = {
+		ARROW_UP: '.arrow_u',
+		ARROW_DOWN: '.arrow_d'
+	};
+
 	function ZTable(base, param){
 		this._base = base;
 		this._cols = param.cols;
@@ -70,7 +79,7 @@
 	ZTable.prototype._createFloatHead = function(floatStart){
 		if(!this._floathead.dom){
 			var h = this._thead.cloneNode(true);
-			h.classList.add('z-table-head');
+			h.classList.add(ClassName.TABLE_HEAD);
 			h.style.position = 'fixed';
 			h.style.top = '0';
 			this._base.appendChild(h);
@@ -81,8 +90,8 @@
 			for(var i = 0; i < this._thead.children.length; i++){
 				var title = h.children[i];
 				var colIndex = this._cols[i].index;
-				var asc = title.querySelector('.arrow-u');
-				var des = title.querySelector('.arrow-d');
+				var asc = title.querySelector(Selector.ARROW_UP);
+				var des = title.querySelector(Selector.ARROW_DOWN);
 
 				if(asc){
 					addHandler(asc, 'click', this._getSortHandler(colIndex, true));
@@ -95,7 +104,7 @@
 	};
 
 	ZTable.prototype._init = function(){
-		this._thead.classList.add('z-table-head');
+		this._thead.classList.add(ClassName.TABLE_HEAD);
 		this._base.appendChild(this._thead);
 		this._base.appendChild(this._tbody);
 

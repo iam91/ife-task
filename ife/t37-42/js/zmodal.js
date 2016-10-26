@@ -28,7 +28,15 @@
 		}
 	}
 
-	var showClass = 'z-modal-show';
+	var ClassName = {
+		FIX_CONTENT: 'z-m-c-fixed',
+		MOVING_CONTENT: 'z-m-c-moving',
+		SHOW: 'z-modal-show'
+	};
+
+	var Selector = {
+		CONTENT: '.z-modal-content'
+	};
 	
 	function ZModal(base){
 		this._base = base;
@@ -43,11 +51,20 @@
 	}
 
 	ZModal.prototype._init = function(){
-		this._content = this._base.querySelector('.z-modal-content');
-		this._content.classList.add('z-m-c-fixed');
 		addHandler(this._base, 'click', this._randomClickHandler = this._handlerWrapper(this._randomClick));
-		addHandler(this._content, 'mousedown', this._dragStartHandler = this._handlerWrapper(this._dragStart));
-		addHandler(this._content, 'mouseup', this._dragStopHandler = this._handlerWrapper(this._dragStop));
+		
+		this._content = this._base.querySelector(Selector.CONTENT);
+		if(this._content){
+			this._content.classList.add(ClassName.FIX_CONTENT);
+			addHandler(this._content, 'mousedown', this._dragStartHandler = this._handlerWrapper(this._dragStart));
+			//Sometimes mouse moves too fast that mouse is up outside of content
+			addHandler(this._base, 'mouseup', this._dragStopHandler = this._handlerWrapper(this._dragStop));
+		}
+
+		var r = this._base.scrollHeight
+		var h = document.documentElement.clientHeight;
+		console.log(r);
+		console.log(h);
 	};
 
 	ZModal.prototype._drag = function(e){
@@ -58,9 +75,10 @@
 	ZModal.prototype._dragStart = function(e){
 		this._content.style.left = this._content.offsetLeft + 'px';
 		this._content.style.top = this._content.offsetTop + 'px';
+		this._content.style.position = 'absolute';
 		this._content.style.margin = '0';
-		//.z-m-c-fixed must be moved after reading offsetLeft and offsetTop
-		this._content.classList.remove('z-m-c-fixed');
+		//.z-m-c-fixed can only be moved after reading offsetLeft and offsetTop
+		this._content.classList.remove(ClassName.FIX_CONTENT);
 		this._innerOffsetX = e.pageX - this._content.offsetLeft;
 		this._innerOffsetY = e.pageY - this._content.offsetTop;
 		addHandler(this._content, 'mousemove', this._dragHandler = this._handlerWrapper(this._drag));
@@ -73,10 +91,13 @@
 
 	ZModal.prototype._randomClick = function(e){
 		if(e.target === e.currentTarget){
-			this._content.style.left = '';
-			this._content.style.top = '';
-			this._content.style.margin = '';
-			this._content.classList.add('z-m-c-fixed');
+			if(this._content){
+				this._content.style.left = '';
+				this._content.style.top = '';
+				this._content.style.margin = '';
+				this._content.style.position = '';
+				this._content.classList.add(ClassName.FIX_CONTENT);
+			}
 			this.hide();
 		}
 	};
@@ -89,11 +110,11 @@
 	};
 
 	ZModal.prototype.show = function(){
-		this._base.classList.add(showClass);
+		this._base.classList.add(ClassName.SHOW);
 	};
 
 	ZModal.prototype.hide = function(){
-		this._base.classList.remove(showClass);
+		this._base.classList.remove(ClassName.SHOW);
 	};
 
 	function zm(q){

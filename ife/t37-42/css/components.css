@@ -137,18 +137,17 @@ table.z-table thead.z-table-head td {
 div.z-modal {
   position: fixed;
   top: 0;
-  right: 0;
-  bottom: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
   visibility: hidden;
-  z-index: 2147483647; }
+  z-index: 2147483647;
+  overflow: auto; }
   div.z-modal div.z-modal-content {
-    position: absolute;
     padding: 10px;
     width: 50%; }
   div.z-modal div.z-m-c-fixed {
-    margin: 8% auto;
-    left: 25%; }
+    margin: 8% auto; }
 
 div.z-modal-show {
   visibility: visible; }

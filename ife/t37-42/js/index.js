@@ -1,25 +1,45 @@
 window.onload = function(e){
+
 	var _ = function(query){
 		return document.querySelector(query);
 	};
+	/**
+	 * function for adding event handler
+	 */
+	function addHandler(elem, type, handler){
+		if(elem.attachEvent){
+			elem.attachEvent('on' + type, handler);
+		}
+		else if(elem.addEventListener){
+			elem.addEventListener(type, handler, false);
+		}
+		else{
+			elem['on' + type] = handler;
+		}
+	}
 
+	/**
+	 * Init modal
+	 */
+	var m0 = zm('#m0');
 	var m1 = zm(_('#m1'));
 	var m2 = zm('#m2');
 
+	var s0 = _('#s0');
 	var s1 = _('#s1');
 	var s2 = _('#s2');
 
-	//console.log(m1);
-	//console.log(m2);
 
+	addHandler(s0, 'click', function(e){
+		m0.show();
+	});
 	addHandler(s1, 'click', function(e){
 		m1.show();
 	});
-
 	addHandler(s2, 'click', function(e){
 		m2.show();
 	});
-
+/*
 	var tableParams = {
 		cols: [
 			{index: 'name', title: '姓名'},
@@ -76,12 +96,5 @@ window.onload = function(e){
 
 	addHandler(s4, 'click', function(e){
 		d.togglePad();
-	});
-	var t0 = $(document);
-	var t1 = $(document.querySelector('.a'));
-	var t2 = $('.a').first();
-	var t3 = document.querySelector('.a');
-	console.log(t0);
-	console.log(!t1.is(t3));
-	console.log(t2);
+	});*/
 };

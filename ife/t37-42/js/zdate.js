@@ -1,10 +1,7 @@
 /**
  * Depends on jQuery
  */
- /*
-  * TODO solve bug: div can be clicked
-  */ 
-;(function($, window, document){
+ ;(function($, window, document){
 
 	function $$(elem){
 		return document.createElement(elem);
