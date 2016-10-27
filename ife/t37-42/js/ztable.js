@@ -43,8 +43,8 @@
 	};
 
 	var Selector = {
-		ARROW_UP: '.arrow_u',
-		ARROW_DOWN: '.arrow_d'
+		ARROW_UP: '.arrow-u',
+		ARROW_DOWN: '.arrow-d'
 	};
 
 	function ZTable(base, param){
@@ -57,36 +57,38 @@
 		this._thead = $$('thead');
 		this._tbody = $$('tbody');
 
-		this._floathead = {
-			dom: null,
-			_floatStart: 0,
-			_inTableDisplace: 0,
-			show: function(){
-				this.dom.style.visibility = 'visible';
-			},
-			hide: function(){
-				this.dom.style.visibility = 'hidden';
-			},
-			isInTable: function(top){
-				var displace = this._floatStart - top;
-				return displace < this._inTableDisplace;
-			}
-		};
+		this._floathead = null;
+		this._inTableDisplacement = 0;
 
 		this._init();
 	}
 
-	ZTable.prototype._createFloatHead = function(floatStart){
-		if(!this._floathead.dom){
+	ZTable.prototype._show = function(){
+		if(this._floathead){
+			this._floathead.style.visibility = 'visible';
+		}
+	};
+
+	ZTable.prototype._hide = function(){
+		if(this._floathead){
+			this._floathead.style.visibility = 'hidden';
+		}
+	};
+
+	ZTable.prototype._isInTable = function(top){
+		var displace = - top;
+		return displace < this._inTableDisplacement && displace > 0;
+	};
+
+	ZTable.prototype._createFloatHead = function(){
+		if(!this._floathead){
 			var h = this._thead.cloneNode(true);
 			h.classList.add(ClassName.TABLE_HEAD);
 			h.style.position = 'fixed';
 			h.style.top = '0';
+			this._floathead = h;
 			this._base.appendChild(h);
-			this._floathead._floatStart = floatStart;
-			this._floathead.dom = h;
-			this._floathead._inTableDisplace = this._base.offsetHeight - this._thead.offsetHeight;
-		
+			//bind sort handlers
 			for(var i = 0; i < this._thead.children.length; i++){
 				var title = h.children[i];
 				var colIndex = this._cols[i].index;
@@ -110,29 +112,21 @@
 
 		this._loadTitle();
 		this._loadData();
+		this._inTableDisplacement = this._base.offsetHeight;
 
 		addHandler(document, 'scroll', this._handlerWrapper(this._floatHeadHandler));
 	};
 
 	ZTable.prototype._floatHeadHandler = function(e){
 		var rec = this._thead.getBoundingClientRect();
-		if(rec.top < 0){
-			if(!this._floathead.dom){
-				this._createFloatHead(rec.top);
+		var flag = this._isInTable(rec.top);
+		if(flag){
+			if(!this._floathead){
+				this._createFloatHead();
 			}
-			else{
-				if(this._floathead.isInTable(rec.top)){
-					this._floathead.show();
-				}
-				else{
-					this._floathead.hide();
-				}
-			}
-		}
-		else{
-			if(this._floathead.dom){
-				this._floathead.hide();
-			}
+			this._show();
+		}else{
+			this._hide();
 		}
 	};
 
@@ -160,8 +154,8 @@
 			title.innerHTML = '<span>' + col.title + '</span>' 
 				+ (col.sortable !== undefined ? this._sortArrow : '');
 
-			var asc = title.querySelector('.arrow-u');
-			var des = title.querySelector('.arrow-d');
+			var asc = title.querySelector(Selector.ARROW_UP);
+			var des = title.querySelector(Selector.ARROW_DOWN);
 
 			/**
 			 * !!! Do not modify this._cols like this: `this._cols[i].sortable = col.sortable || sort;`,
