@@ -101,7 +101,8 @@
 
 table.z-table {
   font-family: "Microsoft YaHei";
-  border-collapse: collapse; }
+  border-collapse: collapse;
+  border: 50px solid black; }
   table.z-table td {
     text-align: center; }
   table.z-table thead.z-table-head span {

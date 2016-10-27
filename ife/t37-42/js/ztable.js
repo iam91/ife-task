@@ -77,7 +77,7 @@
 
 	ZTable.prototype._isInTable = function(top){
 		var displace = - top;
-		return displace < this._inTableDisplacement && displace > 0;
+		return  displace > 0 && displace < this._inTableDisplacement;
 	};
 
 	ZTable.prototype._createFloatHead = function(){
@@ -112,14 +112,16 @@
 
 		this._loadTitle();
 		this._loadData();
-		this._inTableDisplacement = this._base.offsetHeight;
-
+		this._inTableDisplacement = this._tbody.clientHeight;
 		addHandler(document, 'scroll', this._handlerWrapper(this._floatHeadHandler));
 	};
 
 	ZTable.prototype._floatHeadHandler = function(e){
 		var rec = this._thead.getBoundingClientRect();
-		var flag = this._isInTable(rec.top);
+		var top = rec.top 
+			+ (this._base.offsetHeight - this._base.clientHeight)     //top border width of table
+			+ (this._thead.offsetHeight - this._thead.clientHeight);  //top border width of thead
+		var flag = this._isInTable(top);
 		if(flag){
 			if(!this._floathead){
 				this._createFloatHead();
