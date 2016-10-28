@@ -1,0 +1,17 @@
+.z-g-waterfall{
+	width: 100%;
+	overflow: hidden;
+	.z-g-waterfall-col{
+		float: left;
+		overflow: hidden;
+		.z-g-waterfall-pic{
+			width: 100%;
+			overflow: hidden;
+			box-sizing: border-box;
+			img{
+				width: 100%;
+				display: block;
+			}
+		}
+	}
+}

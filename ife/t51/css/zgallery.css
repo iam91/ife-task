@@ -108,4 +108,32 @@
     top: 66.6667%;
     left: 0; }
 
+.z-g-waterfall {
+  width: 100%;
+  overflow: hidden; }
+  .z-g-waterfall .z-g-waterfall-col {
+    float: left;
+    overflow: hidden; }
+    .z-g-waterfall .z-g-waterfall-col .z-g-waterfall-pic {
+      width: 100%;
+      overflow: hidden;
+      box-sizing: border-box; }
+      .z-g-waterfall .z-g-waterfall-col .z-g-waterfall-pic img {
+        width: 100%;
+        display: block; }
+
+.z-g-brick {
+  width: 100%;
+  overflow: hidden; }
+  .z-g-brick .z-g-brick-row {
+    width: 100%;
+    overflow: hidden; }
+    .z-g-brick .z-g-brick-row div {
+      float: left;
+      overflow: hidden; }
+      .z-g-brick .z-g-brick-row div img {
+        display: block;
+        width: 100%;
+        height: 100%; }
+
 /*# sourceMappingURL=zgallery.css.map */

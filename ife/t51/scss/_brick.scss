@@ -1,0 +1,17 @@
+.z-g-brick{
+	width: 100%;
+	overflow: hidden;
+	.z-g-brick-row{
+		width: 100%;
+		overflow: hidden;
+		div{
+			float: left;
+			overflow: hidden;
+			img{
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+		}
+	}
+}
