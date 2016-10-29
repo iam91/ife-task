@@ -113,6 +113,7 @@
   overflow: hidden; }
   .z-g-waterfall .z-g-waterfall-col {
     float: left;
+    box-sizing: border-box;
     overflow: hidden; }
     .z-g-waterfall .z-g-waterfall-col .z-g-waterfall-pic {
       width: 100%;
@@ -130,10 +131,12 @@
     overflow: hidden; }
     .z-g-brick .z-g-brick-row div {
       float: left;
-      overflow: hidden; }
+      overflow: hidden;
+      box-sizing: border-box;
+      height: 100%; }
       .z-g-brick .z-g-brick-row div img {
-        display: block;
         width: 100%;
+        display: block;
         height: 100%; }
 
 /*# sourceMappingURL=zgallery.css.map */

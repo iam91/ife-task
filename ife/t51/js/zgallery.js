@@ -44,7 +44,7 @@
 			return h;
 		},
 
-		arrayClone: function(head, tail){
+		arrayAppend: function(head, tail){
 			for(var i = 0; i < tail.length; i++){
 				head.push(tail[i]);
 			}
@@ -57,6 +57,9 @@
 			}
 		},
 
+		/**
+		 * Used in jigsaw layout
+		 */
 		imageClip: function(img, r, isRect, index, count){
 			var w = img.width;
 			var h = img.height;
@@ -92,7 +95,9 @@
 				img.classList.add(ClassName.H_CLIP);
 				var polygon = '<polygon points="' + x1 + ' 0, ' + x2 + ' 0, ' + x2 + ' 1, 0 1"/>';
 			}
-			var styleInner = '.' + ClassName.JIGSAW_X + count + " div:nth-child(" + (index + 1) + ") img{-webkit-clip-path: url('#clip-shape-" + index + "');clip-path: url('#clip-shape-" + index + "');}";
+			var styleInner = '.' + ClassName.JIGSAW_X + count + " div:nth-child(" + (index + 1) 
+				+ ") img{-webkit-clip-path: url('#clip-shape-" + index 
+				+ "');clip-path: url('#clip-shape-" + index + "');}";
 
 			//make clip-path usable in firefox
 			var t = document.createElement('div');
@@ -163,21 +168,31 @@
 
 		/**
 		 * Waterfall layout member variables
+		 * @namespace
 		 * @private
 		 */
-		this._colCount = 4;
-		this._cols = null;
+		this._waterfall = {
+			colCount: 0,
+			cols: null
+		}
 
 		/**
 		 * Brick layout member variables
+		 * @namespace
 		 * @private
 		 */
-		this._maxBin = 6;
-		this._minBin = 3;
-		this._minHeight = 150;
-		//this._maxHeight
-		this._cacheHead = 0;
-		this._cacheTail = 1;
+		this._brick = {
+			maxBin: 0,
+			minBin: 0,
+			minHeight: 0,
+			cacheHead: 0,
+			cacheTail: 0,
+			rows: null,
+			renderCache: null
+		}
+
+		//for test
+		this.temp = null;
 	}
 
 	/******* The following are event handlers *******/
@@ -189,8 +204,8 @@
 
 		this._fetchImage();
 		var img = e.target;
-		this._cache.push(img);//console.log(this._cache)
-		this._cacheTail++;
+		this._cache.push(img);
+		this._brick.cacheTail++;
 		this._placeImage();
 	};
 
@@ -202,7 +217,7 @@
 		this._fetchImage();
 		var img = e.target;
 		this._cache.push(img);
-		this._cacheTail++;
+		this._brick.cacheTail++;
 		this._placeImage();
 	};
 
@@ -221,6 +236,8 @@
 	};
 
 	ZGallery.prototype._placeImage = null;
+
+	ZGallery.prototype._removeImage = null;
 
 	/******* The following are private methods for a speicific layout *******/
 
@@ -271,19 +288,23 @@
 
 	ZGallery.prototype._initWaterfall = function(opt){
 		this._g.classList.add(ClassName.WATERFALL_G);
-		this._colCount = opt && opt.colCount || 4;
-		this._cols = new Array(this._colCount);
+		this._waterfall.colCount = opt && opt.colCount || 4;
+		this._waterfall.cols = new Array(this._colCount);
 
 		//Column width in percentage relative to container.
-		var colWidth = 100 / this._colCount;
+		var colWidth = 100 / this._waterfall.colCount;
 		//Render the column containers.
 		var frag = document.createDocumentFragment();
-		for(var i = 0; i < this._colCount; i++){
+		for(var i = 0; i < this._waterfall.colCount; i++){
 			var col = document.createElement('div');
 			col.style.width = colWidth + '%';
 			col.classList.add(ClassName.WATERFALL_COL);
 			frag.appendChild(col);
-			this._cols[i] = col;
+			this._waterfall.cols[i] = col;
+			//Set vertical gutter width.
+			if(i < this._waterfall.colCount - 1){
+				col.style.paddingRight = this._gutterX + 'px';
+			}
 		}
 		this._g.appendChild(frag);
 	};
@@ -293,24 +314,22 @@
 		var div = document.createElement('div');
 		div.appendChild(img);
 		div.classList.add(ClassName.WATERFALL_PIC);
+		
+
 		//Set horizontal gutter width.
-		div.style.paddingBottom = this._gutterY + 'px';
+		div.style.marginBottom = this._gutterY + 'px';
 
 		//Find the shortest column.
 		var minIndex = 0;
-		var minReferer = this._cols[minIndex];
+		var minReferer = this._waterfall.cols[minIndex];
 		var min = minReferer.clientHeight;
-		for(var i = 0; i < this._colCount; i++){
-			var h = this._cols[i].clientHeight;
+		for(var i = 0; i < this._waterfall.colCount; i++){
+			var h = this._waterfall.cols[i].clientHeight;
 			if(min > h){
 				min = h;
 				minIndex = i;
-				minReferer = this._cols[minIndex];
+				minReferer = this._waterfall.cols[minIndex];
 			}
-		}
-		if(minIndex < this._colCount - 1){
-			//Set vertical gutter width.
-			div.style.paddingRight = this._gutterX + 'px';
 		}
 		minReferer.appendChild(div);
 	};
@@ -318,27 +337,66 @@
 	ZGallery.prototype._initBrick = function(opt){
 		this._g.classList.add(ClassName.BRICK_G);
 
-		this._minBin = opt && opt.minBin || 3;
-		this._maxBin = opt && opt.maxBin || 6;
-		this._minHeight = opt && opt.minHeight || 150;
-		this._cacheHead = 0;
-		this._cacheTail = 1;
+		this._brick.minBin = opt && opt.minBin || 2;
+		this._brick.maxBin = opt && opt.maxBin || 5;
+		this._brick.minHeight = opt && opt.minHeight || 150;
+		this._brick.cacheHead = 0;
+		this._brick.cacheTail = 0;
+		this._brick.rows = [];
+
+		this._addPlaceholderRow();
+
+		function brickOnresize(e){
+			var totWidth = this._g.clientWidth;
+			for(var i = 0; i < this._g.children.length; i++){
+				//Resize every row.
+				var row = this._g.children[i];
+				row.style.height = totWidth * (this._brick.minHeight / this._brick.rows[i].totImageWidth) + 'px';
+			}
+		}
+
+		Util.addHandler(window, 'resize', Util.eventHandlerWrapper(brickOnresize, this, false));
 	};
 
-	ZGallery.prototype._placeImageBrick = function(){
-		var cacheWindow = this._cacheTail - this._cacheHead + 1;
+	ZGallery.prototype._addPlaceholderRow = function(){
+		var placeholderRow = document.createElement('div');
+		this._g.appendChild(placeholderRow);
+		this._brick.rows.push({totImageWidth: 0});
+	};
 
-		if(cacheWindow >= this._maxBin){
-			//layout algorithm
+	ZGallery.prototype._reachMaxBinBrick = function(){
+		return (this._brick.cacheTail - this._brick.cacheHead) >= this._brick.maxBin;
+	};
+
+	ZGallery.prototype._remainBrick = function(){
+		return (this._brick.cacheTail - this._brick.cacheHead) < this._brick.maxBin  
+			&& this._cache.length == this._urls.length;
+	}
+
+	ZGallery.prototype._placeImageBrick = function(){
+
+		var reachMaxFlag = this._reachMaxBinBrick();
+		var remainFlag = this._remainBrick();
+
+		if(reachMaxFlag || remainFlag){
+			//clear remains
+			this._g.removeChild(this._g.lastChild);
+			this._brick.rows.pop();
+
+			var offset = reachMaxFlag ? this._brick.maxBin : this._brick.cacheTail - this._brick.cacheHead;
+
 			var totWidth = this._g.clientWidth;
 			var totImageWidth = 0;
-			var id = this._cacheHead;
-			while(id < this._cacheTail){
+			var id = this._brick.cacheHead;
+			var end = this._brick.cacheHead + offset;
+
+			//get images in the row
+			while(id < end){
 				var img = this._cache[id];
-				var w = this._minHeight * img.width / img.height;
+				var w = this._brick.minHeight * img.width / img.height;
 				if(
-					totImageWidth + w > totWidth 
-					&& (id - this._cacheHead + 1) > this._minBin  //must be more than minBin
+					totImageWidth + w > totWidth
+					&& (id - this._brick.cacheHead) > this._brick.minBin  //must be more than minBin
 				   )
 				{
 					break;
@@ -347,26 +405,88 @@
 				totImageWidth += w;
 			}
 
-			var styleHeight = this._minHeight //* totWidth / totImageWidth;
+			//row container
 			var row = document.createElement('div');
 			row.classList.add(ClassName.BRICK_ROW);
-			for(var i = this._cacheHead; i < id; i++){
-				var img = this._cache[i];
-				
-				this._cacheHead++;
+			if(remainFlag){
+				row.style.height = this._brick.minHeight + 'px';
+				this._brick.rows.push({totImageWidth: totWidth});
+			}
+			else if(reachMaxFlag){
+				row.style.height = totWidth * (this._brick.minHeight / totImageWidth) + 'px';
+				this._brick.rows.push({totImageWidth: totImageWidth});
+			}
 
-				var wiggle = 0.95;
-				var styleWidth = this._minHeight * img.width / img.height / totImageWidth;
-				//var styleWidth = styleHeight * img.width / img.height * wiggle ;
+			//add to the row
+			for(var i = this._brick.cacheHead; i < id; i++){
+				var img = this._cache[i];
+				if(reachMaxFlag){
+					this._brick.cacheHead++;
+				}
+
+				if(reachMaxFlag){
+					var styleWidth = (this._brick.minHeight * img.width / img.height / totImageWidth);
+				}
+				else if(remainFlag){
+					var styleWidth = (this._brick.minHeight * img.width / img.height / totWidth);
+				}
 
 				var imgWrapper = document.createElement('div');
-				imgWrapper.style.width = styleWidth * 100 + '%';//styleWidth + 'px';
-				//imgWrapper.style.height = styleHeight + 'px';
+				imgWrapper.style.width = styleWidth * 100 + '%';
 
+				imgWrapper.style.paddingBottom = this._gutterY + 'px';
+				if(i < id - 1){
+					imgWrapper.style.paddingRight = this._gutterX + 'px';
+				}
 				imgWrapper.appendChild(img);
 				row.appendChild(imgWrapper);
+
+				this._imageElements.push({
+					elem: imgWrapper,
+					id: i
+				});
 			}
 			this._g.appendChild(row);
+			if(reachMaxFlag){
+				this._addPlaceholderRow();
+			}
+		}
+	};
+
+	ZGallery.prototype._removeImageBrick = function(image){
+		for(var i = 0; i < image.length; i++){
+			var imgWrapper = image[i].elem;             
+			var id = image[i].id;
+			//Find the first image in the same row
+			var cursor = imgWrapper;
+			var rowHeadId = id;
+			while(cursor.previousSibling){
+				cursor = cursor.previousSibling;
+				rowHeadId--;
+			}
+
+			//Clear following rows.
+			var curr = imgWrapper.parentNode;
+			while(curr){
+				var next = curr.nextSibling;
+				this._g.removeChild(curr);
+				curr = next;
+			}
+			this._addPlaceholderRow();
+
+			this._cache.splice(id, 1);
+			this._urls.splice(id, 1);
+			this._imageElements.splice(id, this._imageElements.length - id);
+			this._brick.cacheHead = rowHeadId;
+			this._brick.cacheTail--;
+			while(this._brick.cacheHead < this._brick.cacheTail){
+				var t = this._brick.cacheHead;
+				this._placeImageBrick();
+				if(t == this._brick.cacheHead){
+					//If the last row reached.
+					break;
+				}
+			}
 		}
 	};
 
@@ -405,8 +525,44 @@
 		/**
 		 * @todo clear zgallery
 		 */
-		this._urls = Util.arrayClone(this._urls, image);
+		this._urls = Util.arrayAppend(this._urls, image);
 		this._fetchImage();
+	};
+
+	/**
+	 * Add images to zgallery.
+	 * @param {(string|string[])} image A single image url or an array of image urls.
+	 */
+	ZGallery.prototype.addImage = function(image){
+		if(!this._initialized){
+			console.warn('ZGallery has not been initialized yet!');
+			return;
+		}
+
+		if(typeof image === 'string'){
+			this.addImage([image]);
+			return;
+		}
+
+		this._urls = Util.arrayAppend(this._urls, image);
+		this._fetchImage();
+	};
+
+	/**
+	 * Remove images.
+	 * @param  {(object|object[])} image Images need removing.
+	 * @return {boolean} Indicate whether all images are removed successfully.
+	 */
+	ZGallery.prototype.removeImage = function(image){
+		if(!this._initialized){
+			console.warn('ZGallery has not been initialized yet!');
+			return;
+		}
+		if(!(image instanceof Array)){
+			this.removeImage([image]);
+			return;
+		}
+		this._removeImage(image);
 	};
 
 	/**
@@ -441,6 +597,14 @@
 	};
 
 	/**
+	 * Get dom elements attached to images width index.
+	 * @return {object[]}
+	 */
+	ZGallery.prototype.getImageElements = function(){
+		return Util.arrayAppend([], this._imageElements);
+	};
+
+	/**
 	 * Initialize zgallery based on specified layout.
 	 * @public
 	 * @param {object} opt Configuration options for zgallery.
@@ -454,14 +618,17 @@
 			case this.LAYOUT.JIGSAW:
 				this._initJigsaw(opt);
 				this._placeImage = this._placeImageJigsaw;
+				this._removeImage = this._removeImageJigsaw;
 				break;
 			case this.LAYOUT.WATERFALL:
 				this._initWaterfall(opt);
 				this._placeImage = this._placeImageWaterfall;
+				this._removeImage = this._removeImageWaterfall;
 				break; 
 			case this.LAYOUT.BRICK:
 				this._initBrick(opt);
 				this._placeImage = this._placeImageBrick;
+				this._removeImage = this._removeImageBrick;
 				break;
 			default:
 				break;

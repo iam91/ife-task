@@ -3,6 +3,7 @@
 	overflow: hidden;
 	.z-g-waterfall-col{
 		float: left;
+		box-sizing: border-box;
 		overflow: hidden;
 		.z-g-waterfall-pic{
 			width: 100%;
