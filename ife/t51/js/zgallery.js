@@ -334,6 +334,11 @@
 		minReferer.appendChild(div);
 	};
 
+	ZGallery.prototype._removeImageWaterfall = function(image){
+		for(var i = 0; i < image.length; i++){}
+
+	};
+
 	ZGallery.prototype._initBrick = function(opt){
 		this._g.classList.add(ClassName.BRICK_G);
 
@@ -441,10 +446,12 @@
 				imgWrapper.appendChild(img);
 				row.appendChild(imgWrapper);
 
+				/***
 				this._imageElements.push({
 					elem: imgWrapper,
 					id: i
 				});
+				***/
 			}
 			this._g.appendChild(row);
 			if(reachMaxFlag){
@@ -454,6 +461,7 @@
 	};
 
 	ZGallery.prototype._removeImageBrick = function(image){
+		/***
 		for(var i = 0; i < image.length; i++){
 			var imgWrapper = image[i].elem;             
 			var id = image[i].id;
@@ -477,6 +485,7 @@
 			this._cache.splice(id, 1);
 			this._urls.splice(id, 1);
 			this._imageElements.splice(id, this._imageElements.length - id);
+
 			this._brick.cacheHead = rowHeadId;
 			this._brick.cacheTail--;
 			while(this._brick.cacheHead < this._brick.cacheTail){
@@ -488,6 +497,7 @@
 				}
 			}
 		}
+		***/
 	};
 
 	/******* The following are public methods and variables provided by zgallery *******/

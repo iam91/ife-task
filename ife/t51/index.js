@@ -46,8 +46,10 @@ window.onload = function(){
 		
 	function f(){
 		var e = gg.getImageElements();
-		gg.removeImage(e[2]);
+		gg.removeImage([e[2]]);
+	console.log(e[2].elem.hash)
 	}
+
 
 	setTimeout(f, 1000)
 	//gg.addImage(urls);
