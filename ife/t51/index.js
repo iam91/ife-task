@@ -37,20 +37,20 @@ window.onload = function(){
 	var gg = new g(document.querySelector('.z-gallery'));
 	console.log(gg);
 	//gg.setLayout(gg.LAYOUT.JIGSAW);
-	//gg.setLayout(gg.LAYOUT.WATERFALL);
-	gg.setLayout(gg.LAYOUT.BRICK);
+	gg.setLayout(gg.LAYOUT.WATERFALL);
+	//gg.setLayout(gg.LAYOUT.BRICK);
 	gg.setGutter(5);
 	gg.init({colCount: 5});
 	gg.setImage(urls);
 
-		/*
+		
 	function f(){
 		var e = gg.getImageElements();
+		console.log(e.length)
 		gg.removeImage([e[2]]);
-	console.log(e[2].elem.hash)
-	}*/
+	}
 
 
-	//setTimeout(f, 1000)
+	setTimeout(f, 1000);
 	//gg.addImage(urls);
 };

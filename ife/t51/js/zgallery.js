@@ -192,13 +192,12 @@
 			minHeight: 0,
 			maxHeight: 0,
 			cacheHead: 0,
-			cacheTail: 0,
 			rows: null,
 			renderCache: null
 		}
 
 		//for test
-		this.temp = null;
+		this.temp = 0;
 	}
 
 	/******* The following are event handlers *******/
@@ -211,7 +210,6 @@
 		this._fetchImage();
 		var img = e.target;
 		this._cache.push(img);
-		this._brick.cacheTail++;
 		this._placeImage();
 	};
 
@@ -223,7 +221,6 @@
 		this._fetchImage();
 		var img = e.target;
 		this._cache.push(img);
-		this._brick.cacheTail++;
 		this._placeImage();
 	};
 
@@ -274,6 +271,8 @@
 	ZGallery.prototype._placeImage = null;
 
 	ZGallery.prototype._removeImage = null;
+
+	ZGallery.prototype._clearLayout = null;
 
 	/******* The following are private methods for a speicific layout *******/
 	ZGallery.prototype._renderModal = function(){
@@ -349,7 +348,6 @@
 			if(colWidth > this._waterfall.maxWidth || colWidth < this._waterfall.minWidth){
 				//responsive action
 				this._clearLayoutWaterfall();
-				this._makeColsWaterfall();
 				this._waterfall.cachePointer = 0;
 				while(this._waterfall.cachePointer < this._cache.length){
 					this._placeImageWaterfall();
@@ -382,6 +380,12 @@
 
 	ZGallery.prototype._clearLayoutWaterfall = function(){
 		this._g.innerHTML = '';
+		Util.arrayClear(this._waterfall.cols);
+		Util.arrayClear(this._imageElements);
+		this._waterfall.cols = null;
+		if(!this._waterfall.cols){
+			this._makeColsWaterfall();
+		}
 	};
 
 	ZGallery.prototype._placeImageWaterfall = function(){
@@ -389,6 +393,9 @@
 		var div = document.createElement('div');
 		div.appendChild(img);
 		div.classList.add(ClassName.WATERFALL_PIC);
+		
+		//Add to image elements.
+		this._imageElements.push(div);
 
 		//Set horizontal gutter width.
 		div.style.marginBottom = this._gutterY + 'px';
@@ -408,13 +415,22 @@
 		minReferer.appendChild(div);
 	};
 
+	ZGallery.prototype._removeImageWaterfall = function(image){
+		for(var i = 0; i < image.length; i++){
+			var img = image[i];
+			img.parentNode.removeChild(img);
+		}
+		var index = this._cache.indexOf(img.firstChild);
+		this._cache.splice(index, 1);
+		this._urls.splice(index, 1);
+	};
+
 	ZGallery.prototype._initBrick = function(opt){
 		this._g.classList.add(ClassName.BRICK_G);
 
 		this._brick.minHeight = opt && opt.minHeight || 200;
 		this._brick.maxHeight = opt && opt.maxHeight || 250;
 		this._brick.cacheHead = 0;
-		this._brick.cacheTail = 0;
 		this._brick.rows = [];
 
 		this._addPlaceholderRow();
@@ -439,7 +455,7 @@
 				this._clearLayoutBrick();
 				//reset the layout
 				this._brick.cacheHead = 0;
-				while(this._brick.cacheHead < this._brick.cacheTail){
+				while(this._brick.cacheHead < this._cache.length){
 					var t = this._brick.cacheHead;
 					this._placeImageBrick();
 					if(t == this._brick.cacheHead){
@@ -460,16 +476,26 @@
 
 	ZGallery.prototype._clearLayoutBrick = function(){
 		this._g.innerHTML = '';
+		Util.arrayClear(this._imageElements);
+		Util.arrayClear(this._brick.rows);
 		this._addPlaceholderRow();
 	};
 
 	ZGallery.prototype._placeImageBrick = function(){
 
-		var tail = this._brick.cacheTail;
+		var tail = this._cache.length;
 		var head = this._brick.cacheHead;
 		var offset = tail - head;
 
-		//clear remains
+		//clear the last row(a placeholder row or a row needs rebuilding)
+		var lastRow= this._g.lastChild;
+		var lastRowCount = lastRow.children.length;
+		if(lastRowCount > 0){
+			while(lastRowCount > 0){
+				this._imageElements.pop();
+				lastRowCount--;
+			} 
+		}
 		this._g.removeChild(this._g.lastChild);
 		this._brick.rows.pop();
 
@@ -491,8 +517,8 @@
 		}
 
 		if(isFull && id == head){
-			//Can not contain this image.
-			//Skip it.
+			//Can not contain an image.
+			//Skip.
 			this._brick.cacheHead++;
 			this._addPlaceholderRow();
 			return;
@@ -502,6 +528,7 @@
 		var row = document.createElement('div');
 		row.classList.add(ClassName.BRICK_ROW);
 
+		//Compute and set row height.
 		if(isFull){
 			var rowHeight = totWidth * (this._brick.minHeight / totImageWidth);
 			var minTotalWidth = totImageWidth;
@@ -514,7 +541,7 @@
 		this._brick.rows.push({minTotalWidth: minTotalWidth});
 		row.style.height = rowHeight + 'px';
 
-		//add to the row
+		//Add images to the row
 		for(var i = head; i < id; i++){
 			var img = this._cache[i];
 			if(isFull){
@@ -532,6 +559,9 @@
 			}
 			imgWrapper.appendChild(img);
 			row.appendChild(imgWrapper);
+
+			//Add to image elements.
+			this._imageElements.push(imgWrapper);
 		}
 		this._g.appendChild(row);
 
@@ -540,49 +570,19 @@
 		}
 
 		if(this._cache.length == this._urls.length && isFull){
-			//Manually add remaining images since onload event will no longer triggered
+			//Place remaining images.
 			this._placeImageBrick();
 		}
 	};
 
 	ZGallery.prototype._removeImageBrick = function(image){
-		/***
 		for(var i = 0; i < image.length; i++){
-			var imgWrapper = image[i].elem;             
-			var id = image[i].id;
-			//Find the first image in the same row
-			var cursor = imgWrapper;
-			var rowHeadId = id;
-			while(cursor.previousSibling){
-				cursor = cursor.previousSibling;
-				rowHeadId--;
-			}
-
-			//Clear following rows.
-			var curr = imgWrapper.parentNode;
-			while(curr){
-				var next = curr.nextSibling;
-				this._g.removeChild(curr);
-				curr = next;
-			}
-			this._addPlaceholderRow();
-
-			this._cache.splice(id, 1);
-			this._urls.splice(id, 1);
-			this._imageElements.splice(id, this._imageElements.length - id);
-
-			this._brick.cacheHead = rowHeadId;
-			this._brick.cacheTail--;
-			while(this._brick.cacheHead < this._brick.cacheTail){
-				var t = this._brick.cacheHead;
-				this._placeImageBrick();
-				if(t == this._brick.cacheHead){
-					//If the last row reached.
-					break;
-				}
-			}
+			var img = image[i];
+			img.parentNode.removeChild(img);
 		}
-		***/
+		var index = this._cache.indexOf(img.firstChild);
+		this._cache.splice(index, 1);
+		this._urls.splice(index, 1);
 	};
 
 	/******* The following are public methods and variables provided by zgallery *******/
@@ -617,9 +617,8 @@
 
 		Util.arrayClear(this._urls);
 		Util.arrayClear(this._imageElements);
-		/**
-		 * @todo clear zgallery
-		 */
+		this._clearLayout();
+
 		this._urls = Util.arrayAppend(this._urls, image);
 		this._fetchImage();
 	};
@@ -741,16 +740,19 @@
 				this._initJigsaw(opt);
 				this._placeImage = this._placeImageJigsaw;
 				this._removeImage = this._removeImageJigsaw;
+				this._clearLayout = this._clearLayoutJigsaw;
 				break;
 			case this.LAYOUT.WATERFALL:
 				this._initWaterfall(opt);
 				this._placeImage = this._placeImageWaterfall;
 				this._removeImage = this._removeImageWaterfall;
+				this._clearLayout = this._clearLayoutWaterfall;
 				break; 
 			case this.LAYOUT.BRICK:
 				this._initBrick(opt);
 				this._placeImage = this._placeImageBrick;
 				this._removeImage = this._removeImageBrick;
+				this._clearLayout = this._clearLayoutBrick;
 				break;
 			default:
 				break;
