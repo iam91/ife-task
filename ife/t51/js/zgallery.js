@@ -64,7 +64,8 @@
 			var w = img.width;
 			var h = img.height;
 
-			var svgHead = '<svg width="0" height="0"><defs><clipPath id="clip-shape-' + index + '" clipPathUnits="objectBoundingBox">';
+			var svgHead = '<svg width="0" height="0"><defs><clipPath id="clip-shape-' 
+				+ index + '" clipPathUnits="objectBoundingBox">';
 			var svgTail = '</clipPath></defs></svg>';
 
 			if(h / w > r){
@@ -182,8 +183,6 @@
 		 * @private
 		 */
 		this._brick = {
-			minBin: 0,
-			maxBin: 0,
 			minHeight: 0,
 			maxHeight: 0,
 			cacheHead: 0,
@@ -344,8 +343,6 @@
 	ZGallery.prototype._initBrick = function(opt){
 		this._g.classList.add(ClassName.BRICK_G);
 
-		this._brick.minBin = opt && opt.minBin || 2;
-		this._brick.maxBin = opt && opt.maxBin || 5;
 		this._brick.minHeight = opt && opt.minHeight || 150;
 		this._brick.maxHeight = opt && opt.maxHeight || 200;
 		this._brick.cacheHead = 0;
@@ -377,7 +374,7 @@
 					var t = this._brick.cacheHead;
 					this._placeImageBrick();
 					if(t == this._brick.cacheHead){
-						//If the last row reached.
+						//The last row reached.
 						break;
 					}
 				}
@@ -399,68 +396,75 @@
 
 	ZGallery.prototype._placeImageBrick = function(){
 
-		var isMaxBin = this._brick.cacheTail - this._brick.cacheHead >= this._brick.maxBin;
-		var isRemaining = !isMaxBin && this._cache.length == this._urls.length;
-		var offset = isMaxBin ? this._brick.maxBin : this._brick.cacheTail - this._brick.cacheHead;
-		if(isMaxBin || isRemaining){
-			//clear remains
-			this._g.removeChild(this._g.lastChild);
-			this._brick.rows.pop();
+		var tail = this._brick.cacheTail;
+		var head = this._brick.cacheHead;
+		var offset = tail - head;
 
-			var totWidth = this._g.clientWidth;
-			var totImageWidth = 0;
-			var id = this._brick.cacheHead;
-			var end = this._brick.cacheHead + offset;
+		//clear remains
+		this._g.removeChild(this._g.lastChild);
+		this._brick.rows.pop();
 
-			//get images in the row
-			while(id < end){
-				var img = this._cache[id];
-				var w = this._brick.minHeight * img.width / img.height;
-				if(totImageWidth + w > totWidth){
-					break;
-				}
-				id++;
-				totImageWidth += w;
+		var totWidth = this._g.clientWidth;
+		var totImageWidth = 0;
+
+		//get images in the row
+		var id = head;
+		var isFull = false;
+		while(id < tail){
+			var img = this._cache[id];
+			var w = this._brick.minHeight * img.width / img.height;
+			if(totImageWidth + w > totWidth){
+				isFull = true;
+				break;
 			}
+			id++;
+			totImageWidth += w;
+		}
+		//console.log(head + ',' + id + ',' + tail)
 
-			//row container
-			var row = document.createElement('div');
-			row.classList.add(ClassName.BRICK_ROW);
+		//row container
+		var row = document.createElement('div');
+		row.classList.add(ClassName.BRICK_ROW);
 
-			if(isMaxBin){
-				var rowHeight = totWidth * (this._brick.minHeight / totImageWidth);
-				var minTotalWidth = totImageWidth;
+		if(isFull){
+			var rowHeight = totWidth * (this._brick.minHeight / totImageWidth);
+			var minTotalWidth = totImageWidth;
+		}
+		else{
+			var rowHeight = this._brick.minHeight;
+			var minTotalWidth = totWidth;
+		}
+
+		this._brick.rows.push({minTotalWidth: minTotalWidth});
+		row.style.height = rowHeight + 'px';
+
+		//add to the row
+		for(var i = head; i < id; i++){
+			var img = this._cache[i];
+			if(isFull){
+				//images in this row may be not enough, can be used next time
+				this._brick.cacheHead++;
 			}
-			else if(isRemaining){
-				var rowHeight = this._brick.minHeight;
-				var minTotalWidth = totWidth;
-			}
-			this._brick.rows.push({minTotalWidth: minTotalWidth});
-			row.style.height = rowHeight + 'px';
+			var styleWidth = (this._brick.minHeight * img.width / img.height / minTotalWidth);
 
-			//add to the row
-			for(var i = this._brick.cacheHead; i < id; i++){
-				var img = this._cache[i];
-				if(isMaxBin){
-					//images in this row may be not enough, can be used next time
-					this._brick.cacheHead++;
-				}
-				var styleWidth = (this._brick.minHeight * img.width / img.height / minTotalWidth);
+			var imgWrapper = document.createElement('div');
+			imgWrapper.style.width = styleWidth * 100 + '%';
 
-				var imgWrapper = document.createElement('div');
-				imgWrapper.style.width = styleWidth * 100 + '%';
+			imgWrapper.style.paddingBottom = this._gutterY + 'px';
+			if(i < id - 1){
+				imgWrapper.style.paddingRight = this._gutterX + 'px';
+			}
+			imgWrapper.appendChild(img);
+			row.appendChild(imgWrapper);
+		}
+		this._g.appendChild(row);
+		if(isFull){
+			this._addPlaceholderRow();
+		}
 
-				imgWrapper.style.paddingBottom = this._gutterY + 'px';
-				if(i < id - 1){
-					imgWrapper.style.paddingRight = this._gutterX + 'px';
-				}
-				imgWrapper.appendChild(img);
-				row.appendChild(imgWrapper);
-			}
-			this._g.appendChild(row);
-			if(isMaxBin){
-				this._addPlaceholderRow();
-			}
+		if(this._cache.length == this._urls.length && isFull){
+			//Manually add remaining images since onload event will no longer triggered
+			this._placeImageBrick();
 		}
 	};
 
