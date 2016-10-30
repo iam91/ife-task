@@ -173,8 +173,11 @@
 		 * @private
 		 */
 		this._waterfall = {
+			minWidth: 0,
+			maxWidth: 0,
 			colCount: 0,
-			cols: null
+			cols: null,
+			cachePointer: 0
 		}
 
 		/**
@@ -264,7 +267,8 @@
 				this._g.innerHTML = '';
 			}
 			
-			var count = GlobalConst.jigsaw.max < this._cache.length ? GlobalConst.jigsaw.max : this._cache.length;
+			var count = GlobalConst.jigsaw.max < this._cache.length 
+				? GlobalConst.jigsaw.max : this._cache.length;
 			this._g.classList.add(ClassName.JIGSAW_X + count);
 
 			for(var i = 0; i < count; i++){
@@ -290,14 +294,33 @@
 
 	ZGallery.prototype._initWaterfall = function(opt){
 		this._g.classList.add(ClassName.WATERFALL_G);
-		this._waterfall.colCount = opt && opt.colCount || 4;
+		this._waterfall.minWidth = opt && opt.minWidth || 250;
+		this._waterfall.maxWidth = opt && opt.maxWidth || 350;
+		this._waterfall.cachePointer = 0;
+		this._g.style.minWidth = this._waterfall.minWidth + 'px';
 		if(!this._waterfall.cols){
 			this._makeColsWaterfall();
 		}
+		function waterfallOnresize(e){
+			var totWidth = this._g.clientWidth;
+			var colWidth = totWidth / this._waterfall.colCount;
+
+			if(colWidth > this._waterfall.maxWidth || colWidth < this._waterfall.minWidth){
+				//responsive action
+				this._clearLayoutWaterfall();
+				this._makeColsWaterfall();
+				this._waterfall.cachePointer = 0;
+				while(this._waterfall.cachePointer < this._cache.length){
+					this._placeImageWaterfall();
+				}
+			}
+		}
+		Util.addHandler(window, 'resize', Util.eventHandlerWrapper(waterfallOnresize, this, false));
 	};
 
 	ZGallery.prototype._makeColsWaterfall = function(){
-		this._waterfall.cols = new Array(this._colCount);
+		this._waterfall.colCount = Math.ceil(this._g.clientWidth / this._waterfall.minWidth);
+		this._waterfall.cols = new Array(this._waterfall.colCount);
 		//Column width in percentage relative to container.
 		var colWidth = 100 / this._waterfall.colCount;
 		//Render the column containers.
@@ -316,8 +339,12 @@
 		this._g.appendChild(frag);
 	};
 
+	ZGallery.prototype._clearLayoutWaterfall = function(){
+		this._g.innerHTML = '';
+	};
+
 	ZGallery.prototype._placeImageWaterfall = function(){
-		var img = this._cache[this._cache.length - 1];
+		var img = this._cache[this._waterfall.cachePointer++];
 		var div = document.createElement('div');
 		div.appendChild(img);
 		div.classList.add(ClassName.WATERFALL_PIC);
@@ -343,8 +370,8 @@
 	ZGallery.prototype._initBrick = function(opt){
 		this._g.classList.add(ClassName.BRICK_G);
 
-		this._brick.minHeight = opt && opt.minHeight || 150;
-		this._brick.maxHeight = opt && opt.maxHeight || 200;
+		this._brick.minHeight = opt && opt.minHeight || 200;
+		this._brick.maxHeight = opt && opt.maxHeight || 250;
 		this._brick.cacheHead = 0;
 		this._brick.cacheTail = 0;
 		this._brick.rows = [];
@@ -360,11 +387,12 @@
 				var expectHeight = totWidth * (this._brick.minHeight / this._brick.rows[i].minTotalWidth);
 				row.style.height = expectHeight + 'px';
 
-				//responsive actions
+				//need responsive actions
 				if(expectHeight < this._brick.minHeight || expectHeight > this._brick.maxHeight){
 					responsiveFlag = true;
 				}
 			}
+
 			if(responsiveFlag){
 				//clear 
 				this._clearLayoutBrick();
@@ -420,7 +448,14 @@
 			id++;
 			totImageWidth += w;
 		}
-		//console.log(head + ',' + id + ',' + tail)
+
+		if(isFull && id == head){
+			//Can not contain this image.
+			//Skip it.
+			this._brick.cacheHead++;
+			this._addPlaceholderRow();
+			return;
+		}
 
 		//row container
 		var row = document.createElement('div');
@@ -458,6 +493,7 @@
 			row.appendChild(imgWrapper);
 		}
 		this._g.appendChild(row);
+
 		if(isFull){
 			this._addPlaceholderRow();
 		}
