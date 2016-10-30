@@ -167,6 +167,9 @@
 		this._gutterX = 0;
 		this._gutterY = 0;
 
+		this._enableFullScreen = true;
+		this._modal = null;
+
 		/**
 		 * Waterfall layout member variables
 		 * @namespace
@@ -224,6 +227,29 @@
 		this._placeImage();
 	};
 
+	/**
+	 * @callback
+	 */
+	ZGallery.prototype._show = function(e){
+		var t = e.target.cloneNode(e);
+		this._modal.appendChild(t);
+		var w = t.clientWidth;
+		var h = t.clientHeight;
+		t.style.marginLeft = '-' + w/2 + 'px';
+		t.style.marginTop = '-' + h/2 + 'px';
+		this._modal.style.visibility = 'visible';
+	};
+
+	/**
+	 * @callback
+	 */
+	ZGallery.prototype._hide = function(e){
+		if(e.target == this._modal){
+			this._modal.innerHTML = '';
+			this._modal.style.visibility = 'hidden';
+		}
+	};
+
 	/******* The following are private methods for common use *******/
 
 	
@@ -237,6 +263,11 @@
 				Util.eventHandlerWrapper(this._onImageLoaded, this, true, 'load'));
 			Util.addHandler(img, 'error', 
 				Util.eventHandlerWrapper(this._onImageFailed, this, true, 'error'));
+			
+			if(this._enableFullScreen){
+				Util.addHandler(img, 'click', 
+					Util.eventHandlerWrapper(this._show, this, false));
+			}
 		}
 	};
 
@@ -245,6 +276,15 @@
 	ZGallery.prototype._removeImage = null;
 
 	/******* The following are private methods for a speicific layout *******/
+	ZGallery.prototype._renderModal = function(){
+		var modal = document.createElement('div');
+		modal.classList.add('z-g-modal');
+		modal.style.visibility = 'hidden';
+		this._modal = modal;
+		document.body.appendChild(modal);
+		Util.addHandler(modal, 'click', 
+			Util.eventHandlerWrapper(this._hide, this, false));
+	};
 
 	ZGallery.prototype._initJigsaw = function(){
 		this._g.classList.add(ClassName.JIGSAW_G);
@@ -297,6 +337,7 @@
 		this._waterfall.minWidth = opt && opt.minWidth || 250;
 		this._waterfall.maxWidth = opt && opt.maxWidth || 350;
 		this._waterfall.cachePointer = 0;
+		this._waterfall.resizeTimer = -1;
 		this._g.style.minWidth = this._waterfall.minWidth + 'px';
 		if(!this._waterfall.cols){
 			this._makeColsWaterfall();
@@ -629,6 +670,31 @@
     	this._gutterY = y || this._gutterX;
     };
 
+    /**
+     * Enable full screen image checking.
+     * @public
+     */
+    ZGallery.prototype.enableFullScreen = function(){
+    	this._enableFullScreen = true;
+    };
+
+    /**
+     * Disable full screen image checking.
+     * @public
+     */
+    ZGallery.prototype.disableFullScreen = function(){
+    	this._enableFullScreen = false;
+    };
+
+    /**
+     * Query whether full screen image cheching is enabled.
+     * @public
+     * @return {boolean} Whether full screen image checking is enabled.
+     */
+    ZGallery.prototype.isFullScreenEnabled = function(){
+    	return this._enableFullScreen;
+    };
+
 	/**
 	 * Set the layout of zgallery.
 	 * @public
@@ -667,6 +733,8 @@
 		if(this._initialized){
 			return;
 		}
+
+		this._renderModal();
 
 		switch(this._layout){
 			case this.LAYOUT.JIGSAW:

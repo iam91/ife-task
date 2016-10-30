@@ -37,8 +37,8 @@ window.onload = function(){
 	var gg = new g(document.querySelector('.z-gallery'));
 	console.log(gg);
 	//gg.setLayout(gg.LAYOUT.JIGSAW);
-	gg.setLayout(gg.LAYOUT.WATERFALL);
-	//gg.setLayout(gg.LAYOUT.BRICK);
+	//gg.setLayout(gg.LAYOUT.WATERFALL);
+	gg.setLayout(gg.LAYOUT.BRICK);
 	gg.setGutter(5);
 	gg.init({colCount: 5});
 	gg.setImage(urls);
