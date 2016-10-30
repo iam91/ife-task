@@ -182,9 +182,10 @@
 		 * @private
 		 */
 		this._brick = {
-			maxBin: 0,
 			minBin: 0,
+			maxBin: 0,
 			minHeight: 0,
+			maxHeight: 0,
 			cacheHead: 0,
 			cacheTail: 0,
 			rows: null,
@@ -222,6 +223,8 @@
 	};
 
 	/******* The following are private methods for common use *******/
+
+	
 	
 	ZGallery.prototype._fetchImage = function(){
 		if(this._urlIndex < this._urls.length){
@@ -289,8 +292,13 @@
 	ZGallery.prototype._initWaterfall = function(opt){
 		this._g.classList.add(ClassName.WATERFALL_G);
 		this._waterfall.colCount = opt && opt.colCount || 4;
-		this._waterfall.cols = new Array(this._colCount);
+		if(!this._waterfall.cols){
+			this._makeColsWaterfall();
+		}
+	};
 
+	ZGallery.prototype._makeColsWaterfall = function(){
+		this._waterfall.cols = new Array(this._colCount);
 		//Column width in percentage relative to container.
 		var colWidth = 100 / this._waterfall.colCount;
 		//Render the column containers.
@@ -314,7 +322,6 @@
 		var div = document.createElement('div');
 		div.appendChild(img);
 		div.classList.add(ClassName.WATERFALL_PIC);
-		
 
 		//Set horizontal gutter width.
 		div.style.marginBottom = this._gutterY + 'px';
@@ -334,17 +341,13 @@
 		minReferer.appendChild(div);
 	};
 
-	ZGallery.prototype._removeImageWaterfall = function(image){
-		for(var i = 0; i < image.length; i++){}
-
-	};
-
 	ZGallery.prototype._initBrick = function(opt){
 		this._g.classList.add(ClassName.BRICK_G);
 
 		this._brick.minBin = opt && opt.minBin || 2;
 		this._brick.maxBin = opt && opt.maxBin || 5;
 		this._brick.minHeight = opt && opt.minHeight || 150;
+		this._brick.maxHeight = opt && opt.maxHeight || 200;
 		this._brick.cacheHead = 0;
 		this._brick.cacheTail = 0;
 		this._brick.rows = [];
@@ -353,42 +356,56 @@
 
 		function brickOnresize(e){
 			var totWidth = this._g.clientWidth;
+			var responsiveFlag = false;
 			for(var i = 0; i < this._g.children.length; i++){
 				//Resize every row.
 				var row = this._g.children[i];
-				row.style.height = totWidth * (this._brick.minHeight / this._brick.rows[i].totImageWidth) + 'px';
+				var expectHeight = totWidth * (this._brick.minHeight / this._brick.rows[i].minTotalWidth);
+				row.style.height = expectHeight + 'px';
+
+				//responsive actions
+				if(expectHeight < this._brick.minHeight || expectHeight > this._brick.maxHeight){
+					responsiveFlag = true;
+				}
+			}
+			if(responsiveFlag){
+				//clear 
+				this._clearLayoutBrick();
+				//reset the layout
+				this._brick.cacheHead = 0;
+				while(this._brick.cacheHead < this._brick.cacheTail){
+					var t = this._brick.cacheHead;
+					this._placeImageBrick();
+					if(t == this._brick.cacheHead){
+						//If the last row reached.
+						break;
+					}
+				}
 			}
 		}
-
 		Util.addHandler(window, 'resize', Util.eventHandlerWrapper(brickOnresize, this, false));
 	};
 
 	ZGallery.prototype._addPlaceholderRow = function(){
 		var placeholderRow = document.createElement('div');
 		this._g.appendChild(placeholderRow);
-		this._brick.rows.push({totImageWidth: 0});
+		this._brick.rows.push({minTotalWidth: 0});
 	};
 
-	ZGallery.prototype._reachMaxBinBrick = function(){
-		return (this._brick.cacheTail - this._brick.cacheHead) >= this._brick.maxBin;
+	ZGallery.prototype._clearLayoutBrick = function(){
+		this._g.innerHTML = '';
+		this._addPlaceholderRow();
 	};
-
-	ZGallery.prototype._remainBrick = function(){
-		return (this._brick.cacheTail - this._brick.cacheHead) < this._brick.maxBin  
-			&& this._cache.length == this._urls.length;
-	}
 
 	ZGallery.prototype._placeImageBrick = function(){
 
-		var reachMaxFlag = this._reachMaxBinBrick();
-		var remainFlag = this._remainBrick();
-
-		if(reachMaxFlag || remainFlag){
+		var isMaxBin = this._brick.cacheTail - this._brick.cacheHead >= this._brick.maxBin;
+		var isRemaining = !isMaxBin && this._cache.length == this._urls.length;
+		var offset = isMaxBin ? this._brick.maxBin : this._brick.cacheTail - this._brick.cacheHead;
+		if(isMaxBin || isRemaining){
 			//clear remains
 			this._g.removeChild(this._g.lastChild);
 			this._brick.rows.pop();
-
-			var offset = reachMaxFlag ? this._brick.maxBin : this._brick.cacheTail - this._brick.cacheHead;
 
 			var totWidth = this._g.clientWidth;
 			var totImageWidth = 0;
@@ -399,11 +416,7 @@
 			while(id < end){
 				var img = this._cache[id];
 				var w = this._brick.minHeight * img.width / img.height;
-				if(
-					totImageWidth + w > totWidth
-					&& (id - this._brick.cacheHead) > this._brick.minBin  //must be more than minBin
-				   )
-				{
+				if(totImageWidth + w > totWidth){
 					break;
 				}
 				id++;
@@ -413,28 +426,26 @@
 			//row container
 			var row = document.createElement('div');
 			row.classList.add(ClassName.BRICK_ROW);
-			if(remainFlag){
-				row.style.height = this._brick.minHeight + 'px';
-				this._brick.rows.push({totImageWidth: totWidth});
+
+			if(isMaxBin){
+				var rowHeight = totWidth * (this._brick.minHeight / totImageWidth);
+				var minTotalWidth = totImageWidth;
 			}
-			else if(reachMaxFlag){
-				row.style.height = totWidth * (this._brick.minHeight / totImageWidth) + 'px';
-				this._brick.rows.push({totImageWidth: totImageWidth});
+			else if(isRemaining){
+				var rowHeight = this._brick.minHeight;
+				var minTotalWidth = totWidth;
 			}
+			this._brick.rows.push({minTotalWidth: minTotalWidth});
+			row.style.height = rowHeight + 'px';
 
 			//add to the row
 			for(var i = this._brick.cacheHead; i < id; i++){
 				var img = this._cache[i];
-				if(reachMaxFlag){
+				if(isMaxBin){
+					//images in this row may be not enough, can be used next time
 					this._brick.cacheHead++;
 				}
-
-				if(reachMaxFlag){
-					var styleWidth = (this._brick.minHeight * img.width / img.height / totImageWidth);
-				}
-				else if(remainFlag){
-					var styleWidth = (this._brick.minHeight * img.width / img.height / totWidth);
-				}
+				var styleWidth = (this._brick.minHeight * img.width / img.height / minTotalWidth);
 
 				var imgWrapper = document.createElement('div');
 				imgWrapper.style.width = styleWidth * 100 + '%';
@@ -445,16 +456,9 @@
 				}
 				imgWrapper.appendChild(img);
 				row.appendChild(imgWrapper);
-
-				/***
-				this._imageElements.push({
-					elem: imgWrapper,
-					id: i
-				});
-				***/
 			}
 			this._g.appendChild(row);
-			if(reachMaxFlag){
+			if(isMaxBin){
 				this._addPlaceholderRow();
 			}
 		}
