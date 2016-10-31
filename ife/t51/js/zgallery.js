@@ -158,10 +158,13 @@
 		BRICK_ROW:     'z-g-brick-row',
 		V_CLIP:        'v-clip',
 		H_CLIP:        'h-clip',
+		WIDTH_FIRST:   'w-first',
+		HEIGHT_FIRST:  'h-first'
 	};
 
 	/**
 	 * GlobalConst
+	 * @readonly
 	 * @namespace
 	 */
 	var GlobalConst = {
@@ -289,6 +292,11 @@
 					 */
 				};
 			})();
+
+			if(this._enableFullScreen){
+				Util.addHandler(img, 'click', 
+					Util.eventHandlerWrapper(this._show, this, false));
+			}
 		}
 		
 		function check(){
@@ -342,6 +350,14 @@
 	ZGallery.prototype._show = function(e){
 		var t = e.target.cloneNode(e);
 		this._modal.appendChild(t);
+
+		var w = t.width;
+		var h = t.width;
+		if(w > h){
+			t.classList.add(ClassName.WIDTH_FIRST);
+		}else{
+			t.classList.add(ClassName.HEIGHT_FIRST);
+		}
 
 		/**
 		 * @todo Refine centralization.

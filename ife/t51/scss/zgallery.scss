@@ -19,6 +19,12 @@
 		top: 50%;
 		left: 50%;
 		box-shadow: 0 0 7px 2px black;
+		&.w-first{
+			width: 80%;
+		}
+		&.h-first{
+			height: 80%;
+		}
 	}
 }
 .z-g-modal-hide{
