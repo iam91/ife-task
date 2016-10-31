@@ -1,13 +1,13 @@
 window.onload = function(){
 	/////////////////
-	/*
+	
 	var urls = [];
-	for(var i = 1; i <= 22; i++){
+	for(var i = 2; i <= 3; i++){
 		urls.push(i + '.png');
 	}
-	*/
-	/////////////////
 	
+	/////////////////
+	/*
 	var urls = [
 			'https://placehold.it/2500x2500/004687',
 			'https://placehold.it/2500x1500/b6b6b6',
@@ -34,23 +34,23 @@ window.onload = function(){
 			'https://placehold.it/3500x4500/ff5a09',
 			'https://placehold.it/3500x2500/b81d18',
 			'https://placehold.it/3500x4500/b6b6b6',
-			'https://placehold.it/3500x3500/004687'];
+			'https://placehold.it/3500x3500/004687'];*/
 	var gg = new g(document.querySelector('.z-gallery'));
 	console.log(gg);
-	//gg.setLayout(gg.LAYOUT.JIGSAW);
-	gg.setLayout(gg.LAYOUT.WATERFALL);
+	gg.setLayout(gg.LAYOUT.JIGSAW);
+	//gg.setLayout(gg.LAYOUT.WATERFALL);
 	//gg.setLayout(gg.LAYOUT.BRICK);
 	gg.setGutter(5);
 	gg.init({colCount: 5});
 	gg.setImage(urls);
-console.log(gg._cache);
-		
-	function f(){
-		console.log(gg._cache);
-	}
+	function fun(){
+		var t = gg.getImageElements();
+		//gg.removeImage(t[0]);
+		gg.addImage(urls[1]);
+	};
 
+	setTimeout(fun, 5000);
 
-	setTimeout(f, 100);
 	//gg.addImage(urls);
 /*
 	var img = new Array(urls.length);
