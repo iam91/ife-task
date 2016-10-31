@@ -5,6 +5,22 @@
 
 	'use strict';
 
+	/** 
+	 * @typedef CacheItem
+	 * @type {object} 
+	 * @property {HTMLImageElement} img - Store the element.
+	 * @property {boolean} commit - Indicate whether the image can be committed.
+	 */
+
+	/**
+	 * @typedef MonitorItem
+	 * @type {object}
+	 * @property {HTMLImageElement} img - Store the element.
+	 * @property {CacheItem} cache - Point to its position in cache.
+	 * @property {number} width - Width before checking.
+	 * @property {number} height - Height bofore checking.
+	 */
+
 	/**
 	 * Util
 	 * @namespace
@@ -34,6 +50,14 @@
 			}
 		},
 
+		/**
+		 * Rectify execution context of event handlers.
+		 * Remove the event handler if it's intended to execute only once.
+		 * @param {Function} handler Event handler.
+		 * @param {object} context Execution context of the event handler.
+		 * @param {boolean} once Indicate whether the handler is intended to execute only once.
+		 * @param {string} eventType The event type.
+		 */
 		eventHandlerWrapper: function(handler, context, once, eventType){
 			var h = function(e){
 				if(once){
@@ -59,6 +83,10 @@
 
 		/**
 		 * Used in jigsaw layout
+		 * @param {Image} img Image needs clipping.
+		 * @param {number} r Height to width ratio.
+		 * @param {number} index Index of the image, used to add to clip-path ids to distinguish clip-paths.
+		 * @param {number} count Number of images to be showed.
 		 */
 		imageClip: function(img, r, isRect, index, count){
 			var w = img.width;
@@ -69,7 +97,7 @@
 			var svgTail = '</clipPath></defs></svg>';
 
 			if(h / w > r){
-				//too much height
+				//too large height
 				var ww = w;
 				var hh = ww * r;
 				if(isRect){
@@ -83,7 +111,7 @@
 				var polygon = '<polygon points="' + x + ' 0, 1 0, 1 ' + y + ', 0 ' + y + '"/>';
 			}
 			else{
-				//too much width
+				//too large width
 				var hh = h;
 				var ww = hh / r;
 				if(isRect){
@@ -101,6 +129,7 @@
 				+ "');clip-path: url('#clip-shape-" + index + "');}";
 
 			//make clip-path usable in firefox
+			//add clip-paths
 			var t = document.createElement('div');
 			var s = document.createElement('style');
 			t.innerHTML = svgHead + polygon + svgTail;
@@ -113,41 +142,48 @@
 
 	/**
 	 * @private
+	 * @readonly
+	 * @enum {number}
 	 */
 	var ClassName = {
-		JIGSAW_G: 'z-g-jigsaw',
-		JIGSAW_X: 'z-g-jigsaw-',
-		WATERFALL_G: 'z-g-waterfall',
+		MODAL:         'z-g-modal',
+		MODAL_HIDE:    'z-g-modal-hide',
+		MODAL_SHOW:    'z-g-modal-show',
+		JIGSAW_G:      'z-g-jigsaw',
+		JIGSAW_X:      'z-g-jigsaw-',
+		WATERFALL_G:   'z-g-waterfall',
 		WATERFALL_COL: 'z-g-waterfall-col',
 		WATERFALL_PIC: 'z-g-waterfall-pic',
-		BRICK_G: 'z-g-brick',
-		BRICK_ROW: 'z-g-brick-row',
-		V_CLIP: 'v-clip',
-		H_CLIP: 'h-clip',
+		BRICK_G:       'z-g-brick',
+		BRICK_ROW:     'z-g-brick-row',
+		V_CLIP:        'v-clip',
+		H_CLIP:        'h-clip',
 	};
 
 	/**
-	 * @private
+	 * GlobalConst
+	 * @namespace
 	 */
 	var GlobalConst = {
 		jigsaw: {
-			max: 6,
-			ratio: 9 / 15,
+			max:    6,
+			ratio:  9 / 15,
 			ratios: {
-				'1': [9 / 15],
-				'2': [9 / 10, 9 / 10],
-				'3': [9 / (15 - 4.5), 1, 1],
-				'4': [9 / 15, 9 / 15, 9 / 15, 9 / 15],
-				'5': [6 / 10, 1, (9 - 5) / 5, 9 / 15, 9 / 15],
-				'6': [9 / 15, 9 / 15, 9 / 15, 9 / 15, 9 / 15, 9 / 15]
-			}
+						'1': [9 / 15],
+						'2': [9 / 10, 9 / 10],
+						'3': [9 / (15 - 4.5), 1, 1],
+						'4': [9 / 15, 9 / 15, 9 / 15, 9 / 15],
+						'5': [6 / 10, 1, (9 - 5) / 5, 9 / 15, 9 / 15],
+						'6': [9 / 15, 9 / 15, 9 / 15, 9 / 15, 9 / 15, 9 / 15]
+					}
 		}
 	}
 
 	/**
-	 * ZGallery
+	 * ZGallery class
 	 * @public
 	 * @constructor
+	 * @param {HTMLElement} g Base container of zgallery.
 	 */
 	function ZGallery(g){
 
@@ -155,20 +191,33 @@
 		 * Common member variables
 		 * @private
 		 */
-		this._g = g;
-		this._layout = this.LAYOUT.JIGSAW;
 		this._urls = [];
-		this._urlIndex = 0;
-		this._imageElements = [];
+		/**
+		 * @type {CacheItem[]}
+		 */
 		this._cache = [];
+		this._cacheCursor = 0;
+		this._commitCursor = 0;
+		this._urlIndex = 0;
 
+
+		this._g = g;
+		this._imageElements = [];
+		this._layout = this.LAYOUT.JIGSAW;
 		this._initialized = false;
-
 		this._gutterX = 0;
 		this._gutterY = 0;
-
 		this._enableFullScreen = true;
 		this._modal = null;
+
+		/**
+		 * Jigsaw layout member variables
+		 * @namespace
+		 * @private
+		 */
+		this._jigsaw = {
+			svg: null
+		};
 
 		/**
 		 * Waterfall layout member variables
@@ -176,11 +225,10 @@
 		 * @private
 		 */
 		this._waterfall = {
-			minWidth: 0,
-			maxWidth: 0,
-			colCount: 0,
-			cols: null,
-			cachePointer: 0
+			minWidth:     0,
+			maxWidth:     0,
+			colCount:     0,
+			cols:         null
 		}
 
 		/**
@@ -189,40 +237,104 @@
 		 * @private
 		 */
 		this._brick = {
-			minHeight: 0,
-			maxHeight: 0,
-			cacheHead: 0,
-			rows: null,
+			minHeight:   0,
+			maxHeight:   0,
+			rows:        null,
 			renderCache: null
 		}
-
-		//for test
-		this.temp = 0;
 	}
 
+	//////////////////////////////////////////////////
+	ZGallery.prototype._fetchImage = function(){
+		/**
+		 * @type {MonitorItem[]}
+		 */
+		var monitor = [];
+		var timer = -1;
+		var timerInterval = 40;
+		
+		while(this._urlIndex < this._urls.length){
+			var img = new Image();
+			img.src = this._urls[this._urlIndex++];
+
+			this._cache.push({
+				img: img, 
+				commit: false
+			});
+
+			var cache = this._cache[this._cache.length - 1];
+			
+			monitor.push({
+				img: img, 
+				cache: cache,
+				width: img.width,
+				height: img.height
+			});	
+
+			img.onload = (function(){
+				var _cache = cache;
+				return function(e){
+					e.target.onload = null;
+					_cache.commit = true;
+				};
+			})();
+
+			img.onerror = (function(){
+				var _cache = cache;
+				return function(e){
+					e.target.onerror = null;
+					_cache.commit = true;
+					/**
+					 * @todo add error handle
+					 */
+				};
+			})();
+		}
+		
+		function check(){
+			for(var i = 0; i < monitor.length; i++){
+				var item = monitor[i];
+				if(item.img.width != item.width 
+					&& item.img.height != item.height){
+					//Size fetched.
+					monitor.splice(i, 1);
+					item.cache.commit = true;
+					item.cache = null;
+					item = null;
+				}
+			}
+			if(monitor.length == 0){
+				clearInterval(timer);
+			}
+		};
+		
+		timer = setInterval(check, timerInterval);
+	};
+
+	ZGallery.prototype._checkCacheCommit = function(){
+		var timer = -1;
+		var timerInterval = 40;
+		
+		var _this = this;
+		function check(){
+			var cursor = _this._commitCursor;
+			while(cursor < _this._cache.length && _this._cache[cursor].commit){
+				cursor++;
+			}
+			_this._commitCursor = cursor;
+			while(_this._cacheCursor < _this._commitCursor){
+				_this._placeImage();
+			}
+			if(_this._commitCursor == _this._cache.length){
+				timer = clearInterval(timer);
+			}
+		};
+
+		timer = setInterval(check, timerInterval);
+	};
+	//////////////////////////////////////////////////
+
 	/******* The following are event handlers *******/
-
-	/**
-	 * @callback
-	 */
-	ZGallery.prototype._onImageLoaded = function(e){
-
-		this._fetchImage();
-		var img = e.target;
-		this._cache.push(img);
-		this._placeImage();
-	};
-
-	/**
-	 * @callback
-	 */
-	ZGallery.prototype._onImageFailed = function(e){
-
-		this._fetchImage();
-		var img = e.target;
-		this._cache.push(img);
-		this._placeImage();
-	};
 
 	/**
 	 * @callback
@@ -230,11 +342,17 @@
 	ZGallery.prototype._show = function(e){
 		var t = e.target.cloneNode(e);
 		this._modal.appendChild(t);
+
+		/**
+		 * @todo Refine centralization.
+		 */
 		var w = t.clientWidth;
 		var h = t.clientHeight;
 		t.style.marginLeft = '-' + w/2 + 'px';
 		t.style.marginTop = '-' + h/2 + 'px';
-		this._modal.style.visibility = 'visible';
+		
+		this._modal.classList.remove(ClassName.MODAL_HIDE);
+		this._modal.classList.add(ClassName.MODAL_SHOW);
 	};
 
 	/**
@@ -243,29 +361,22 @@
 	ZGallery.prototype._hide = function(e){
 		if(e.target == this._modal){
 			this._modal.innerHTML = '';
-			this._modal.style.visibility = 'hidden';
+			this._modal.classList.remove(ClassName.MODAL_SHOW);
+			this._modal.classList.add(ClassName.MODAL_HIDE);
 		}
 	};
 
 	/******* The following are private methods for common use *******/
+	
+	ZGallery.prototype._renderModal = function(){
+		var modal = document.createElement('div');
+		modal.classList.add(ClassName.MODAL);
+		modal.classList.add(ClassName.MODAL_HIDE);
+		document.body.appendChild(modal);
+		Util.addHandler(modal, 'click', 
+			Util.eventHandlerWrapper(this._hide, this, false));
 
-	
-	
-	ZGallery.prototype._fetchImage = function(){
-		if(this._urlIndex < this._urls.length){
-			var url = this._urls[this._urlIndex++];
-			var img = document.createElement('img');
-			img.src = url;
-			Util.addHandler(img, 'load', 
-				Util.eventHandlerWrapper(this._onImageLoaded, this, true, 'load'));
-			Util.addHandler(img, 'error', 
-				Util.eventHandlerWrapper(this._onImageFailed, this, true, 'error'));
-			
-			if(this._enableFullScreen){
-				Util.addHandler(img, 'click', 
-					Util.eventHandlerWrapper(this._show, this, false));
-			}
-		}
+		this._modal = modal;
 	};
 
 	ZGallery.prototype._placeImage = null;
@@ -275,19 +386,11 @@
 	ZGallery.prototype._clearLayout = null;
 
 	/******* The following are private methods for a speicific layout *******/
-	ZGallery.prototype._renderModal = function(){
-		var modal = document.createElement('div');
-		modal.classList.add('z-g-modal');
-		modal.style.visibility = 'hidden';
-		this._modal = modal;
-		document.body.appendChild(modal);
-		Util.addHandler(modal, 'click', 
-			Util.eventHandlerWrapper(this._hide, this, false));
-	};
 
 	ZGallery.prototype._initJigsaw = function(){
 		this._g.classList.add(ClassName.JIGSAW_G);
-		//fixed the height
+		this._jigsaw.svg = document.createElement('div');
+		//Fix the height
 		this._g.style.height = this._g.clientWidth * GlobalConst.jigsaw.ratio + 'px';
 
 		function jigsawOnresize(e){
@@ -297,6 +400,23 @@
 		Util.addHandler(window, 'resize', Util.eventHandlerWrapper(jigsawOnresize, this, false));
 	};
 
+	ZGallery.prototype._removeImageJigsaw = function(image){
+		for(var i = 0; i < image.length; i++){
+			var img = image[i];
+			var index = this._cache.indexOf(img.firstChild);
+			this._cache.splice(index, 1);
+			this._urls.splice(index, 1);
+		}
+		this._clearLayoutJigsaw();
+		this._placeImageJigsaw();
+	};
+
+	ZGallery.prototype._clearLayoutJigsaw = function(){
+		this._g.innerHTML = '';
+		Util.arrayClear(this._cache);
+		Util.arrayClear(this._imageElements);
+	};
+
 	ZGallery.prototype._placeImageJigsaw = function(){
 
 		if(this._cache.length == this._urls.length                //images are all loaded 
@@ -304,6 +424,7 @@
 			if(this._g.innerHTML){
 				//layout should be reset
 				this._g.innerHTML = '';
+				Util.arrayClear(this._imageElements);
 			}
 			
 			var count = GlobalConst.jigsaw.max < this._cache.length 
@@ -311,7 +432,7 @@
 			this._g.classList.add(ClassName.JIGSAW_X + count);
 
 			for(var i = 0; i < count; i++){
-				var img = this._cache[i];
+				var img = this._cache[i].img;
 				var iw = img.width;
 				var ih = img.height;
 
@@ -327,6 +448,8 @@
 				var div = document.createElement('div');
 				div.appendChild(img);
 				this._g.appendChild(div);
+
+				this._imageElements.push(div);
 			}
 		}
 	};
@@ -348,14 +471,14 @@
 			if(colWidth > this._waterfall.maxWidth || colWidth < this._waterfall.minWidth){
 				//responsive action
 				this._clearLayoutWaterfall();
-				this._waterfall.cachePointer = 0;
-				while(this._waterfall.cachePointer < this._cache.length){
+				this._cacheCursor = 0;
+				while(this._cacheCursor < this._commitCursor){
 					this._placeImageWaterfall();
 				}
 			}
 		}
 		Util.addHandler(window, 'resize', Util.eventHandlerWrapper(waterfallOnresize, this, false));
-	};
+};
 
 	ZGallery.prototype._makeColsWaterfall = function(){
 		this._waterfall.colCount = Math.ceil(this._g.clientWidth / this._waterfall.minWidth);
@@ -389,7 +512,7 @@
 	};
 
 	ZGallery.prototype._placeImageWaterfall = function(){
-		var img = this._cache[this._waterfall.cachePointer++];
+		var img = this._cache[this._cacheCursor++].img;
 		var div = document.createElement('div');
 		div.appendChild(img);
 		div.classList.add(ClassName.WATERFALL_PIC);
@@ -402,27 +525,27 @@
 
 		//Find the shortest column.
 		var minIndex = 0;
-		var minReferer = this._waterfall.cols[minIndex];
-		var min = minReferer.clientHeight;
+		var minCol = this._waterfall.cols[minIndex];
+		var min = minCol.clientHeight;
 		for(var i = 0; i < this._waterfall.colCount; i++){
 			var h = this._waterfall.cols[i].clientHeight;
 			if(min > h){
 				min = h;
 				minIndex = i;
-				minReferer = this._waterfall.cols[minIndex];
+				minCol = this._waterfall.cols[minIndex];
 			}
 		}
-		minReferer.appendChild(div);
+		minCol.appendChild(div);
 	};
 
 	ZGallery.prototype._removeImageWaterfall = function(image){
 		for(var i = 0; i < image.length; i++){
 			var img = image[i];
 			img.parentNode.removeChild(img);
+			var index = this._cache.indexOf(img.firstChild);
+			this._cache.splice(index, 1);
+			this._urls.splice(index, 1);
 		}
-		var index = this._cache.indexOf(img.firstChild);
-		this._cache.splice(index, 1);
-		this._urls.splice(index, 1);
 	};
 
 	ZGallery.prototype._initBrick = function(opt){
@@ -430,7 +553,7 @@
 
 		this._brick.minHeight = opt && opt.minHeight || 200;
 		this._brick.maxHeight = opt && opt.maxHeight || 250;
-		this._brick.cacheHead = 0;
+		this._cacheCursor = 0;
 		this._brick.rows = [];
 
 		this._addPlaceholderRow();
@@ -454,11 +577,11 @@
 				//clear 
 				this._clearLayoutBrick();
 				//reset the layout
-				this._brick.cacheHead = 0;
-				while(this._brick.cacheHead < this._cache.length){
-					var t = this._brick.cacheHead;
+				this._cacheCursor = 0;
+				while(this._cacheCursor < this._cache.length){
+					var t = this._cacheCursor;
 					this._placeImageBrick();
-					if(t == this._brick.cacheHead){
+					if(t == this._cacheCursor){
 						//The last row reached.
 						break;
 					}
@@ -484,10 +607,10 @@
 	ZGallery.prototype._placeImageBrick = function(){
 
 		var tail = this._cache.length;
-		var head = this._brick.cacheHead;
+		var head = this._cacheCursor;
 		var offset = tail - head;
 
-		//clear the last row(a placeholder row or a row needs rebuilding)
+		//Clear the last row(a placeholder row or a row needs rebuilding).
 		var lastRow= this._g.lastChild;
 		var lastRowCount = lastRow.children.length;
 		if(lastRowCount > 0){
@@ -499,14 +622,13 @@
 		this._g.removeChild(this._g.lastChild);
 		this._brick.rows.pop();
 
+		//Get images in the row.
 		var totWidth = this._g.clientWidth;
 		var totImageWidth = 0;
-
-		//get images in the row
 		var id = head;
 		var isFull = false;
 		while(id < tail){
-			var img = this._cache[id];
+			var img = this._cache[id].img;
 			var w = this._brick.minHeight * img.width / img.height;
 			if(totImageWidth + w > totWidth){
 				isFull = true;
@@ -519,7 +641,7 @@
 		if(isFull && id == head){
 			//Can not contain an image.
 			//Skip.
-			this._brick.cacheHead++;
+			this._cacheCursor++;
 			this._addPlaceholderRow();
 			return;
 		}
@@ -546,7 +668,7 @@
 			var img = this._cache[i];
 			if(isFull){
 				//images in this row may be not enough, can be used next time
-				this._brick.cacheHead++;
+				this._cacheCursor++;
 			}
 			var styleWidth = (this._brick.minHeight * img.width / img.height / minTotalWidth);
 
@@ -579,10 +701,10 @@
 		for(var i = 0; i < image.length; i++){
 			var img = image[i];
 			img.parentNode.removeChild(img);
+			var index = this._cache.indexOf(img.firstChild);
+			this._cache.splice(index, 1);
+			this._urls.splice(index, 1);
 		}
-		var index = this._cache.indexOf(img.firstChild);
-		this._cache.splice(index, 1);
-		this._urls.splice(index, 1);
 	};
 
 	/******* The following are public methods and variables provided by zgallery *******/
@@ -614,13 +736,14 @@
 			this.setImage([image]);
 			return;
 		}
-
+/*
 		Util.arrayClear(this._urls);
 		Util.arrayClear(this._imageElements);
 		this._clearLayout();
-
+*/
 		this._urls = Util.arrayAppend(this._urls, image);
 		this._fetchImage();
+		this._checkCacheCommit();
 	};
 
 	/**
@@ -720,6 +843,10 @@
 	 * @return {object[]}
 	 */
 	ZGallery.prototype.getImageElements = function(){
+		if(!this._initialized){
+			console.warn('ZGallery has not been initialized yet!');
+			return;
+		}
 		return Util.arrayAppend([], this._imageElements);
 	};
 

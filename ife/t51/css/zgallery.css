@@ -155,4 +155,10 @@
     left: 50%;
     box-shadow: 0 0 7px 2px black; }
 
+.z-g-modal-hide {
+  visibility: hidden; }
+
+.z-g-modal-show {
+  visibility: visible; }
+
 /*# sourceMappingURL=zgallery.css.map */
