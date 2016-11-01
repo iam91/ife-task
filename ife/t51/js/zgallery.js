@@ -401,10 +401,6 @@
 		timer = setInterval(check, timerInterval);
 	};
 
-	ZGallery.prototype._getIndex = function(img){
-
-	};
-
 	ZGallery.prototype._placeImage = null;
 
 	ZGallery.prototype._removeImage = null;
@@ -426,7 +422,7 @@
 		var nextIndex = (index + 1) % this._commitCursor;
 
 		for(var i = prevIndex; i <= nextIndex; i++){
-			var t = this._cache[i].img;
+			var t = this._cache[i].img.cloneNode(true);
 			t.classList.add(t.width > t.height 
 				? ClassName.WIDTH_FIRST : ClassName.HEIGHT_FIRST);
 			this._banner.appendChild(t);
@@ -471,7 +467,7 @@
 
 		this._banner.removeChild(this._banner.children[2]);
 
-		var newImage = this._cache[newPrevIndex].img;
+		var newImage = this._cache[newPrevIndex].img.cloneNode(true);
 		newImage.classList.add(newImage.width > newImage.height 
 			? ClassName.WIDTH_FIRST : ClassName.HEIGHT_FIRST);
 		newImage.classList.add(ClassName.MODAL_BANNER_PREV);
@@ -493,7 +489,7 @@
 
 		this._banner.removeChild(this._banner.children[0]);
 
-		var newImage = this._cache[newNextIndex].img;
+		var newImage = this._cache[newNextIndex].img.cloneNode(true);
 		newImage.classList.add(newImage.width > newImage.height 
 			? ClassName.WIDTH_FIRST : ClassName.HEIGHT_FIRST);
 		newImage.classList.add(ClassName.MODAL_BANNER_NEXT);

@@ -10,6 +10,9 @@ $arrow-displace: 30px;
 $arrow-color: white;
 $arrow-hover-color: #989898;
 
+$banner-prev-pos: 100% / 6;
+$banner-mid-pos: 100% / 2;
+$banner-next-pos: 100% * 5 / 6;
 
 .z-gallery{
 	img:hover{
@@ -23,37 +26,33 @@ $arrow-hover-color: #989898;
 	right: 0;
 	bottom: 0;
 	background-color: rgba(0, 0, 0, 0.8); 
-	img{
-		position: absolute;
-		box-shadow: $modal-children-shadow;
-		&.w-first{
-			width: 22%;
-		}
-		&.h-first{
-			height: 22%;
-		}
-	}
 	.z-g-modal-banner{
 		position: absolute;
 		width: 300%;
 		height: 100%;
 		top: 0;
 		left: -100%;
-		*{
+		img{
 			position: absolute;
-			width: 33.33333%;
-			height: 100%;
-			top: 0;
+			top: 50%;
+			box-shadow: $modal-children-shadow;
 			transition: left 0.5s linear;
+			transform: translate(-50%, -50%);
+			&.w-first{
+				width: 22%;
+			}
+			&.h-first{
+				height: 66%;
+			}
 		}
 		.z-g-modal-b-mid{
-			left: 33.33333%;
+			left: $banner-mid-pos;
 		}
 		.z-g-modal-b-prev{
-			left: 0;
+			left: $banner-prev-pos;
 		}
 		.z-g-modal-b-next{
-			left: 66.66666%;
+			left: $banner-next-pos;
 		}
 	}
 	.arrow{

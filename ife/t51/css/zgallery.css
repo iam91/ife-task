@@ -149,31 +149,28 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.8); }
-  .z-g-modal img {
-    position: absolute;
-    box-shadow: 0 0 7px 2px black; }
-    .z-g-modal img.w-first {
-      width: 22%; }
-    .z-g-modal img.h-first {
-      height: 22%; }
   .z-g-modal .z-g-modal-banner {
     position: absolute;
     width: 300%;
     height: 100%;
     top: 0;
     left: -100%; }
-    .z-g-modal .z-g-modal-banner * {
+    .z-g-modal .z-g-modal-banner img {
       position: absolute;
-      width: 33.33333%;
-      height: 100%;
-      top: 0;
-      transition: left 0.5s linear; }
+      top: 50%;
+      box-shadow: 0 0 7px 2px black;
+      transition: left 0.5s linear;
+      transform: translate(-50%, -50%); }
+      .z-g-modal .z-g-modal-banner img.w-first {
+        width: 22%; }
+      .z-g-modal .z-g-modal-banner img.h-first {
+        height: 66%; }
     .z-g-modal .z-g-modal-banner .z-g-modal-b-mid {
-      left: 33.33333%; }
+      left: 50%; }
     .z-g-modal .z-g-modal-banner .z-g-modal-b-prev {
-      left: 0; }
+      left: 16.66667%; }
     .z-g-modal .z-g-modal-banner .z-g-modal-b-next {
-      left: 66.66666%; }
+      left: 83.33333%; }
   .z-g-modal .arrow {
     position: absolute;
     width: 0;
