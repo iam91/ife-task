@@ -26,6 +26,12 @@
 	 */
 
 	/**
+	 * @typedef BrickRow
+	 * @type {object}
+	 * @property {number} ratio Height to width ratio of the brick row.
+	 */
+
+	/**
 	 * Util
 	 * @namespace
 	 */
@@ -249,12 +255,14 @@
 		this._brick = {
 			minHeight:   0,
 			maxHeight:   0,
+			/**
+			 * @type {BrickRow[]}
+			 */
 			rows:        null,
 			renderCache: null
 		}
 	}
 
-	//////////////////////////////////////////////////
 	/******* The following are private methods for common use *******/
 	
 	ZGallery.prototype._renderModal = function(){
@@ -324,7 +332,7 @@
 				var item = monitor[i];
 				if(item.img.width != item.width 
 					&& item.img.height != item.height){
-					//Size fetched.
+					//Size fetched, commit the image.
 					monitor.splice(i, 1);
 					item.cache.commit = true;
 					item.cache = null;
@@ -367,7 +375,7 @@
 
 	ZGallery.prototype._resetLayout = null;
 
-	//////////////////////////////////////////////////
+	/******* The above are private methods for common use *******/
 
 	/******* The following are event handlers *******/
 
@@ -409,7 +417,9 @@
 		}
 	};
 
-	/******* The following are private methods for a speicific layout *******/
+	/******* The above are event handlers *******/
+
+	/******* The following are private methods for jigsaw layout *******/
 
 	ZGallery.prototype._initJigsaw = function(){
 		this._g.classList.add(ClassName.JIGSAW_G);
@@ -422,7 +432,8 @@
 			this._g.style.height = this._g.clientWidth * GlobalConst.jigsaw.ratio + 'px';
 		}
 
-		Util.addHandler(window, 'resize', Util.eventHandlerWrapper(jigsawOnresize, this, false));
+		Util.addHandler(window, 'resize', 
+			Util.eventHandlerWrapper(jigsawOnresize, this, false));
 	};
 
 	ZGallery.prototype._resetLayoutJigsaw = function(){
@@ -448,11 +459,12 @@
 	};
 
 	ZGallery.prototype._placeImageJigsaw = function(){
-		if(this._commitCursor == this._cache.length               //images are all loaded 
+		if(this._commitCursor == this._cache.length               //all images are committed
 			|| this._commitCursor >= GlobalConst.jigsaw.max){     //jigsawMax has reached
 			
 			this._resetLayoutJigsaw();
 			
+			//Only first n ( 1<= n <=6 ) images are displayed.
 			var count = GlobalConst.jigsaw.max < this._commitCursor
 				? GlobalConst.jigsaw.max : this._commitCursor;
 
@@ -474,11 +486,11 @@
 					this._jigsaw.clipPath.push(Util.imageClip(img, r, true, i, count));
 				}
 
-				var div = document.createElement('div');
-				div.appendChild(img);
-				this._g.appendChild(div);
+				var wrapper = document.createElement('div');
+				wrapper.appendChild(img);
+				this._g.appendChild(wrapper);
 
-				this._imageElements.push(div);
+				this._imageElements.push(wrapper);
 			}
 		}
 	};
@@ -506,6 +518,10 @@
 		this._placeImageJigsaw();
 		return ret;
 	};
+
+	/******* The above are private methods for jigsaw layout *******/
+
+	/******* The following are private methods for waterfall layout *******/
 
 	ZGallery.prototype._initWaterfall = function(opt){
 		this._g.classList.add(ClassName.WATERFALL_G);
@@ -565,15 +581,15 @@
 	ZGallery.prototype._placeImageWaterfall = function(){
 		while(this._cacheCursor < this._commitCursor){
 			var img = this._cache[this._cacheCursor++].img;
-			var imgWrapper = document.createElement('div');
-			imgWrapper.appendChild(img);
-			imgWrapper.classList.add(ClassName.WATERFALL_PIC);
+			var wrapper = document.createElement('div');
+			wrapper.appendChild(img);
+			wrapper.classList.add(ClassName.WATERFALL_PIC);
 			
 			//Add to image elements.
-			this._imageElements.push(imgWrapper);
+			this._imageElements.push(wrapper);
 
 			//Set horizontal gutter width.
-			imgWrapper.style.marginBottom = this._gutterY + 'px';
+			wrapper.style.marginBottom = this._gutterY + 'px';
 
 			//Find the shortest column.
 			var minIndex = 0;
@@ -587,7 +603,7 @@
 					minCol = this._waterfall.cols[minIndex];
 				}
 			}
-			minCol.appendChild(imgWrapper);
+			minCol.appendChild(wrapper);
 		}
 	};
 
@@ -612,6 +628,10 @@
 		return true;
 	};
 
+	/******* The above are private methods for waterfall layout *******/
+
+	/******* The following are private methods for brick layout *******/
+	
 	ZGallery.prototype._initBrick = function(opt){
 		this._g.classList.add(ClassName.BRICK_G);
 		
@@ -628,7 +648,7 @@
 			for(var i = 0; i < this._g.children.length; i++){
 				//Resize every row.
 				var row = this._g.children[i];
-				var expectHeight = totWidth * (this._brick.minHeight / this._brick.rows[i].minTotalWidth);
+				var expectHeight = totWidth * (this._brick.rows[i].ratio);
 				row.style.height = expectHeight + 'px';
 
 				//need responsive actions
@@ -659,40 +679,48 @@
 		this._cacheCursor = 0;
 	};
 
+	ZGallery.prototype._clearLastRow = function(){
+		//Clear the last row(a placeholder row or a row needs rebuilding).
+		var lastRow= this._g.lastChild;
+		var lastRowCount = lastRow.children.length;
+		while(lastRowCount > 0){
+			this._imageElements.pop();
+			lastRowCount--;
+		} 
+		this._g.removeChild(this._g.lastChild);
+		this._brick.rows.pop();
+	};
+
 	ZGallery.prototype._placeImageBrick = function(){
 		var preCursor = -1;
-		while(preCursor != this._cacheCursor && this._cacheCursor < this._commitCursor){
+		while(
+			preCursor != this._cacheCursor              //Images in the cache are meant to be left for rebuilding the last row in the future. 
+			&& this._cacheCursor < this._commitCursor   //When there are images left in the cache.
+			){
+
 			preCursor = this._cacheCursor;
+
 			var tail = this._commitCursor;
 			var head = this._cacheCursor;
 			var offset = tail - head;
 
-			//Clear the last row(a placeholder row or a row needs rebuilding).
-			var lastRow= this._g.lastChild;
-			var lastRowCount = lastRow.children.length;
-			if(lastRowCount > 0){
-				while(lastRowCount > 0){
-					this._imageElements.pop();
-					lastRowCount--;
-				} 
-			}
-			this._g.removeChild(this._g.lastChild);
-			this._brick.rows.pop();
+			this._clearLastRow();
 
 			//Get images in the row.
+			var normHeight = this._brick.minHeight;
 			var totWidth = this._g.clientWidth;
-			var totImageWidth = 0;
+			var normTotWidth = 0;
 			var id = head;
 			var isFull = false;
 			while(id < tail){
 				var img = this._cache[id].img;
-				var w = this._brick.minHeight * img.width / img.height;
-				if(totImageWidth + w > totWidth){
+				var w = normHeight * img.width / img.height;
+				if(normTotWidth + w > totWidth){
 					isFull = true;
 					break;
 				}
 				id++;
-				totImageWidth += w;
+				normTotWidth += w;
 			}
 
 			if(isFull && id == head){
@@ -708,16 +736,11 @@
 			row.classList.add(ClassName.BRICK_ROW);
 
 			//Compute and set row height.
-			if(isFull){
-				var rowHeight = totWidth * (this._brick.minHeight / totImageWidth);
-				var minTotalWidth = totImageWidth;
-			}
-			else{
-				var rowHeight = this._brick.minHeight;
-				var minTotalWidth = totWidth;
-			}
+			var rowWidth = isFull ? totWidth : normTotWidth;
+			var rowHeight = normHeight * rowWidth / normTotWidth;
+			var normRowWidth = isFull ? normTotWidth : totWidth;
 
-			this._brick.rows.push({minTotalWidth: minTotalWidth});
+			this._brick.rows.push({ratio: normHeight / normRowWidth});
 			row.style.height = rowHeight + 'px';
 
 			//Add images to the row
@@ -727,20 +750,20 @@
 					//images in this row may be not enough, can be used next time
 					this._cacheCursor++;
 				}
-				var styleWidth = (this._brick.minHeight * img.width / img.height / minTotalWidth);
+				var styleWidth = (normHeight * img.width / img.height / normRowWidth);
 
-				var imgWrapper = document.createElement('div');
-				imgWrapper.style.width = styleWidth * 100 + '%';
+				var wrapper = document.createElement('div');
+				wrapper.style.width = styleWidth * 100 + '%';
 
-				imgWrapper.style.paddingBottom = this._gutterY + 'px';
+				wrapper.style.paddingBottom = this._gutterY + 'px';
 				if(i < id - 1){
-					imgWrapper.style.paddingRight = this._gutterX + 'px';
+					wrapper.style.paddingRight = this._gutterX + 'px';
 				}
-				imgWrapper.appendChild(img);
-				row.appendChild(imgWrapper);
+				wrapper.appendChild(img);
+				row.appendChild(wrapper);
 
 				//Add to image elements.
-				this._imageElements.push(imgWrapper);
+				this._imageElements.push(wrapper);
 			}
 			this._g.appendChild(row);
 
@@ -770,6 +793,8 @@
 		}
 		return true;
 	};
+
+	/******* The above are private methods for brick layout *******/
 
 	/******* The following are public methods and variables provided by zgallery *******/
 
@@ -890,6 +915,7 @@
 		for(var key in this.LAYOUT){
 			if(this.LAYOUT[key] == layout){
 				this._layout = layout;
+				return;
 			}
 		}
 		this._layout = this.LAYOUT.JIGSAW;
