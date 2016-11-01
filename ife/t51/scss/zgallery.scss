@@ -2,6 +2,15 @@
 @import "_waterfall.scss";
 @import "_brick.scss";
 
+$modal-children-shadow: 0 0 7px 2px black;
+
+$arrow-height: 30px;
+$arrow-width: 50px;
+$arrow-displace: 30px;
+$arrow-color: white;
+$arrow-hover-color: #989898;
+
+
 .z-gallery{
 	img:hover{
 		opacity: 0.5;
@@ -16,14 +25,56 @@
 	background-color: rgba(0, 0, 0, 0.8); 
 	img{
 		position: absolute;
-		top: 50%;
-		left: 50%;
-		box-shadow: 0 0 7px 2px black;
+		box-shadow: $modal-children-shadow;
 		&.w-first{
-			width: 80%;
+			width: 22%;
 		}
 		&.h-first{
-			height: 80%;
+			height: 22%;
+		}
+	}
+	.z-g-modal-banner{
+		position: absolute;
+		width: 300%;
+		height: 100%;
+		top: 0;
+		left: -100%;
+		*{
+			position: absolute;
+			width: 33.33333%;
+			height: 100%;
+			top: 0;
+			transition: left 0.5s linear;
+		}
+		.z-g-modal-b-mid{
+			left: 33.33333%;
+		}
+		.z-g-modal-b-prev{
+			left: 0;
+		}
+		.z-g-modal-b-next{
+			left: 66.66666%;
+		}
+	}
+	.arrow{
+		position: absolute;
+		width: 0;
+		height: 0;
+		border: $arrow-height solid transparent;
+		top: 50%;
+	}
+	.arrow-prev{
+		border-right: $arrow-width solid $arrow-color;
+		left: $arrow-displace;
+		&:hover{
+			border-right: $arrow-width solid $arrow-hover-color;
+		}
+	}
+	.arrow-next{
+		border-left: $arrow-width solid $arrow-color;
+		right: $arrow-displace;;
+		&:hover{
+			border-left: $arrow-width solid $arrow-hover-color		
 		}
 	}
 }

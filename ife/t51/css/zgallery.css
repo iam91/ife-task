@@ -151,13 +151,45 @@
   background-color: rgba(0, 0, 0, 0.8); }
   .z-g-modal img {
     position: absolute;
-    top: 50%;
-    left: 50%;
     box-shadow: 0 0 7px 2px black; }
     .z-g-modal img.w-first {
-      width: 80%; }
+      width: 22%; }
     .z-g-modal img.h-first {
-      height: 80%; }
+      height: 22%; }
+  .z-g-modal .z-g-modal-banner {
+    position: absolute;
+    width: 300%;
+    height: 100%;
+    top: 0;
+    left: -100%; }
+    .z-g-modal .z-g-modal-banner * {
+      position: absolute;
+      width: 33.33333%;
+      height: 100%;
+      top: 0;
+      transition: left 0.5s linear; }
+    .z-g-modal .z-g-modal-banner .z-g-modal-b-mid {
+      left: 33.33333%; }
+    .z-g-modal .z-g-modal-banner .z-g-modal-b-prev {
+      left: 0; }
+    .z-g-modal .z-g-modal-banner .z-g-modal-b-next {
+      left: 66.66666%; }
+  .z-g-modal .arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: 30px solid transparent;
+    top: 50%; }
+  .z-g-modal .arrow-prev {
+    border-right: 50px solid white;
+    left: 30px; }
+    .z-g-modal .arrow-prev:hover {
+      border-right: 50px solid #989898; }
+  .z-g-modal .arrow-next {
+    border-left: 50px solid white;
+    right: 30px; }
+    .z-g-modal .arrow-next:hover {
+      border-left: 50px solid #989898; }
 
 .z-g-modal-hide {
   visibility: hidden; }

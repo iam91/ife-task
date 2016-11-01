@@ -158,20 +158,27 @@
 	 * @enum {number}
 	 */
 	var ClassName = {
-		MODAL:         'z-g-modal',
-		MODAL_HIDE:    'z-g-modal-hide',
-		MODAL_SHOW:    'z-g-modal-show',
-		JIGSAW_G:      'z-g-jigsaw',
-		JIGSAW_X:      'z-g-jigsaw-',
-		WATERFALL_G:   'z-g-waterfall',
-		WATERFALL_COL: 'z-g-waterfall-col',
-		WATERFALL_PIC: 'z-g-waterfall-pic',
-		BRICK_G:       'z-g-brick',
-		BRICK_ROW:     'z-g-brick-row',
-		V_CLIP:        'v-clip',
-		H_CLIP:        'h-clip',
-		WIDTH_FIRST:   'w-first',
-		HEIGHT_FIRST:  'h-first'
+		MODAL:             'z-g-modal',
+		MODAL_BANNER:      'z-g-modal-banner',
+		MODAL_BANNER_PREV: 'z-g-modal-b-prev',
+		MODAL_BANNER_MID:  'z-g-modal-b-mid',
+		MODAL_BANNER_NEXT: 'z-g-modal-b-next',
+		MODAL_HIDE:        'z-g-modal-hide',
+		MODAL_SHOW:    	   'z-g-modal-show',
+		JIGSAW_G:      	   'z-g-jigsaw',
+		JIGSAW_X:          'z-g-jigsaw-',
+		WATERFALL_G:       'z-g-waterfall',
+		WATERFALL_COL:     'z-g-waterfall-col',
+		WATERFALL_PIC:     'z-g-waterfall-pic',
+		BRICK_G:           'z-g-brick',
+		BRICK_ROW:         'z-g-brick-row',
+		V_CLIP:            'v-clip',
+		H_CLIP:            'h-clip',
+		WIDTH_FIRST:       'w-first',
+		HEIGHT_FIRST:      'h-first',
+		ARROW_PREV:        'arrow-prev',
+		ARROW_NEXT:        'arrow-next',
+		ARROW:             'arrow'
 	};
 
 	/**
@@ -223,7 +230,12 @@
 		this._gutterX = 0;
 		this._gutterY = 0;
 		this._enableFullScreen = true;
+		
 		this._modal = null;
+		this._banner = null;
+		this._modalBannerPrev = null;
+		this._modalBannerMid = null;
+		this._modalBannerNext = null;
 
 		/**
 		 * Jigsaw layout member variables
@@ -269,11 +281,31 @@
 		var modal = document.createElement('div');
 		modal.classList.add(ClassName.MODAL);
 		modal.classList.add(ClassName.MODAL_HIDE);
+		
+		var prev = document.createElement('div');
+		var next = document.createElement('div');
+		var banner = document.createElement('div');
+
+		prev.classList.add(ClassName.ARROW);
+		next.classList.add(ClassName.ARROW);
+		prev.classList.add(ClassName.ARROW_PREV);
+		next.classList.add(ClassName.ARROW_NEXT);
+		banner.classList.add(ClassName.MODAL_BANNER);
+
+		modal.appendChild(banner);
+		modal.appendChild(prev);
+		modal.appendChild(next);
 		document.body.appendChild(modal);
-		Util.addHandler(modal, 'click', 
+
+		Util.addHandler(banner, 'click', 
 			Util.eventHandlerWrapper(this._hide, this, false));
+		Util.addHandler(prev, 'click', 
+			Util.eventHandlerWrapper(this._prev, this, false));
+		Util.addHandler(next, 'click', 
+			Util.eventHandlerWrapper(this._next, this, false));
 
 		this._modal = modal;
+		this._banner = banner;
 	};
 
 	ZGallery.prototype._fetchImage = function(){
@@ -369,6 +401,10 @@
 		timer = setInterval(check, timerInterval);
 	};
 
+	ZGallery.prototype._getIndex = function(img){
+
+	};
+
 	ZGallery.prototype._placeImage = null;
 
 	ZGallery.prototype._removeImage = null;
@@ -383,24 +419,26 @@
 	 * @callback
 	 */
 	ZGallery.prototype._show = function(e){
-		var t = e.target.cloneNode(e);
-		this._modal.appendChild(t);
+		var img = e.target.cloneNode(e);
+		var index = parseInt(img.getAttribute('z-g-index'));
 
-		var w = t.width;
-		var h = t.width;
-		if(w > h){
-			t.classList.add(ClassName.WIDTH_FIRST);
-		}else{
-			t.classList.add(ClassName.HEIGHT_FIRST);
+		var prevIndex = (index - 1 + this._commitCursor) % this._commitCursor;
+		var nextIndex = (index + 1) % this._commitCursor;
+
+		for(var i = prevIndex; i <= nextIndex; i++){
+			var t = this._cache[i].img;
+			t.classList.add(t.width > t.height 
+				? ClassName.WIDTH_FIRST : ClassName.HEIGHT_FIRST);
+			this._banner.appendChild(t);
 		}
+
+		this._banner.children[0].classList.add(ClassName.MODAL_BANNER_PREV);
+		this._banner.children[1].classList.add(ClassName.MODAL_BANNER_MID);
+		this._banner.children[2].classList.add(ClassName.MODAL_BANNER_NEXT);
 
 		/**
 		 * @todo Refine centralization.
 		 */
-		var w = t.clientWidth;
-		var h = t.clientHeight;
-		t.style.marginLeft = '-' + w/2 + 'px';
-		t.style.marginTop = '-' + h/2 + 'px';
 		
 		this._modal.classList.remove(ClassName.MODAL_HIDE);
 		this._modal.classList.add(ClassName.MODAL_SHOW);
@@ -410,11 +448,56 @@
 	 * @callback
 	 */
 	ZGallery.prototype._hide = function(e){
-		if(e.target == this._modal){
-			this._modal.innerHTML = '';
+		if(
+			e.target == this._banner){
+			this._banner.innerHTML = '';
 			this._modal.classList.remove(ClassName.MODAL_SHOW);
 			this._modal.classList.add(ClassName.MODAL_HIDE);
 		}
+	};
+
+	/**
+	 * @callback
+	 */
+	ZGallery.prototype._prev = function(e){
+
+		var newMidIndex = parseInt(this._banner.children[0].getAttribute('z-g-index'));
+		var newPrevIndex = (newMidIndex - 1 + this._commitCursor) % this._commitCursor;
+
+		this._banner.children[0].classList.remove(ClassName.MODAL_BANNER_PREV);
+		this._banner.children[1].classList.remove(ClassName.MODAL_BANNER_MID);
+		this._banner.children[1].classList.add(ClassName.MODAL_BANNER_NEXT);
+		this._banner.children[0].classList.add(ClassName.MODAL_BANNER_MID);
+
+		this._banner.removeChild(this._banner.children[2]);
+
+		var newImage = this._cache[newPrevIndex].img;
+		newImage.classList.add(newImage.width > newImage.height 
+			? ClassName.WIDTH_FIRST : ClassName.HEIGHT_FIRST);
+		newImage.classList.add(ClassName.MODAL_BANNER_PREV);
+		this._banner.insertBefore(newImage, this._banner.children[0]);
+	};
+
+	/**
+	 * @callback
+	 */
+	ZGallery.prototype._next = function(e){
+
+		var newMidIndex = parseInt(this._banner.children[2].getAttribute('z-g-index'));
+		var newNextIndex = (newMidIndex + 1) % this._commitCursor;
+
+		this._banner.children[2].classList.remove(ClassName.MODAL_BANNER_NEXT);
+		this._banner.children[1].classList.remove(ClassName.MODAL_BANNER_MID);
+		this._banner.children[1].classList.add(ClassName.MODAL_BANNER_PREV);
+		this._banner.children[2].classList.add(ClassName.MODAL_BANNER_MID);
+
+		this._banner.removeChild(this._banner.children[0]);
+
+		var newImage = this._cache[newNextIndex].img;
+		newImage.classList.add(newImage.width > newImage.height 
+			? ClassName.WIDTH_FIRST : ClassName.HEIGHT_FIRST);
+		newImage.classList.add(ClassName.MODAL_BANNER_NEXT);
+		this._banner.appendChild(newImage);
 	};
 
 	/******* The above are event handlers *******/
@@ -474,6 +557,7 @@
 
 			for(var i = 0; i < count; i++){
 				var img = this._cache[i].img;
+				img.setAttribute('z-g-index', i);
 				var iw = img.width;
 				var ih = img.height;
 
@@ -581,6 +665,7 @@
 	ZGallery.prototype._placeImageWaterfall = function(){
 		while(this._cacheCursor < this._commitCursor){
 			var img = this._cache[this._cacheCursor++].img;
+			img.setAttribute('z-g-index', i);
 			var wrapper = document.createElement('div');
 			wrapper.appendChild(img);
 			wrapper.classList.add(ClassName.WATERFALL_PIC);
@@ -746,6 +831,7 @@
 			//Add images to the row
 			for(var i = head; i < id; i++){
 				var img = this._cache[i].img;
+				img.setAttribute('z-g-index', i);
 				if(isFull){
 					//images in this row may be not enough, can be used next time
 					this._cacheCursor++;
