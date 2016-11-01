@@ -115,11 +115,11 @@
     float: left;
     box-sizing: border-box;
     overflow: hidden; }
-    .z-g-waterfall .z-g-waterfall-col .z-g-waterfall-pic {
+    .z-g-waterfall .z-g-waterfall-col .wrapper {
       width: 100%;
       overflow: hidden;
       box-sizing: border-box; }
-      .z-g-waterfall .z-g-waterfall-col .z-g-waterfall-pic img {
+      .z-g-waterfall .z-g-waterfall-col .wrapper img {
         width: 100%;
         display: block; }
 
@@ -129,18 +129,44 @@
   .z-g-brick .z-g-brick-row {
     width: 100%;
     overflow: hidden; }
-    .z-g-brick .z-g-brick-row div {
+    .z-g-brick .z-g-brick-row .wrapper {
       float: left;
       overflow: hidden;
       box-sizing: border-box;
       height: 100%; }
-      .z-g-brick .z-g-brick-row div img {
+      .z-g-brick .z-g-brick-row .wrapper img {
         width: 100%;
         display: block;
         height: 100%; }
 
-.z-gallery img:hover {
-  opacity: 0.5; }
+.z-gallery {
+  font-family: "Microsoft YaHei"; }
+  .z-gallery img:hover {
+    opacity: 0.5; }
+  .z-gallery .wrapper {
+    position: relative; }
+    .z-gallery .wrapper .info {
+      position: absolute;
+      top: 0;
+      left: 0;
+      font-size: 0.6em;
+      padding: 0.5em;
+      margin: 0.5em;
+      width: 1em;
+      height: 1em;
+      color: transparent;
+      background-color: transparent;
+      border-radius: 1em;
+      transition: background-color 0.5s linear; }
+      .z-gallery .wrapper .info:hover {
+        width: auto;
+        height: auto;
+        background-color: black;
+        color: white;
+        opacity: 0.5;
+        box-shadow: 0 0 7px 2px black; }
+      .z-gallery .wrapper .info p {
+        margin: 0; }
 
 .z-g-modal {
   position: fixed;

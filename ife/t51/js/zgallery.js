@@ -169,7 +169,6 @@
 		JIGSAW_X:          'z-g-jigsaw-',
 		WATERFALL_G:       'z-g-waterfall',
 		WATERFALL_COL:     'z-g-waterfall-col',
-		WATERFALL_PIC:     'z-g-waterfall-pic',
 		BRICK_G:           'z-g-brick',
 		BRICK_ROW:         'z-g-brick-row',
 		V_CLIP:            'v-clip',
@@ -178,7 +177,9 @@
 		HEIGHT_FIRST:      'h-first',
 		ARROW_PREV:        'arrow-prev',
 		ARROW_NEXT:        'arrow-next',
-		ARROW:             'arrow'
+		ARROW:             'arrow',
+		WRAPPER:           'wrapper',
+		INFO:              'info'
 	};
 
 	/**
@@ -214,6 +215,7 @@
 		 * @private
 		 */
 		this._urls = [];
+		this._title = [];
 		/**
 		 * @type {CacheItem[]}
 		 */
@@ -233,9 +235,6 @@
 		
 		this._modal = null;
 		this._banner = null;
-		this._modalBannerPrev = null;
-		this._modalBannerMid = null;
-		this._modalBannerNext = null;
 
 		/**
 		 * Jigsaw layout member variables
@@ -401,6 +400,13 @@
 		timer = setInterval(check, timerInterval);
 	};
 
+	ZGallery.prototype._createInfo = function(title, width, height){
+		var info = document.createElement('div');
+		info.classList.add(ClassName.INFO);
+		info.innerHTML = '<p>' + title + '</p><p>' + width + 'px ' + height + 'px</p>';
+		return info;
+	};
+
 	ZGallery.prototype._placeImage = null;
 
 	ZGallery.prototype._removeImage = null;
@@ -415,13 +421,17 @@
 	 * @callback
 	 */
 	ZGallery.prototype._show = function(e){
+		var bannerWin = this._layout == this.LAYOUT.JIGSAW ? this._jigsaw.count : this._commitCursor;
+
 		var img = e.target.cloneNode(e);
 		var index = parseInt(img.getAttribute('z-g-index'));
 
-		var prevIndex = (index - 1 + this._commitCursor) % this._commitCursor;
-		var nextIndex = (index + 1) % this._commitCursor;
+		var prevIndex = (index - 1 + bannerWin) % bannerWin;
+		var nextIndex = (index + 1) % bannerWin;
 
-		for(var i = prevIndex; i <= nextIndex; i++){
+		var end = (nextIndex + 1) % bannerWin;
+
+		for(var i = prevIndex; i != end; i = (i+1) % bannerWin){
 			var t = this._cache[i].img.cloneNode(true);
 			t.classList.add(t.width > t.height 
 				? ClassName.WIDTH_FIRST : ClassName.HEIGHT_FIRST);
@@ -431,10 +441,6 @@
 		this._banner.children[0].classList.add(ClassName.MODAL_BANNER_PREV);
 		this._banner.children[1].classList.add(ClassName.MODAL_BANNER_MID);
 		this._banner.children[2].classList.add(ClassName.MODAL_BANNER_NEXT);
-
-		/**
-		 * @todo Refine centralization.
-		 */
 		
 		this._modal.classList.remove(ClassName.MODAL_HIDE);
 		this._modal.classList.add(ClassName.MODAL_SHOW);
@@ -456,9 +462,10 @@
 	 * @callback
 	 */
 	ZGallery.prototype._prev = function(e){
+		var bannerWin = this._layout == this.LAYOUT.JIGSAW ? this._jigsaw.count : this._commitCursor;
 
 		var newMidIndex = parseInt(this._banner.children[0].getAttribute('z-g-index'));
-		var newPrevIndex = (newMidIndex - 1 + this._commitCursor) % this._commitCursor;
+		var newPrevIndex = (newMidIndex - 1 + bannerWin) % bannerWin;
 
 		this._banner.children[0].classList.remove(ClassName.MODAL_BANNER_PREV);
 		this._banner.children[1].classList.remove(ClassName.MODAL_BANNER_MID);
@@ -478,9 +485,10 @@
 	 * @callback
 	 */
 	ZGallery.prototype._next = function(e){
+		var bannerWin = this._layout == this.LAYOUT.JIGSAW ? this._jigsaw.count : this._commitCursor;
 
 		var newMidIndex = parseInt(this._banner.children[2].getAttribute('z-g-index'));
-		var newNextIndex = (newMidIndex + 1) % this._commitCursor;
+		var newNextIndex = (newMidIndex + 1) % bannerWin;
 
 		this._banner.children[2].classList.remove(ClassName.MODAL_BANNER_NEXT);
 		this._banner.children[1].classList.remove(ClassName.MODAL_BANNER_MID);
@@ -567,6 +575,7 @@
 				}
 
 				var wrapper = document.createElement('div');
+				wrapper.classList.add(ClassName.WRAPPER);
 				wrapper.appendChild(img);
 				this._g.appendChild(wrapper);
 
@@ -660,14 +669,10 @@
 
 	ZGallery.prototype._placeImageWaterfall = function(){
 		while(this._cacheCursor < this._commitCursor){
-			var img = this._cache[this._cacheCursor++].img;
-			img.setAttribute('z-g-index', i);
+			var img = this._cache[this._cacheCursor].img;
+			img.setAttribute('z-g-index', this._cacheCursor++);
 			var wrapper = document.createElement('div');
-			wrapper.appendChild(img);
-			wrapper.classList.add(ClassName.WATERFALL_PIC);
-			
-			//Add to image elements.
-			this._imageElements.push(wrapper);
+			wrapper.classList.add(ClassName.WRAPPER);
 
 			//Set horizontal gutter width.
 			wrapper.style.marginBottom = this._gutterY + 'px';
@@ -684,7 +689,15 @@
 					minCol = this._waterfall.cols[minIndex];
 				}
 			}
+
+			var info = this._createInfo(this._title[this._cacheCursor], img.width, img.height);
+
+			wrapper.appendChild(img);
+			wrapper.appendChild(info);
 			minCol.appendChild(wrapper);
+
+			//Add to image elements.
+			this._imageElements.push(wrapper);
 		}
 	};
 
@@ -835,13 +848,18 @@
 				var styleWidth = (normHeight * img.width / img.height / normRowWidth);
 
 				var wrapper = document.createElement('div');
+				wrapper.classList.add(ClassName.WRAPPER);
 				wrapper.style.width = styleWidth * 100 + '%';
 
 				wrapper.style.paddingBottom = this._gutterY + 'px';
 				if(i < id - 1){
 					wrapper.style.paddingRight = this._gutterX + 'px';
 				}
+
+				var info = this._createInfo(this._title[i], img.width, img.height);
+
 				wrapper.appendChild(img);
+				wrapper.appendChild(info);
 				row.appendChild(wrapper);
 
 				//Add to image elements.
@@ -896,15 +914,16 @@
 	 * Initialize zgallery.
 	 * Old images will be displaced by new images using this method.
 	 * @param {(string|string[])} image A single image url or an array of image urls.
+	 * @param {(string|string[])} title A single title or an array of titles associated with the images.
 	 */
-	ZGallery.prototype.setImage = function(image){
+	ZGallery.prototype.setImage = function(image, title){
 		if(!this._initialized){
 			console.warn('ZGallery has not been initialized yet!');
 			return;
 		}
 
 		if(typeof image === 'string'){
-			this.setImage([image]);
+			this.setImage([image], [title]);
 			return;
 		}
 
@@ -912,6 +931,7 @@
 		this._resetLayout();
 
 		this._urls = Util.arrayAppend(this._urls, image);
+		this._title = Util.arrayAppend(this._title, title);
 		this._fetchImage();
 		this._checkCacheCommit();
 	};
@@ -919,19 +939,21 @@
 	/**
 	 * Add images to zgallery.
 	 * @param {(string|string[])} image A single image url or an array of image urls.
+	 * @param {(string|string[])} title A single title or an array of titles associated with the images.
 	 */
-	ZGallery.prototype.addImage = function(image){
+	ZGallery.prototype.addImage = function(image, title){
 		if(!this._initialized){
 			console.warn('ZGallery has not been initialized yet!');
 			return;
 		}
 
 		if(typeof image === 'string'){
-			this.addImage([image]);
+			this.addImage([image], [title]);
 			return;
 		}
 
 		this._urls = Util.arrayAppend(this._urls, image);
+		this._title = Util.arrayAppend(this._title, title);
 		this._fetchImage();
 		this._checkCacheCommit();
 	};

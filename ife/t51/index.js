@@ -1,11 +1,26 @@
 window.onload = function(){
 	/////////////////
-	
+	/*
 	var urls = [];
 	for(var i = 1; i <= 22; i++){
 		urls.push(i + '.png');
 	}
-	
+	*/
+	/////////////////
+	var init = 'http://goss1.asiacn.vcg.com/creative/vcg/800-bigwater/13789000/gic';
+	var code = 13789837;
+	var urls = [];
+	var title = [];
+	for(var i = 0; i < 20; i++){
+		urls.push(init + (code + i) + '.jpg');
+		title.push(String(code + i));
+	}
+	var appendUrls = [];
+	var appendTitle = [];
+	for(var i = 20; i < 35; i++){
+		appendUrls.push(init + (code + i) + '.jpg');
+		appendTitle.push(String(code + i));
+	}
 	/////////////////
 	/*
 	var urls = [
@@ -43,38 +58,13 @@ window.onload = function(){
 	gg.setLayout(gg.LAYOUT.BRICK);
 	gg.setGutter(5);
 	gg.init({colCount: 5});
-	gg.setImage(urls);/*
-	function fun(){
-		var t = gg.getImageElements();
-		//gg.removeImage(t[0]);
-		gg.addImage(urls[1]);
-	};
+	gg.setImage(urls, title);
 
-	setTimeout(fun, 5000);*/
-
-	//gg.addImage(urls);
-/*
-	var img = new Array(urls.length);
-
-	for(var i = 0; i < img.length; i++){
-		var ig = {img: new Image(), w: 0, h: 0};
-		ig.img.src = urls[i];
-		img[i] = ig;
-		ig.img.onload = function(e){
-			console.log('onload: ' + e.target.width + ',' + e.target.height + ',' + (new Date()).getTime());
-		};	
-	}
-	var onready = function(e){
-		for(var i = 0; i < img.length; i++){
-			if(img[i].img.width != img[i].w){
-				console.log('onready: ' + img[i].img.width + ',' + img[i].img.height + ',' + (new Date()).getTime());
-				img.splice(i, 1);
-				if(img.length == 0){
-					clearInterval(timer);
-				}
-			}
+	document.onscroll = function(e){
+		var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
+		
+		if(window.innerHeight + scrollTop >= document.body.clientHeight){
+			gg.addImage(appendUrls, appendTitle);
 		}
 	};
-	var timer = setInterval(onready, 40);
-*/
 };
