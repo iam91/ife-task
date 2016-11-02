@@ -1,17 +1,9 @@
 window.onload = function(){
-	/////////////////
-	/*
-	var urls = [];
-	for(var i = 1; i <= 22; i++){
-		urls.push(i + '.png');
-	}
-	*/
-	/////////////////
 	var init = 'http://goss1.asiacn.vcg.com/creative/vcg/800-bigwater/13789000/gic';
 	var code = 13789837;
 	var urls = [];
 	var title = [];
-	for(var i = 20; i < 35; i++){
+	for(var i = 20; i < 22; i++){
 		urls.push(init + (code + i) + '.jpg');
 		title.push(String(code + i));
 	}
@@ -50,28 +42,37 @@ window.onload = function(){
 			'https://placehold.it/3500x2500/b81d18',
 			'https://placehold.it/3500x4500/b6b6b6',
 			'https://placehold.it/3500x3500/004687'];*/
+
+	/////////////////
+	/*
+	var urls = [];
+	for(var i = 1; i <= 22; i++){
+		urls.push(i + '.png');
+	}
+	*/
+	/////////////////
+
 	var gg = new g(document.querySelector('.z-gallery'));
 	console.log(gg);
 	console.log(urls.length)
-	//gg.setLayout(gg.LAYOUT.JIGSAW);
-	gg.setLayout(gg.LAYOUT.WATERFALL);
+	gg.setLayout(gg.LAYOUT.JIGSAW);
+	//gg.setLayout(gg.LAYOUT.WATERFALL);
 	//gg.setLayout(gg.LAYOUT.BRICK);
-	gg.setGutter(5);
+	gg.setGutter(15);
 	gg.init({colCount: 5});
 	gg.setImage(urls, title);
 
 	function fun(){
-		var ele = gg.getImageElements();
-		gg.removeImage(ele[0]);
+		gg.addImage(urls, title);
 	}
 
-	setTimeout(fun, 2000);
-
+	//setTimeout(fun, 1000);
+	/*
 	document.onscroll = function(e){
 		var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
 		
 		if(window.innerHeight + scrollTop >= document.body.clientHeight){
 			gg.addImage(appendUrls, appendTitle);
 		}
-	};
+	};*/
 };

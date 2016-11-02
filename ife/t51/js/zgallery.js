@@ -396,15 +396,36 @@
 		timer = setInterval(check, timerInterval);
 	};
 
-	ZGallery.prototype._assembleImage = function(title, img, wrapper){
+	ZGallery.prototype._assembleImage = function(title, img, wrapper, leanRight, r, w, h){
 		var info = document.createElement('div');
-		var del = document.createElement('div');
+		var del = document.createElement('a');
 		del.classList.add(ClassName.DEL);
 		info.classList.add(ClassName.INFO);
+		if(leanRight){
+			del.style.left = 'auto';
+			info.style.left = 'auto';
+			del.style.right = (100 / 3) + '%';
+			info.style.right = (100 / 3) + '%';
+		}
 		info.innerHTML = '<p>' + title + '</p><p>' + img.width + 'px ' + img.height + 'px</p>';
 		wrapper.appendChild(img);
 		wrapper.appendChild(info);
 		wrapper.appendChild(del);
+	};
+
+	ZGallery.prototype._removeImageData = function(index){
+			if(index < this._cacheCursor){
+				this._cacheCursor--;
+			}
+			if(index < this._commitCursor){
+				this._commitCursor--;
+			}
+			this._imageElements.splice(index, 1);
+			this._cache.splice(index, 1);
+			this._urls.splice(index, 1);
+			for(var j = index; j < this._cache.length; j++){
+				this._cache[j].img.setAttribute('z-g-index', j);
+			}
 	};
 
 	ZGallery.prototype._placeImage = null;
@@ -421,13 +442,20 @@
 	 * @callback
 	 */
 	ZGallery.prototype._delete = function(e){
-		
+		if(e.target.nodeName !== 'A'){
+			return;
+		}
+		var wrapper = e.target.parentNode;
+		this._removeImage([wrapper]);
 	};
 
 	/**
 	 * @callback
 	 */
 	ZGallery.prototype._show = function(e){
+		if(e.target.nodeName !== 'IMG'){
+			return;
+		}
 		var bannerWin = this._layout == this.LAYOUT.JIGSAW ? this._jigsaw.count : this._commitCursor;
 
 		var img = e.target.cloneNode(e);
@@ -438,8 +466,9 @@
 
 		var end = (nextIndex + 1) % bannerWin;
 
-		for(var i = prevIndex; i != end; i = (i+1) % bannerWin){
-			var t = this._cache[i].img.cloneNode(true);
+		for(var i = -1; i < 2; i++){
+			var id = (i < 0 ? (index + i + bannerWin) : index + i) % bannerWin;
+			var t = this._cache[id].img.cloneNode(true);
 			t.classList.add(t.width > t.height 
 				? ClassName.WIDTH_FIRST : ClassName.HEIGHT_FIRST);
 			this._banner.appendChild(t);
@@ -574,16 +603,16 @@
 
 				var r = GlobalConst.jigsaw.ratios[String(count)][i];
 
-				if(count == 2 && i == 1){
-					this._jigsaw.clipPath.push(Util.imageClip(img, r, false, i, count));
-				}
-				else{
-					this._jigsaw.clipPath.push(Util.imageClip(img, r, true, i, count));
-				}
+				
+				this._jigsaw.clipPath.push(Util.imageClip(img, r, 
+					!(count == 2 && i == 1), i, count));
 
 				var wrapper = document.createElement('div');
 				wrapper.classList.add(ClassName.WRAPPER);
-				wrapper.appendChild(img);
+				
+				this._assembleImage(this._title[i], img, wrapper, 
+					(count == 2 && i == 1), r, iw, ih);
+
 				this._g.appendChild(wrapper);
 
 				this._imageElements.push(wrapper);
@@ -710,25 +739,21 @@
 		var flag = true;
 		for(var i = 0; i < image.length; i++){
 			var wrapper = image[i];
-			wrapper.parentNode.removeChild(wrapper);
+			var col = wrapper.parentNode;
+			col.removeChild(wrapper);
 			var img = wrapper.firstChild;
 			var index = parseInt(img.getAttribute('z-g-index'));
-			console.log(index);
-			if(index){
-				if(index < this._cacheCursor){
-					this._cacheCursor--;
-				}
-				if(index < this._commitCursor){
-					this._commitCursor--;
-				}
-				this._imageElements.splice(index, 1);
-				this._cache.splice(index, 1);
-				this._urls.splice(index, 1);
-				for(var j = index; j < this._cache.length; j++){
-					this._cache[j].img.setAttribute('z-g-index', j);
-				}
+
+			if(index >= 0){
+				this._removeImageData();
 			}else{
 				flag = false;
+			}
+
+			if(col.children.length == 0){
+				var colIndex = this._waterfall.cols.indexOf(col);
+				this._waterfall.cols.splice(colIndex, 1);
+				this._g.removeChild(col);
 			}
 		}
 		return flag;
@@ -884,24 +909,37 @@
 	};
 
 	ZGallery.prototype._removeImageBrick = function(image){
+		var flag = true;
 		for(var i = 0; i < image.length; i++){
-			var img = image[i];
-			img.parentNode.removeChild(img);
-			var index = this._imageElements.indexOf(img);
-			if(index < 0){
-				return false;
+			var wrapper = image[i];
+			var row = wrapper.parentNode;
+			row.removeChild(wrapper);
+			var img = wrapper.firstChild;
+			var index = parseInt(img.getAttribute('z-g-index'));
+			
+			if(index >= 0){
+				this._removeImageData();
+			}else{
+				flag = false;
 			}
-			if(index < this._cacheCursor){
-				this._cacheCursor--;
+
+			if(row.children.length == 0){
+				var rowIndex = 0;
+				while(rowIndex < this._g.children.length){
+					if(this._g.children[rowIndex] === row){
+						break;
+					}
+					rowIndex++;
+				}
+
+				if(rowIndex == this._g.children.length - 1){
+					this._addPlaceholderRow();
+				}
+				this._brick.rows.splice(rowIndex, 1);
+				this._g.removeChild(row);
 			}
-			if(index < this._commitCursor){
-				this._commitCursor--;
-			}
-			this._imageElements.splice(index, 1);
-			this._cache.splice(index, 1);
-			this._urls.splice(index, 1);
 		}
-		return true;
+		return flag;
 	};
 
 	/******* The above are private methods for brick layout *******/
@@ -1072,6 +1110,9 @@
 			Util.addHandler(this._g, 'click', 
 				Util.eventHandlerWrapper(this._show, this, false));
 		}
+
+		Util.addHandler(this._g, 'click', 
+			Util.eventHandlerWrapper(this._delete, this, false));
 
 		switch(this._layout){
 			case this.LAYOUT.JIGSAW:
