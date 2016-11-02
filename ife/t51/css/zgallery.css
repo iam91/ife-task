@@ -152,21 +152,33 @@
       font-size: 0.6em;
       padding: 0.5em;
       margin: 0.5em;
-      width: 1em;
-      height: 1em;
+      width: auto;
+      height: auto;
       color: transparent;
       background-color: transparent;
       border-radius: 1em;
-      transition: background-color 0.5s linear; }
+      transition: box-shadow 0.2s linear; }
       .z-gallery .wrapper .info:hover {
-        width: auto;
-        height: auto;
         background-color: black;
         color: white;
         opacity: 0.5;
         box-shadow: 0 0 7px 2px black; }
       .z-gallery .wrapper .info p {
         margin: 0; }
+    .z-gallery .wrapper .del {
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin: 0.5em;
+      border-radius: 0.5em;
+      width: 1em;
+      height: 1em;
+      background-color: transparent;
+      transition: box-shadow 0.2s linear; }
+      .z-gallery .wrapper .del:hover {
+        background-color: #b81d18;
+        opacity: 0.5;
+        box-shadow: 0 0 7px 2px black; }
 
 .z-g-modal {
   position: fixed;

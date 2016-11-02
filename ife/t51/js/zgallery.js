@@ -179,7 +179,8 @@
 		ARROW_NEXT:        'arrow-next',
 		ARROW:             'arrow',
 		WRAPPER:           'wrapper',
-		INFO:              'info'
+		INFO:              'info',
+		DEL:               'del'
 	};
 
 	/**
@@ -351,11 +352,6 @@
 					 */
 				};
 			})();
-
-			if(this._enableFullScreen){
-				Util.addHandler(img, 'click', 
-					Util.eventHandlerWrapper(this._show, this, false));
-			}
 		}
 		
 		function check(){
@@ -400,11 +396,15 @@
 		timer = setInterval(check, timerInterval);
 	};
 
-	ZGallery.prototype._createInfo = function(title, width, height){
+	ZGallery.prototype._assembleImage = function(title, img, wrapper){
 		var info = document.createElement('div');
+		var del = document.createElement('div');
+		del.classList.add(ClassName.DEL);
 		info.classList.add(ClassName.INFO);
-		info.innerHTML = '<p>' + title + '</p><p>' + width + 'px ' + height + 'px</p>';
-		return info;
+		info.innerHTML = '<p>' + title + '</p><p>' + img.width + 'px ' + img.height + 'px</p>';
+		wrapper.appendChild(img);
+		wrapper.appendChild(info);
+		wrapper.appendChild(del);
 	};
 
 	ZGallery.prototype._placeImage = null;
@@ -416,6 +416,13 @@
 	/******* The above are private methods for common use *******/
 
 	/******* The following are event handlers *******/
+
+	/**
+	 * @callback
+	 */
+	ZGallery.prototype._delete = function(e){
+		
+	};
 
 	/**
 	 * @callback
@@ -690,10 +697,8 @@
 				}
 			}
 
-			var info = this._createInfo(this._title[this._cacheCursor], img.width, img.height);
+			this._assembleImage(this._title[this._cacheCursor], img, wrapper);
 
-			wrapper.appendChild(img);
-			wrapper.appendChild(info);
 			minCol.appendChild(wrapper);
 
 			//Add to image elements.
@@ -702,24 +707,31 @@
 	};
 
 	ZGallery.prototype._removeImageWaterfall = function(image){
+		var flag = true;
 		for(var i = 0; i < image.length; i++){
-			var img = image[i];
-			img.parentNode.removeChild(img);
-			var index = this._imageElements.indexOf(img);
-			if(index < 0){
-				return false;
+			var wrapper = image[i];
+			wrapper.parentNode.removeChild(wrapper);
+			var img = wrapper.firstChild;
+			var index = parseInt(img.getAttribute('z-g-index'));
+			console.log(index);
+			if(index){
+				if(index < this._cacheCursor){
+					this._cacheCursor--;
+				}
+				if(index < this._commitCursor){
+					this._commitCursor--;
+				}
+				this._imageElements.splice(index, 1);
+				this._cache.splice(index, 1);
+				this._urls.splice(index, 1);
+				for(var j = index; j < this._cache.length; j++){
+					this._cache[j].img.setAttribute('z-g-index', j);
+				}
+			}else{
+				flag = false;
 			}
-			if(index < this._cacheCursor){
-				this._cacheCursor--;
-			}
-			if(index < this._commitCursor){
-				this._commitCursor--;
-			}
-			this._imageElements.splice(index, 1);
-			this._cache.splice(index, 1);
-			this._urls.splice(index, 1);
 		}
-		return true;
+		return flag;
 	};
 
 	/******* The above are private methods for waterfall layout *******/
@@ -856,10 +868,8 @@
 					wrapper.style.paddingRight = this._gutterX + 'px';
 				}
 
-				var info = this._createInfo(this._title[i], img.width, img.height);
+				this._assembleImage(this._title[i], img, wrapper);
 
-				wrapper.appendChild(img);
-				wrapper.appendChild(info);
 				row.appendChild(wrapper);
 
 				//Add to image elements.
@@ -1057,6 +1067,11 @@
 		}
 
 		this._renderModal();
+
+		if(this._enableFullScreen){
+			Util.addHandler(this._g, 'click', 
+				Util.eventHandlerWrapper(this._show, this, false));
+		}
 
 		switch(this._layout){
 			case this.LAYOUT.JIGSAW:

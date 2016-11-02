@@ -11,13 +11,13 @@ window.onload = function(){
 	var code = 13789837;
 	var urls = [];
 	var title = [];
-	for(var i = 0; i < 20; i++){
+	for(var i = 20; i < 35; i++){
 		urls.push(init + (code + i) + '.jpg');
 		title.push(String(code + i));
 	}
 	var appendUrls = [];
 	var appendTitle = [];
-	for(var i = 20; i < 35; i++){
+	for(var i = 0; i < 20; i++){
 		appendUrls.push(init + (code + i) + '.jpg');
 		appendTitle.push(String(code + i));
 	}
@@ -54,11 +54,18 @@ window.onload = function(){
 	console.log(gg);
 	console.log(urls.length)
 	//gg.setLayout(gg.LAYOUT.JIGSAW);
-	//gg.setLayout(gg.LAYOUT.WATERFALL);
-	gg.setLayout(gg.LAYOUT.BRICK);
+	gg.setLayout(gg.LAYOUT.WATERFALL);
+	//gg.setLayout(gg.LAYOUT.BRICK);
 	gg.setGutter(5);
 	gg.init({colCount: 5});
 	gg.setImage(urls, title);
+
+	function fun(){
+		var ele = gg.getImageElements();
+		gg.removeImage(ele[0]);
+	}
+
+	setTimeout(fun, 2000);
 
 	document.onscroll = function(e){
 		var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;

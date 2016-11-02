@@ -16,7 +16,7 @@ $banner-next-pos: 100% * 5 / 6;
 
 $font-stack: 'Microsoft YaHei';
 
-$info-radius: 1em;
+$del-radius: 0.5em;
 
 .z-gallery{
 	font-family: $font-stack;
@@ -32,15 +32,13 @@ $info-radius: 1em;
 			font-size: 0.6em;
 			padding: 0.5em;
 			margin: 0.5em;
-			width: $info-radius;
-			height: $info-radius;
+			width: auto;
+			height: auto;
 			color: transparent;
 			background-color: transparent;
-			border-radius: $info-radius;
-			transition: background-color 0.5s linear;
+			border-radius: 1em;
+			transition: box-shadow 0.2s linear;
 			&:hover{
-				width: auto;
-				height: auto;
 				background-color: black;
 				color: white;
 				opacity: 0.5;
@@ -48,6 +46,22 @@ $info-radius: 1em;
 			}
 			p{
 				margin: 0;
+			}
+		}
+		.del{
+			position: absolute;
+			top: 0;
+			right: 0;
+			margin: 0.5em;
+			border-radius: $del-radius;
+			width: 2 * $del-radius;
+			height: 2 * $del-radius;
+			background-color: transparent;
+			transition: box-shadow 0.2s linear;
+			&:hover{
+				background-color: #b81d18;
+				opacity: 0.5;
+				box-shadow: $modal-children-shadow;
 			}
 		}
 	}
