@@ -4,7 +4,9 @@
 	.z-g-brick-row{
 		width: 100%;
 		overflow: hidden;
+		transition: height 0.5s linear;
 		.wrapper{
+			transition: width, height 0.5s, 0.5s linear, linear; 
 			float: left;
 			overflow: hidden;
 			box-sizing: border-box;
@@ -13,8 +15,11 @@
 				width: 100%;
 				display: block;
 				height: 100%;
-				//-webkit-clip-path: polygon(10px 10px, 100% 10px, 100% 100%, 10px 100%);
 			}
+		}
+		.wrapper-deleted{
+			width: 0;
+			height: 0;
 		}
 	}
 }

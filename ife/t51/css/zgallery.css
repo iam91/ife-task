@@ -114,22 +114,28 @@
   .z-g-waterfall .z-g-waterfall-col {
     float: left;
     box-sizing: border-box;
-    overflow: hidden; }
+    overflow: hidden;
+    transition: width 0.5s linear; }
     .z-g-waterfall .z-g-waterfall-col .wrapper {
+      transition: width 0.5s linear;
       width: 100%;
       overflow: hidden;
       box-sizing: border-box; }
       .z-g-waterfall .z-g-waterfall-col .wrapper img {
         width: 100%;
         display: block; }
+    .z-g-waterfall .z-g-waterfall-col .wrapper-deleted {
+      width: 0; }
 
 .z-g-brick {
   width: 100%;
   overflow: hidden; }
   .z-g-brick .z-g-brick-row {
     width: 100%;
-    overflow: hidden; }
+    overflow: hidden;
+    transition: height 0.5s linear; }
     .z-g-brick .z-g-brick-row .wrapper {
+      transition: width, height 0.5s, 0.5s linear, linear;
       float: left;
       overflow: hidden;
       box-sizing: border-box;
@@ -138,6 +144,9 @@
         width: 100%;
         display: block;
         height: 100%; }
+    .z-g-brick .z-g-brick-row .wrapper-deleted {
+      width: 0;
+      height: 0; }
 
 .z-gallery {
   font-family: "Microsoft YaHei";

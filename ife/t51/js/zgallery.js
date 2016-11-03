@@ -179,6 +179,7 @@
 		ARROW_NEXT:        'arrow-next',
 		ARROW:             'arrow',
 		WRAPPER:           'wrapper',
+		WRAPPER_DELETED:   'wrapper-deleted',
 		INFO:              'info',
 		DEL:               'del'
 	};
@@ -414,18 +415,18 @@
 	};
 
 	ZGallery.prototype._removeImageData = function(index){
-			if(index < this._cacheCursor){
-				this._cacheCursor--;
-			}
-			if(index < this._commitCursor){
-				this._commitCursor--;
-			}
-			this._imageElements.splice(index, 1);
-			this._cache.splice(index, 1);
-			this._urls.splice(index, 1);
-			for(var j = index; j < this._cache.length; j++){
-				this._cache[j].img.setAttribute('z-g-index', j);
-			}
+		if(index < this._cacheCursor){
+			this._cacheCursor--;
+		}
+		if(index < this._commitCursor){
+			this._commitCursor--;
+		}
+		this._imageElements.splice(index, 1);
+		this._cache.splice(index, 1);
+		this._urls.splice(index, 1);
+		for(var j = index; j < this._cache.length; j++){
+			this._cache[j].img.setAttribute('z-g-index', j);
+		}
 	};
 
 	ZGallery.prototype._placeImage = null;
@@ -441,13 +442,14 @@
 	/**
 	 * @callback
 	 */
+	/*
 	ZGallery.prototype._delete = function(e){
 		if(e.target.nodeName !== 'A'){
 			return;
 		}
 		var wrapper = e.target.parentNode;
 		this._removeImage([wrapper]);
-	};
+	};*/
 
 	/**
 	 * @callback
@@ -745,7 +747,7 @@
 			var index = parseInt(img.getAttribute('z-g-index'));
 
 			if(index >= 0){
-				this._removeImageData();
+				this._removeImageData(index);
 			}else{
 				flag = false;
 			}
@@ -757,6 +759,32 @@
 			}
 		}
 		return flag;
+	};
+
+	/**
+	 * @callback
+	 */
+	ZGallery.prototype._deleteWaterfall = function(e){
+		if(e.target.nodeName !== 'A'){
+			return;
+		}
+		var wrapper = e.target.parentNode;
+
+		//Image deletion animation.
+		wrapper.classList.add(ClassName.WRAPPER_DELETED);
+		wrapper.style.margin = 0;
+		console.log(wrapper.parentNode.children.length);
+		if(wrapper.parentNode.children.length == 1){
+			wrapper.parentNode.style.width = 0;
+		}
+
+		var _this = this;
+		function delwaterfall(){
+			_this._removeImage([wrapper]);
+			clearTimeout(timer);
+		};
+
+		var timer = setTimeout(delwaterfall, 600);
 	};
 
 	/******* The above are private methods for waterfall layout *******/
@@ -869,9 +897,9 @@
 			//Compute and set row height.
 			var rowWidth = isFull ? totWidth : normTotWidth;
 			var rowHeight = normHeight * rowWidth / normTotWidth;
-			var normRowWidth = isFull ? normTotWidth : totWidth;
+			var containerBaseWidth = isFull ? normTotWidth : totWidth;
 
-			this._brick.rows.push({ratio: normHeight / normRowWidth});
+			this._brick.rows.push({ratio: normHeight / containerBaseWidth});
 			row.style.height = rowHeight + 'px';
 
 			//Add images to the row
@@ -882,7 +910,7 @@
 					//images in this row may be not enough, can be used next time
 					this._cacheCursor++;
 				}
-				var styleWidth = (normHeight * img.width / img.height / normRowWidth);
+				var styleWidth = (normHeight * img.width / img.height / containerBaseWidth);
 
 				var wrapper = document.createElement('div');
 				wrapper.classList.add(ClassName.WRAPPER);
@@ -918,7 +946,7 @@
 			var index = parseInt(img.getAttribute('z-g-index'));
 			
 			if(index >= 0){
-				this._removeImageData();
+				this._removeImageData(index);
 			}else{
 				flag = false;
 			}
@@ -940,6 +968,32 @@
 			}
 		}
 		return flag;
+	};
+
+	/**
+	 * @callback
+	 */
+	ZGallery.prototype._deleteBrick = function(e){
+		if(e.target.nodeName !== 'A'){
+			return;
+		}
+		var wrapper = e.target.parentNode;
+
+		//Image deletion animation.
+		wrapper.classList.add(ClassName.WRAPPER_DELETED);
+		wrapper.style.width = 0;
+		wrapper.style.padding = 0;
+		if(wrapper.parentNode.children.length == 1){
+			wrapper.parentNode.style.height = 0;
+		}
+
+		var _this = this;
+		function delbrick(){
+			_this._removeImage([wrapper]);
+			clearTimeout(timer);
+		};
+
+		var timer = setTimeout(delbrick, 600);
 	};
 
 	/******* The above are private methods for brick layout *******/
@@ -1111,31 +1165,34 @@
 				Util.eventHandlerWrapper(this._show, this, false));
 		}
 
-		Util.addHandler(this._g, 'click', 
-			Util.eventHandlerWrapper(this._delete, this, false));
-
 		switch(this._layout){
 			case this.LAYOUT.JIGSAW:
 				this._initJigsaw(opt);
 				this._placeImage = this._placeImageJigsaw;
 				this._removeImage = this._removeImageJigsaw;
 				this._resetLayout = this._resetLayoutJigsaw;
+				this._delete = this._deleteJigsaw;
 				break;
 			case this.LAYOUT.WATERFALL:
 				this._initWaterfall(opt);
 				this._placeImage = this._placeImageWaterfall;
 				this._removeImage = this._removeImageWaterfall;
 				this._resetLayout = this._resetLayoutWaterfall;
+				this._delete = this._deleteWaterfall;
 				break; 
 			case this.LAYOUT.BRICK:
 				this._initBrick(opt);
 				this._placeImage = this._placeImageBrick;
 				this._removeImage = this._removeImageBrick;
 				this._resetLayout = this._resetLayoutBrick;
+				this._delete = this._deleteBrick;
 				break;
 			default:
 				break;
 		};
+
+		Util.addHandler(this._g, 'click', 
+			Util.eventHandlerWrapper(this._delete, this, false));
 
 		this._initialized = true;
 	};

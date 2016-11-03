@@ -3,7 +3,7 @@ window.onload = function(){
 	var code = 13789837;
 	var urls = [];
 	var title = [];
-	for(var i = 20; i < 22; i++){
+	for(var i = 20; i < 35; i++){
 		urls.push(init + (code + i) + '.jpg');
 		title.push(String(code + i));
 	}
@@ -55,9 +55,9 @@ window.onload = function(){
 	var gg = new g(document.querySelector('.z-gallery'));
 	console.log(gg);
 	console.log(urls.length)
-	gg.setLayout(gg.LAYOUT.JIGSAW);
+	//gg.setLayout(gg.LAYOUT.JIGSAW);
 	//gg.setLayout(gg.LAYOUT.WATERFALL);
-	//gg.setLayout(gg.LAYOUT.BRICK);
+	gg.setLayout(gg.LAYOUT.BRICK);
 	gg.setGutter(15);
 	gg.init({colCount: 5});
 	gg.setImage(urls, title);
