@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang='zh-cmn-Hans'>
+	<head>
+		<title>t27/28</title>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="index.css" type="text/css">
+		<script src="../lib/jquery-3.1.1.min.js" type="text/javascript" defer></script>
+		<script src="index.js" type="text/javascript" defer></script>
+		<script src="ship.js" type="text/javascript" defer></script>
+		<script src="commander.js" type="text/javascript" defer></script>
+		<script src="media.js" type="text/javascript" defer></script>
+		<script src="main.js" type="text/javascript" defer></script>
+	</head>
+	<body>
+		<div class='left'>
+			<div class='space'>
+				<div class='planet'></div>
+			</div>
+			<div class='cmd'>
+				<button class='cmd-create'>新的飞船起飞</button>
+				<div class="engine">
+					<label><input type="radio" name="engine" value='walker' checked="true">Walker</label>
+					<label><input type="radio" name="engine" value='runner'>Runner</label>
+					<label><input type="radio" name="engine" value='flier'>Flier</label>
+				</div>
+				<div class="energy">
+					<label><input type="radio" name="energy" value='strong' checked="true">Strong</label>
+					<label><input type="radio" name="energy" value='lightwave'>Lightwave</label>
+					<label><input type="radio" name="energy" value='permanent'>Permanent</label>
+				</div>
+			</div>
+		</div>
+		<div class='right'>
+			<div class='dc'>
+				<table>
+					<thead>
+						<tr>
+							<td>飞船</td>
+							<td>能源系统</td>
+							<td>动力系统</td>
+							<td>状态</td>
+							<td>燃料剩余</td>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+			<div class='console'></div>
+		</div>
+	</body>
+</html>

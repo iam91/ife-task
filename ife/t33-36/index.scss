@@ -1,0 +1,76 @@
+$field-width: 10;
+$field-height: 10;
+
+$grid-size: 50px;
+$grid-border-size: 1px;
+
+$line-size: 16px;
+$line-height: 20px;
+$line-num: 5;
+
+#field{
+	width: (2 * $grid-border-size + $grid-size) * $field-width;
+	height: (2 * $grid-border-size + $grid-size) * $field-width;
+	border: 1px solid grey;
+	position: relative;
+
+	div{
+		float: left;
+	}
+
+	.grid{
+		border: $grid-border-size solid grey;
+		width: $grid-size;
+		height: $grid-size;
+	}
+	.box{
+		$ani-time: 0.5s;
+
+		width: $grid-size + 2 * $grid-border-size;
+		height: $grid-size + 2 * $grid-border-size;
+		box-sizing: border-box;
+		background-color: red;
+		border-top: 20px solid blue;
+		transition: transform $ani-time, left $ani-time, top $ani-time;
+		position: absolute;
+	}
+}
+
+#direct{
+	margin: 1em 0;
+	#win {
+		margin: 1em 0;
+		font-family: 'Microsoft YaHei';
+	
+		.line{
+			font-size: $line-size;
+			line-height: $line-size;
+			height: $line-num * $line-size;
+		}
+
+		
+		#serial{
+			@extend .line;
+			text-align: right;
+			float: left;
+			overflow: hidden;
+			background-color: grey;
+			color: white;
+
+			.warn{
+				background-color: red;
+			}
+		}
+		textarea{
+			@extend .line;
+			padding: 0;
+			outline: none;
+			border: none;
+			color: green;
+			background-color: black;
+			resize: none;
+			display: block;
+			float: left;
+		}
+	}
+}

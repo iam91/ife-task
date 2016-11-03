@@ -1,0 +1,48 @@
+#field {
+  width: 520px;
+  height: 520px;
+  border: 1px solid grey;
+  position: relative; }
+  #field div {
+    float: left; }
+  #field .grid {
+    border: 1px solid grey;
+    width: 50px;
+    height: 50px; }
+  #field .box {
+    width: 52px;
+    height: 52px;
+    box-sizing: border-box;
+    background-color: red;
+    border-top: 20px solid blue;
+    transition: transform 0.5s, left 0.5s, top 0.5s;
+    position: absolute; }
+
+#direct {
+  margin: 1em 0; }
+  #direct #win {
+    margin: 1em 0;
+    font-family: 'Microsoft YaHei'; }
+    #direct #win .line, #direct #win #serial, #direct #win textarea {
+      font-size: 16px;
+      line-height: 16px;
+      height: 80px; }
+    #direct #win #serial {
+      text-align: right;
+      float: left;
+      overflow: hidden;
+      background-color: grey;
+      color: white; }
+      #direct #win #serial .warn {
+        background-color: red; }
+    #direct #win textarea {
+      padding: 0;
+      outline: none;
+      border: none;
+      color: green;
+      background-color: black;
+      resize: none;
+      display: block;
+      float: left; }
+
+/*# sourceMappingURL=index.css.map */

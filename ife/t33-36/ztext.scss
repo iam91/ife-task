@@ -1,0 +1,40 @@
+$line-size: 16px;
+$line-height: 20px;
+$line-num: 5;
+
+.ztext {
+	margin: 1em 0;
+	font-family: 'Microsoft YaHei';
+
+	.line{
+		font-size: $line-size;
+		line-height: $line-size;
+		height: $line-num * $line-size;
+	}
+
+	
+	.ztext-serial{
+		@extend .line;
+		text-align: right;
+		float: left;
+		overflow: hidden;
+		background-color: grey;
+		color: white;
+
+		.warn{
+			background-color: red;
+		}
+	}
+	.ztext-win{
+		@extend .line;
+		min-width: 10em;
+		padding: 0;
+		outline: none;
+		border: none;
+		color: green;
+		background-color: black;
+		float: left;
+		overflow: auto;
+		white-space: pre;
+	}
+}

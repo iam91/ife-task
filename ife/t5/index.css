@@ -1,0 +1,165 @@
+body{
+	background-color: #dddddd;
+	padding: 0;
+	margin: 0;
+}
+nav{
+	background-color: #303030;
+	position: relative;
+	height: 5em;
+	width: 100%;
+}
+nav > img{
+	height: 100%;
+}
+.navbar-links{
+	position: absolute;
+	top: 0;
+	right: 1em;
+	margin: 0;
+}
+.navbar-links > li{
+	float:left;
+	margin-right: 1em;
+	margin-left: 1em;
+}
+.navbar-links > li > a{
+	color: white;
+	text-decoration: none;
+	line-height: 5em;
+}
+.navbar-links > li > a:hover{
+	color:gray;
+}
+article, section, aside{
+	background-color: white;
+	border-color: gray;
+	margin: 1em;
+	padding: 1em;
+	border-width: 1px;
+	box-shadow: 2px 2px 2px 1px gray;
+}
+aside{
+	float: right;
+	width: 23em;
+}
+aside form{
+	font-size: 0.8em;
+}
+aside form div{
+	margin: 0.5em;
+}
+aside header{
+	border-left-style: solid;
+	border-color: silver;
+	border-left-width: 3px;
+	height: 2em;
+	padding-left: 1em;
+	font-weight: bold;
+}
+aside textarea{
+	height: 6em;
+	width: 14em;
+}
+#form-person > div{
+	margin: 1em;
+}
+.form-title{
+	float: left;
+	width: 30%;
+	text-align: right;
+}
+.form-tips{
+	margin: 0.5em 0 0.5em 30%;
+	color: gray;
+}
+.btn{
+	width: 100%;
+	height: 3em;
+	border-radius: 8px;
+	border-width: 1px;
+	border-style: solid;
+	color: white;
+	background-color: #3333CC;
+	font-weight: bold;
+	font-size: 1.25em;
+}
+.btn:hover{
+	background-color: #3300CC; 
+}
+.btn:active{
+	background-color: #333399;
+}
+.content{
+	margin-right: 26em;
+}
+article > header > h3, section > header > h3{
+	color: gray;
+}
+article > header > p, section > header > p{
+	color: gray;
+	font-size: 0.8em;
+}
+/*
+以下注释与.picture设置float:left;配合也可以实现10张图片自适应排列
+*/
+/*
+.float-group::after{
+	content: "";
+	clear: both;
+	display: block;
+}*/
+.pictures{
+	border-width: 1px;
+	border-color: black;
+	border-style: solid;
+	padding: 0.5em 1em 1em 1em;
+	margin: 1em;
+	width: 5em;
+	height: 5em;
+	text-align: center;
+	/*float: left;*/
+	display: inline-block;
+}
+.pictures > p{
+	height: 20%;
+	font-size: 0.7em;
+	margin: 0 0 0.2em 0;
+}
+.pictures > img{
+	height: 80%;
+	width: 100%;
+}
+.mytable{
+	border-style: solid;
+	border-width: 1px;
+	border-color: silver;
+	font-size: 0.9em;
+	width: 100%;
+}
+.mytable, .mytable td{
+	border-style: solid;
+	border-width: 1px;
+	border-color: silver;
+	border-collapse: collapse;
+	padding: 2px;
+}
+.mytable > thead{
+	background-color: #303030;
+	color: white;
+	font-weight: bold;
+}
+.mytable > tfoot{
+	background-color: silver;
+	font-weight: bold;
+}
+.footer{
+	background-color: #181818;
+	width: 100%;
+	height: 5em;
+	color: white;
+	line-height: 4em;
+	text-align: center;
+	font-size: 0.8em;
+	font-weight: bold;
+}

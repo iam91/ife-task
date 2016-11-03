@@ -1,0 +1,20 @@
+#tags, #favs{
+	margin: 1em 0;
+	display: flex;
+}
+.tag, .fav{
+	line-height: 2em;
+	padding: 0 0.5em;
+	margin: 0 0.5em;
+	color: white;
+	font-weight: bold;
+}
+.tag{
+	background-color: blue;
+}
+.fav{
+	background-color: green;
+}
+.hover{
+	background-color: red;
+}

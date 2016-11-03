@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>t31</title>
+		<meta charset='utf-8'>
+		<link rel="stylesheet" href="index.css" type="text/css">
+		<script src="../lib/util.js" type="text/javascript" defer></script>
+		<script src="index.js" type="text/javascript" defer></script>
+	</head>
+	<body>
+		<form action="">
+			<div class='switch'>
+				<input type='radio' name='ifstudent' value='student' checked><label>在校生</label>
+				<input type='radio' name='ifstudent' value='nonstudent'><label>非在校生</label>
+			</div>
+			<div class='switch-content'>
+				<div class='student show'>	
+					<label>学校</label>
+					<select class='city'></select>
+					<select class='school'></select>
+				</div>
+				<div class='nonstudent hide'>	
+					<label>就业单位</label><input type='text'>
+				</div>
+			</div>
+		</form>
+	</body>
+</html>
