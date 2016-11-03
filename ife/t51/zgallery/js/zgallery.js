@@ -408,13 +408,16 @@
 			del.style.right = (100 / 3) + '%';
 			info.style.right = (100 / 3) + '%';
 		}
-		info.innerHTML = '<p>' + title + '</p><p>' + img.width + 'px ' + img.height + 'px</p>';
+		info.innerHTML = '<p>' + (title ? title : '') + '</p><p>' + img.width + 'px ' + img.height + 'px</p>';
 		wrapper.appendChild(img);
 		wrapper.appendChild(info);
 		wrapper.appendChild(del);
 	};
 
 	ZGallery.prototype._removeImageData = function(index){
+		if(index < this._urlIndex){
+			this._urlIndex--;
+		}
 		if(index < this._cacheCursor){
 			this._cacheCursor--;
 		}
@@ -623,27 +626,32 @@
 	};
 
 	ZGallery.prototype._removeImageJigsaw = function(image){
-		var ret = true;
+		var flag = true;
 		for(var i = 0; i < image.length; i++){
-			var img = image[i];
-			img.parentNode.removeChild(img);
-			var index = this._imageElements.indexOf(img);
-			if(index < 0){
-				ret = false;
+			var wrapper = image[i];
+			var img = wrapper.firstChild;
+			var index = parseInt(img.getAttribute('z-g-index'));
+
+			if(index >= 0){
+				this._removeImageData(index);
+			}else{
+				flag = false;
 			}
-			if(index < this._cacheCursor){
-				this._cacheCursor--;
-			}
-			if(index < this._commitCursor){
-				this._commitCursor--;
-			}
-			this._imageElements.splice(index, 1);
-			this._cache.splice(index, 1);
-			this._urls.splice(index, 1);
 		}
 		this._resetLayoutJigsaw();
 		this._placeImageJigsaw();
-		return ret;
+		return flag;
+	};
+
+	/**
+	 * @callback
+	 */
+	ZGallery.prototype._deleteJigsaw = function(e){
+		if(e.target.nodeName !== 'A'){
+			return;
+		}
+		var wrapper = e.target.parentNode;
+		this._removeImage([wrapper]);
 	};
 
 	/******* The above are private methods for jigsaw layout *******/
@@ -773,7 +781,6 @@
 		//Image deletion animation.
 		wrapper.classList.add(ClassName.WRAPPER_DELETED);
 		wrapper.style.margin = 0;
-		console.log(wrapper.parentNode.children.length);
 		if(wrapper.parentNode.children.length == 1){
 			wrapper.parentNode.style.width = 0;
 		}
@@ -1033,7 +1040,9 @@
 		this._resetLayout();
 
 		this._urls = Util.arrayAppend(this._urls, image);
-		this._title = Util.arrayAppend(this._title, title);
+		if(title){
+			this._title = Util.arrayAppend(this._title, title);
+		}
 		this._fetchImage();
 		this._checkCacheCommit();
 	};
@@ -1055,14 +1064,16 @@
 		}
 
 		this._urls = Util.arrayAppend(this._urls, image);
-		this._title = Util.arrayAppend(this._title, title);
+		if(title){
+			this._title = Util.arrayAppend(this._title, title);
+		}
 		this._fetchImage();
 		this._checkCacheCommit();
 	};
 
 	/**
 	 * Remove images.
-	 * @param  {(object|object[])} image Images need removing.
+	 * @param  {(HTMLElement|HTMLElement[])} image Images need removing.
 	 * @return {boolean} Indicate whether all images are removed successfully.
 	 */
 	ZGallery.prototype.removeImage = function(image){
@@ -1138,7 +1149,7 @@
 
 	/**
 	 * Get dom elements attached to images width index.
-	 * @return {object[]}
+	 * @return {HTMLElement[]}
 	 */
 	ZGallery.prototype.getImageElements = function(){
 		if(!this._initialized){
@@ -1197,6 +1208,15 @@
 		this._initialized = true;
 	};
 
-	window.g = ZGallery;
+	if(typeof window.zGallery === 'undefined'){
+		window.zGallery = function(container){
+			if(container){
+				var g = document.createElement('div');
+				g.classList.add('z-gallery');
+				container.appendChild(g);
+			}
+			return new ZGallery(g);
+		};
+	}
 
 })(window, document);
