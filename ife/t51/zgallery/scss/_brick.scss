@@ -1,0 +1,25 @@
+.z-g-brick{
+	width: 100%;
+	overflow: hidden;
+	.z-g-brick-row{
+		width: 100%;
+		overflow: hidden;
+		transition: height 0.5s linear;
+		.wrapper{
+			transition: width, height 0.5s, 0.5s linear, linear; 
+			float: left;
+			overflow: hidden;
+			box-sizing: border-box;
+			height: 100%;
+			img{
+				width: 100%;
+				display: block;
+				height: 100%;
+			}
+		}
+		.wrapper-deleted{
+			width: 0;
+			height: 0;
+		}
+	}
+}
