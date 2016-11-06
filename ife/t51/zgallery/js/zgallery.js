@@ -807,8 +807,14 @@
 
 		function brickOnresize(e){
 			var totWidth = this._g.clientWidth;
-			var responsiveFlag = false;
+			/**
+			 * When window is small enough, this._g contains nothing.
+			 * When window becomes larger from above condition, placeImageBrick() should be invoked,
+			 * so assign true to responsiveFlag.
+			 */
+			var responsiveFlag = true; 
 			for(var i = 0; i < this._g.children.length; i++){
+				responsiveFlag = false;
 				//Resize every row.
 				var row = this._g.children[i];
 				var expectHeight = totWidth * (this._brick.rows[i].ratio);
@@ -831,7 +837,7 @@
 	ZGallery.prototype._addPlaceholderRow = function(){
 		var placeholderRow = document.createElement('div');
 		this._g.appendChild(placeholderRow);
-		this._brick.rows.push({minTotalWidth: 0});
+		this._brick.rows.push({ratio: 0});
 	};
 
 	ZGallery.prototype._resetLayoutBrick = function(){
@@ -1033,6 +1039,7 @@
 			return;
 		}
 
+		Util.arrayClear(this._title);
 		Util.arrayClear(this._urls);
 		this._resetLayout();
 
