@@ -15,6 +15,5 @@ window.onload = function(e){
 	btn.onclick = function(e){
 		gg.addImage(init + (code + add) + '.jpg');
 		add++;
-		console.log(add)
 	};
 };

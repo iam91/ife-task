@@ -159,44 +159,46 @@
     box-shadow: 0 0 1px 1px #A0A0A0; }
     .z-gallery img:hover {
       opacity: 0.5; }
-  .z-gallery .wrapper .info {
-    position: absolute;
-    top: 0;
-    left: 0;
-    font-size: 0.6em;
-    padding: 0.5em;
-    margin: 0.5em;
-    width: auto;
-    height: auto;
-    color: transparent;
-    background-color: transparent;
-    border-radius: 1em;
-    transition: box-shadow 0.2s linear; }
-    .z-gallery .wrapper .info:hover {
-      background-color: black;
-      color: white;
-      opacity: 0.5;
-      box-shadow: 0 0 7px 2px black; }
-    .z-gallery .wrapper .info p {
-      margin: 0; }
-  .z-gallery .wrapper .del {
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin: 0.5em;
-    display: block;
-    border-radius: 0.5em;
-    width: 1em;
-    height: 1em;
-    background-color: transparent;
-    opacity: 0.7;
-    transition: box-shadow 0.2s linear; }
-    .z-gallery .wrapper .del:hover {
-      background-color: #b81d18;
-      box-shadow: 0 0 7px 2px black; }
-    .z-gallery .wrapper .del:active {
-      opacity: 1;
-      box-shadow: none; }
+  .z-gallery .wrapper {
+    background-color: black; }
+    .z-gallery .wrapper .info {
+      position: absolute;
+      top: 0;
+      left: 0;
+      font-size: 0.6em;
+      padding: 0.5em;
+      margin: 0.5em;
+      width: auto;
+      height: auto;
+      color: transparent;
+      background-color: transparent;
+      border-radius: 1em;
+      transition: box-shadow 0.2s linear; }
+      .z-gallery .wrapper .info:hover {
+        background-color: black;
+        color: white;
+        opacity: 0.5;
+        box-shadow: 0 0 7px 2px black; }
+      .z-gallery .wrapper .info p {
+        margin: 0; }
+    .z-gallery .wrapper .del {
+      position: absolute;
+      top: 0;
+      left: 0;
+      margin: 0.5em;
+      display: block;
+      border-radius: 0.5em;
+      width: 1em;
+      height: 1em;
+      background-color: transparent;
+      opacity: 0.7;
+      transition: box-shadow 0.2s linear; }
+      .z-gallery .wrapper .del:hover {
+        background-color: #b81d18;
+        box-shadow: 0 0 7px 2px black; }
+      .z-gallery .wrapper .del:active {
+        opacity: 1;
+        box-shadow: none; }
 
 .z-g-waterfall .wrapper, .z-g-brick .wrapper {
   position: relative; }

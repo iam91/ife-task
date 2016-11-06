@@ -99,7 +99,7 @@
 		 * @param {number} count Number of images to be showed.
 		 * @return {ClipCompatible} HTML elements used to make clip-path compatible.
 		 */
-		imageClip: function(img, r, isRect, index, count){
+		imageClip: function(wrapper, img, r, isRect, index, count){
 			var w = img.width;
 			var h = img.height;
 
@@ -108,47 +108,40 @@
 			var svgTail = '</clipPath></defs></svg>';
 
 			if(h / w > r){
-				//too large height
-				var ww = w;
-				var hh = ww * r;
-				if(isRect){
-					var x = 0;
-				}
-				else{
-					var x = 1 / 3;
-				}
-				var y = hh / h + 0.01;
 				img.classList.add(ClassName.V_CLIP);
-				var polygon = '<polygon points="' + x + ' 0, 1 0, 1 ' + y + ', 0 ' + y + '"/>';
-			}
-			else{
-				//too large width
-				var hh = h;
-				var ww = hh / r;
-				if(isRect){
-					var x1 = 0;
+				if(!isRect){
+					var ww = w;
+					var hh = ww * r;
+					var x = 1 / 3;
+					var y = hh / h + 0.01;
+					var polygon = '<polygon points="' + x + ' 0, 1 0, 1 ' + y + ', 0 ' + y + '"/>';
 				}
-				else{
-					var x1 = ww * 0.5 / w;
-				}
-				var x2 = ww / w + 0.01;
+			}else{
 				img.classList.add(ClassName.H_CLIP);
-				var polygon = '<polygon points="' + x1 + ' 0, ' + x2 + ' 0, ' + x2 + ' 1, 0 1"/>';
+				if(!isRect){
+					var hh = h;
+					var ww = hh / r;
+					var x1 = ww * 0.5 / w;
+					var x2 = ww / w + 0.01;
+					var polygon = '<polygon points="' + x1 + ' 0, ' + x2 + ' 0, ' + x2 + ' 1, 0 1"/>';
+				}
 			}
-			var styleInner = '.' + ClassName.JIGSAW_X + count + " div:nth-child(" + (index + 1) 
-				+ ") img{-webkit-clip-path: url('#clip-shape-" + index 
-				+ "');clip-path: url('#clip-shape-" + index + "');}";
 
-			//make clip-path usable in firefox
-			//add clip-paths
-			var t = document.createElement('div');
-			var s = document.createElement('style');
-			t.innerHTML = svgHead + polygon + svgTail;
-			s.innerHTML = styleInner;
-			s.type = "text/css";
-			document.body.appendChild(t);
-			document.head.appendChild(s);
-			return {svg: t, style: s};
+			if(!isRect){
+				var styleInner = '.' + ClassName.JIGSAW_X + count + " div:nth-child(" + (index + 1) 
+					+ "){-webkit-clip-path: url('#clip-shape-" + index 
+					+ "');clip-path: url('#clip-shape-" + index + "');}";
+				var t = document.createElement('div');
+				var s = document.createElement('style');
+				t.innerHTML = svgHead + polygon + svgTail;
+				s.innerHTML = styleInner;
+				s.type = "text/css";
+				document.body.appendChild(t);
+				document.head.appendChild(s);
+				return {svg: t, style: s};
+			}else{
+				return null;
+			}
 		}
 	};
 
@@ -610,15 +603,17 @@
 
 				var r = GlobalConst.jigsaw.ratios[String(count)][i];
 
-				
-				this._jigsaw.clipPath.push(Util.imageClip(img, r, 
-					!(count == 2 && i == 1), i, count));
-
 				var wrapper = document.createElement('div');
 				wrapper.classList.add(ClassName.WRAPPER);
 				
 				this._assembleImage(this._title[i], img, wrapper, 
 					(count == 2 && i == 1), r, iw, ih);
+
+				var clipResult = Util.imageClip(wrapper, img, r, 
+					!(count == 2 && i == 1), i, count);
+				if(clipResult){
+					this._jigsaw.clipPath.push(clipResult);
+				}
 
 				this._g.appendChild(wrapper);
 
