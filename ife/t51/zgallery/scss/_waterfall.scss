@@ -7,7 +7,7 @@
 		overflow: hidden;
 		transition: width 0.5s linear;
 		.wrapper{
-			transition: width 0.5s linear; 
+			transition: width 0.5s linear, margin 0.5s linear; 
 			width: 100%;
 			overflow: hidden;
 			box-sizing: border-box;

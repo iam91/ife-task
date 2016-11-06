@@ -117,7 +117,7 @@
     overflow: hidden;
     transition: width 0.5s linear; }
     .z-g-waterfall .z-g-waterfall-col .wrapper {
-      transition: width 0.5s linear;
+      transition: width 0.5s linear, margin 0.5s linear;
       width: 100%;
       overflow: hidden;
       box-sizing: border-box; }
@@ -135,7 +135,7 @@
     overflow: hidden;
     transition: height 0.5s linear; }
     .z-g-brick .z-g-brick-row .wrapper {
-      transition: width, height 0.5s, 0.5s linear, linear;
+      transition: width 0.5s linear, height 0.5s linear, padding-right 0.5s linear;
       float: left;
       overflow: hidden;
       box-sizing: border-box;

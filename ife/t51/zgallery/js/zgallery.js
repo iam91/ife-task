@@ -351,6 +351,8 @@
 					/**
 					 * @todo when failed to load the image.
 					 */
+					e.target.width = 100;
+					e.target.height = 100;
 				};
 			})();
 		}
@@ -989,7 +991,7 @@
 		//Image deletion animation.
 		wrapper.classList.add(ClassName.WRAPPER_DELETED);
 		wrapper.style.width = 0;
-		wrapper.style.padding = 0;
+		wrapper.style.paddingRight = 0;
 		if(wrapper.parentNode.children.length == 1){
 			wrapper.parentNode.style.height = 0;
 		}
