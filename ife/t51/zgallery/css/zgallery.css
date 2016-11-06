@@ -3,6 +3,7 @@
   overflow: hidden;
   width: 100%; }
   .z-g-jigsaw div {
+    background-color: black;
     position: absolute;
     overflow: hidden;
     display: block; }
@@ -123,7 +124,7 @@
       box-sizing: border-box; }
       .z-g-waterfall .z-g-waterfall-col .wrapper img {
         width: 100%;
-        display: block; }
+        height: auto; }
     .z-g-waterfall .z-g-waterfall-col .wrapper-deleted {
       width: 0; }
 
@@ -142,7 +143,6 @@
       height: 100%; }
       .z-g-brick .z-g-brick-row .wrapper img {
         width: 100%;
-        display: block;
         height: 100%; }
     .z-g-brick .z-g-brick-row .wrapper-deleted {
       width: 0;
