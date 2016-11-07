@@ -383,8 +383,7 @@
 						//if committed but not assembled yet, assemble it
 						if(i < this._commitCursor){
 							var cacheIndex = parseInt(e.target.getAttribute('z-g-index'));
-							this._assembleImage(cacheIndex, 
-								this._layout == this.LAYOUT.JIGSAW && cacheIndex == 1);
+							this._assembleImage(cacheIndex);
 						}
 
 						that._commitImage();
@@ -459,8 +458,7 @@
 
 			if(img.onload === null){
 				//onload triggered, assemble image.
-				this._assembleImage(this._cache.length - 1, 
-					this._layout == this.LAYOUT.JIGSAW && this._cache.length == 2);
+				this._assembleImage(this._cache.length - 1);
 			}
 		}
 		this._commitCursor = cursor;
@@ -692,7 +690,7 @@
 				if(wrapper.children.length <= 1){
 					//If not assembled
 					this._assembleImage(i, 
-						this._layout == this.LAYOUT.JIGSAW && i == 1);
+						this._layout == this.LAYOUT.JIGSAW && i == 1 && count == 2);
 				}
 
 				var r = GlobalConst.jigsaw.ratios[String(count)][i];
