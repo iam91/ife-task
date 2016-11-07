@@ -122,8 +122,7 @@
 					var ww = w;
 					var hh = ww * r;
 					var x = 1 / 3;
-					var y = hh / h + 0.01;
-					var polygon = '<polygon points="' + x + ' 0, 1 0, 1 ' + y + ', 0 ' + y + '"/>';
+					var polygon = '<polygon points="' + x + ' 0, 1 0, 1 1, 0 1"/>';
 				}
 			}else{
 				img.classList.add(ClassName.H_CLIP);
@@ -385,7 +384,7 @@
 						if(i < this._commitCursor){
 							var cacheIndex = parseInt(e.target.getAttribute('z-g-index'));
 							this._assembleImage(cacheIndex, 
-								this._layout == this.LAYOUT.JIGSAW && cacheIndex == 1);
+								this._layout == this.LAYOUT.JIGSAW && this._cache.length == 2 && cacheIndex == 1);
 						}
 
 						that._commitImage();
@@ -466,6 +465,13 @@
 		}
 		this._commitCursor = cursor;
 		if(this._commitCursor == this._loadCache.length){
+			//fix delete button's position.
+			if(this._cache.length > 2){
+				this._cache[1].wrapper.innerHTML = '';
+				this._cache[1].wrapper.appendChild(this._cache[1].img);
+				this._assembleImage(1);
+			}
+
 			this._hideLoading();
 		}
 		this._placeImage();
@@ -641,8 +647,11 @@
 	ZGallery.prototype._resetLayoutJigsaw = function(){
 		for(var i = 0; i < this._cache.length; i++){
 			var img = this._cache[i].img;
+			var wrapper = this._cache[i].wrapper;
 			img.classList.remove(ClassName.H_CLIP);
 			img.classList.remove(ClassName.V_CLIP);
+			wrapper.innerHTML = '';
+			wrapper.appendChild(img);
 		}
 		this._g.innerHTML = '';
 		this._g.classList.remove(ClassName.JIGSAW_X + this._jigsaw.count);
@@ -706,8 +715,6 @@
 			var img = wrapper.firstChild;
 			var index = parseInt(img.getAttribute('z-g-index'));
 			var cur = img.nextSibling;
-
-			wrapper.innerHTML = '';
 
 			if(index >= 0){
 				this._removeImageData(index);
