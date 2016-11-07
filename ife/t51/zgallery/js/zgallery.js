@@ -384,7 +384,7 @@
 						if(i < this._commitCursor){
 							var cacheIndex = parseInt(e.target.getAttribute('z-g-index'));
 							this._assembleImage(cacheIndex, 
-								this._layout == this.LAYOUT.JIGSAW && this._cache.length == 2 && cacheIndex == 1);
+								this._layout == this.LAYOUT.JIGSAW && cacheIndex == 1);
 						}
 
 						that._commitImage();
@@ -689,7 +689,7 @@
 				var iw = img.width;
 				var ih = img.height;
 
-				if(wrapper.children.length > 1){
+				if(wrapper.children.length <= 1){
 					//If not assembled
 					this._assembleImage(i, 
 						this._layout == this.LAYOUT.JIGSAW && i == 1);
