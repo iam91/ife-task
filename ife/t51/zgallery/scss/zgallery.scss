@@ -32,6 +32,9 @@ $del-radius: 0.5em;
 		}
 	}
 	.wrapper{
+		img.loading{
+			visibility: hidden;
+		}
 		.info{
 			position: absolute;
 			top: 0;

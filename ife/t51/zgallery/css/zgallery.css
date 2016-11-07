@@ -159,6 +159,8 @@
     box-shadow: 0 0 1px 1px #A0A0A0; }
     .z-gallery img:hover {
       opacity: 0.5; }
+  .z-gallery .wrapper img.loading {
+    visibility: hidden; }
   .z-gallery .wrapper .info {
     position: absolute;
     top: 0;

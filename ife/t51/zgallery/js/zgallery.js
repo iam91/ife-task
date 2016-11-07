@@ -3,31 +3,39 @@
 	'use strict';
 
 	/** 
-	 * @typedef CacheItem
-	 * @type {object} 
+	 * @typedef LoadCacheItem
+	 * @type {Object} 
 	 * @property {HTMLImageElement} img - Store the element.
 	 * @property {boolean} commit - Indicate whether the image can be committed.
 	 */
 
 	/**
+	 * @typedef cacheItem
+	 * @type {Object}
+	 * @property {HTMLElement} wrapper - Element wrapping the image.
+	 * @property {HTMLImageElement} img - The image.
+	 * @property {number} urlIndex - Index in urls and loadCache.
+	 * @property {string} title - Image title.
+	 */
+
+	/**
 	 * @typedef MonitorItem
-	 * @type {object}
+	 * @type {Object}
 	 * @property {HTMLImageElement} img - Store the element.
-	 * @property {CacheItem} cache - Point to its position in cache.
 	 * @property {number} width - Width before checking.
 	 * @property {number} height - Height bofore checking.
 	 */
 
 	/**
 	 * @typedef ClipCompatible
-	 * @type {object}
+	 * @type {Object}
 	 * @property {HTMLElement} svg
 	 * @property {HTMLElement} style
 	 */
 
 	/**
 	 * @typedef BrickRow
-	 * @type {object}
+	 * @type {Object}
 	 * @property {number} ratio Height to width ratio of the brick row.
 	 */
 
@@ -64,7 +72,7 @@
 		 * Rectify execution context of event handlers.
 		 * Remove the event handler if it's intended to execute only once.
 		 * @param {Function} handler Event handler.
-		 * @param {object} context Execution context of the event handler.
+		 * @param {Object} context Execution context of the event handler.
 		 * @param {boolean} once Indicate whether the handler is intended to execute only once.
 		 * @param {string} eventType The event type.
 		 */
@@ -93,7 +101,8 @@
 
 		/**
 		 * Used in jigsaw layout
-		 * @param {Image} img Image needs clipping.
+		 * @param {HTMLElement} wrapper Element wraps the image.
+		 * @param {HTMLEImageElement} img Image needs clipping.
 		 * @param {number} r Height to width ratio.
 		 * @param {number} index Index of the image, used to add to clip-path ids to distinguish clip-paths.
 		 * @param {number} count Number of images to be showed.
@@ -128,7 +137,7 @@
 			}
 
 			if(!isRect){
-				var styleInner = '.' + ClassName.JIGSAW_X + count + " div:nth-child(" + (index + 1) 
+				var styleInner = '.' + ClassName.JIGSAW_X + count + " div.wrapper:nth-child(" + (index + 1) 
 					+ "){-webkit-clip-path: url('#clip-shape-" + index 
 					+ "');clip-path: url('#clip-shape-" + index + "');}";
 				var t = document.createElement('div');
@@ -174,7 +183,8 @@
 		WRAPPER:           'wrapper',
 		WRAPPER_DELETED:   'wrapper-deleted',
 		INFO:              'info',
-		DEL:               'del'
+		DEL:               'del',
+		LOADING:           'loading'
 	};
 
 	/**
@@ -212,11 +222,15 @@
 		this._urls = [];
 		this._title = [];
 		/**
-		 * @type {CacheItem[]}
+		 * @type {LoadCacheItem}
+		 */
+		this._loadCache = [];
+		this._commitCursor = 0;
+		/**
+		 * @type {CacheItem}
 		 */
 		this._cache = [];
 		this._cacheCursor = 0;
-		this._commitCursor = 0;
 		this._urlIndex = 0;
 
 
@@ -230,6 +244,7 @@
 		
 		this._modal = null;
 		this._banner = null;
+		this._bannerWin = 0;
 
 		/**
 		 * Jigsaw layout member variables
@@ -302,6 +317,10 @@
 		this._banner = banner;
 	};
 
+	/**
+	 * Fetch the image size.
+	 */
+	//done
 	ZGallery.prototype._fetchImage = function(){
 		/**
 		 * @type {MonitorItem[]}
@@ -311,120 +330,168 @@
 		var timerInterval = 40;
 		
 		while(this._urlIndex < this._urls.length){
-			var img = new Image();
-			img.src = this._urls[this._urlIndex++];
 
-			this._cache.push({
-				img: img, 
-				commit: false
+			var img = new Image();
+			img.src = this._urls[this._urlIndex];
+			//!!!
+			img.style.visibility = 'hidden';
+
+			monitor.push({
+				img: img,
+				width: img.width,
+				height: img.height,
+				index: this._urlIndex
 			});
 
-			var cache = this._cache[this._cache.length - 1];
-			
-			monitor.push({
-				img: img, 
-				cache: cache,
-				width: img.width,
-				height: img.height
-			});	
+			if(img.complete){
+				//!!!
+				img.style.visibility = 'visible';
+				this._loadCache[this._urlIndex] = {img: img, commit: true};
+				this._commitImage();
+			}else{
+				this._loadCache[this._urlIndex] = {img: img, commit: false};
 
-			img.onload = (function(){
-				var _cache = cache;
-				return function(e){
-					e.target.onload = null;
-					_cache.commit = true;
-				};
-			})();
+				img.onload = (function(i, that){
 
-			img.onerror = (function(){
-				var _cache = cache;
-				return function(e){
-					e.target.onerror = null;
-					_cache.commit = true;
-					/**
-					 * @todo when failed to load the image.
-					 */
-					e.target.width = 100;
-					e.target.height = 100;
-				};
-			})();
+					return function(e){
+						e.target.onload = null;
+						//!!!
+						e.target.style.visibility = 'visible';
+						//!!!!
+						that._loadCache[i] = {img: e.target, commit: true};
+
+						//if committed but not assembled yet, assemble it
+						if(i < this._commitCursor){
+							var cacheIndex = parseInt(e.target.getAttribute('z-g-index'));
+							this._assembleImage(cacheIndex, 
+								this._layout == this.LAYOUT.JIGSAW && cacheIndex == 1);
+						}
+
+						that._commitImage();
+					};
+
+				})(this._urlIndex, this);
+
+				img.onerror = (function(i, that){
+
+					return function(e){
+						e.target.onerror = null;
+						that._loadCache[i] = {img: null, commit: true};
+						that._commitImage();
+						monitor[i] = null;
+					};
+
+				})(this._urlIndex, this);
+			}
+
+			this._urlIndex++;
 		}
 		
-		function check(){
-			for(var i = 0; i < monitor.length; i++){
-				var item = monitor[i];
-				if(item.img.width != item.width 
-					&& item.img.height != item.height){
-					//Size fetched, commit the image.
-					monitor.splice(i, 1);
-					item.cache.commit = true;
-					item.cache = null;
-					item = null;
+		var check = (function(that){
+			return function(){
+				for(var i = 0; i < monitor.length; i++){
+					var item = monitor[i];
+					if(!item){
+						monitor.splice(i, 1);
+					}
+					if(item.img.width != item.width 
+						&& item.img.height != item.height){
+						//size fetched
+						monitor.splice(i, 1);
+						that._loadCache[item.index].commit = true;
+						that._commitImage();
+					}
 				}
-			}
-			if(monitor.length == 0){
-				clearInterval(timer);
-			}
-		};
+				if(monitor.length == 0){
+					clearInterval(timer);
+				}
+			};
+		})(this);
 		
 		timer = setInterval(check, timerInterval);
 	};
 
-	ZGallery.prototype._checkCacheCommit = function(){
-		var timer = -1;
-		var timerInterval = 40;
-		
-		var _this = this;
-		function check(){
-			var cursor = _this._commitCursor;
-			while(cursor < _this._cache.length && _this._cache[cursor].commit){
-				cursor++;
+	ZGallery.prototype._commitImage = function(){
+		var cursor = this._commitCursor;
+		while(cursor < this._loadCache.length && this._loadCache[cursor].commit){
+
+			if(!this._loadCache[cursor].img){
+				continue;
 			}
-			_this._commitCursor = cursor;
-			_this._placeImage();
+
+			var img = this._loadCache[cursor].img;
+			img.setAttribute('z-g-index', this._cache.length);
 			
-			if(_this._commitCursor == _this._cache.length){
-				//All images are committed.
-				timer = clearInterval(timer);
-			}
-		};
+			var wrapper = document.createElement('div');
+			wrapper.classList.add(ClassName.WRAPPER);
 
-		timer = setInterval(check, timerInterval);
+			var title = this._title[cursor] ? this._title[cursor] : '';
+
+			wrapper.appendChild(img);
+
+			this._cache.push({
+				wrapper: wrapper,
+				img: img,
+				urlIndex: cursor,
+				title: title
+			});
+			cursor++;
+
+			if(img.onload === null){
+				//onload triggered, assemble image.
+				this._assembleImage(this._cache.length - 1, 
+					this._layout == this.LAYOUT.JIGSAW && this._cache.length == 2);
+			}
+		}
+		this._commitCursor = cursor;
+		this._placeImage();
 	};
 
-	ZGallery.prototype._assembleImage = function(title, img, wrapper, leanRight, r, w, h){
+
+	ZGallery.prototype._assembleImage = function(cacheIndex, leanRight){
 		var info = document.createElement('div');
 		var del = document.createElement('a');
 		del.classList.add(ClassName.DEL);
 		info.classList.add(ClassName.INFO);
+
 		if(leanRight){
 			del.style.left = 'auto';
 			info.style.left = 'auto';
 			del.style.right = (100 / 3) + '%';
 			info.style.right = (100 / 3) + '%';
 		}
+
+		var cache = this._cache[cacheIndex];
+		var title = cache.title;
+		var img = cache.img;
+		var wrapper = cache.wrapper;
+
 		info.innerHTML = '<p>' + (title ? title : '') + '</p><p>' + img.width + 'px ' + img.height + 'px</p>';
-		wrapper.appendChild(img);
 		wrapper.appendChild(info);
 		wrapper.appendChild(del);
 	};
-
+	//done
 	ZGallery.prototype._removeImageData = function(index){
-		if(index < this._urlIndex){
-			this._urlIndex--;
-		}
+		//cache array
+		var cache = this._cache[index];
 		if(index < this._cacheCursor){
 			this._cacheCursor--;
+		}
+		this._cache.splice(index, 1);
+		for(var j = index; j < this._cache.length; j++){
+			this._cache[j].img.setAttribute('z-g-index', j);
+		}
+
+		//load cache array and url array
+		index = cache.urlIndex;
+		if(index < this._urlIndex){
+			this._urlIndex--;
 		}
 		if(index < this._commitCursor){
 			this._commitCursor--;
 		}
-		this._imageElements.splice(index, 1);
-		this._cache.splice(index, 1);
+		this._loadCache.splice(index, 1);
 		this._urls.splice(index, 1);
-		for(var j = index; j < this._cache.length; j++){
-			this._cache[j].img.setAttribute('z-g-index', j);
-		}
 	};
 
 	ZGallery.prototype._placeImage = null;
@@ -440,23 +507,12 @@
 	/**
 	 * @callback
 	 */
-	/*
-	ZGallery.prototype._delete = function(e){
-		if(e.target.nodeName !== 'A'){
-			return;
-		}
-		var wrapper = e.target.parentNode;
-		this._removeImage([wrapper]);
-	};*/
-
-	/**
-	 * @callback
-	 */
 	ZGallery.prototype._show = function(e){
 		if(e.target.nodeName !== 'IMG'){
 			return;
 		}
-		var bannerWin = this._layout == this.LAYOUT.JIGSAW ? this._jigsaw.count : this._commitCursor;
+		var bannerWin = this._layout == this.LAYOUT.JIGSAW ? this._jigsaw.count : this._cache.length;
+		this._bannerWin = bannerWin;
 
 		var img = e.target.cloneNode(e);
 		var index = parseInt(img.getAttribute('z-g-index'));
@@ -498,8 +554,8 @@
 	 * @callback
 	 */
 	ZGallery.prototype._prev = function(e){
-		var bannerWin = this._layout == this.LAYOUT.JIGSAW ? this._jigsaw.count : this._commitCursor;
-
+		//var bannerWin = this._layout == this.LAYOUT.JIGSAW ? this._jigsaw.count : this._cache.length;
+		var bannerWin = this._bannerWin;
 		var newMidIndex = parseInt(this._banner.children[0].getAttribute('z-g-index'));
 		var newPrevIndex = (newMidIndex - 1 + bannerWin) % bannerWin;
 
@@ -521,8 +577,8 @@
 	 * @callback
 	 */
 	ZGallery.prototype._next = function(e){
-		var bannerWin = this._layout == this.LAYOUT.JIGSAW ? this._jigsaw.count : this._commitCursor;
-
+		//var bannerWin = this._layout == this.LAYOUT.JIGSAW ? this._jigsaw.count : this._cache.length;
+		var bannerWin = this._bannerWin;
 		var newMidIndex = parseInt(this._banner.children[2].getAttribute('z-g-index'));
 		var newNextIndex = (newMidIndex + 1) % bannerWin;
 
@@ -532,7 +588,6 @@
 		this._banner.children[2].classList.add(ClassName.MODAL_BANNER_MID);
 
 		this._banner.removeChild(this._banner.children[0]);
-
 		var newImage = this._cache[newNextIndex].img.cloneNode(true);
 		newImage.classList.add(newImage.width > newImage.height 
 			? ClassName.WIDTH_FIRST : ClassName.HEIGHT_FIRST);
@@ -564,6 +619,7 @@
 			var img = this._imageElements[i].firstChild;
 			img.classList.remove(ClassName.H_CLIP);
 			img.classList.remove(ClassName.V_CLIP);
+			img.parentNode.innerHTML = '';
 		}
 		this._g.innerHTML = '';
 		this._g.classList.remove(ClassName.JIGSAW_X + this._jigsaw.count);
@@ -582,14 +638,15 @@
 	};
 
 	ZGallery.prototype._placeImageJigsaw = function(){
-		if(this._commitCursor == this._cache.length               //all images are committed
-			|| this._commitCursor >= GlobalConst.jigsaw.max){     //jigsawMax has reached
+		var currCacheLen = this._cache.length;
+		if(this._commitCursor == this._loadCache.length     //all images are committed
+			|| currCacheLen >= GlobalConst.jigsaw.max){     //jigsawMax has reached
 			
 			this._resetLayoutJigsaw();
 			
 			//Only first n ( 1<= n <=6 ) images are displayed.
-			var count = GlobalConst.jigsaw.max < this._commitCursor
-				? GlobalConst.jigsaw.max : this._commitCursor;
+			var count = GlobalConst.jigsaw.max < currCacheLen
+				? GlobalConst.jigsaw.max : currCacheLen;
 
 			this._jigsaw.count = count;
 
@@ -597,17 +654,17 @@
 
 			for(var i = 0; i < count; i++){
 				var img = this._cache[i].img;
-				img.setAttribute('z-g-index', i);
+				var wrapper = this._cache[i].wrapper;
 				var iw = img.width;
 				var ih = img.height;
 
-				var r = GlobalConst.jigsaw.ratios[String(count)][i];
+				if(wrapper.children.length > 1){
+					//If not assembled
+					this._assembleImage(i, 
+						this._layout == this.LAYOUT.JIGSAW && i == 1);
+				}
 
-				var wrapper = document.createElement('div');
-				wrapper.classList.add(ClassName.WRAPPER);
-				
-				this._assembleImage(this._title[i], img, wrapper, 
-					(count == 2 && i == 1), r, iw, ih);
+				var r = GlobalConst.jigsaw.ratios[String(count)][i];
 
 				var clipResult = Util.imageClip(wrapper, img, r, 
 					!(count == 2 && i == 1), i, count);
@@ -616,8 +673,6 @@
 				}
 
 				this._g.appendChild(wrapper);
-
-				this._imageElements.push(wrapper);
 			}
 		}
 	};
@@ -628,6 +683,9 @@
 			var wrapper = image[i];
 			var img = wrapper.firstChild;
 			var index = parseInt(img.getAttribute('z-g-index'));
+			var cur = img.nextSibling;
+
+			wrapper.innerHTML = '';
 
 			if(index >= 0){
 				this._removeImageData(index);
@@ -655,6 +713,7 @@
 
 	/******* The following are private methods for waterfall layout *******/
 
+	//done
 	ZGallery.prototype._initWaterfall = function(opt){
 		this._g.classList.add(ClassName.WATERFALL_G);
 
@@ -678,6 +737,7 @@
 		Util.addHandler(window, 'resize', Util.eventHandlerWrapper(waterfallOnresize, this, false));
 	};
 
+	//done
 	ZGallery.prototype._initColsWaterfall = function(){
 		if(!this._waterfall.cols){
 			this._waterfall.colCount = Math.ceil(this._g.clientWidth / this._waterfall.minWidth);
@@ -691,7 +751,7 @@
 				col.style.width = colWidth + '%';
 				col.classList.add(ClassName.WATERFALL_COL);
 				frag.appendChild(col);
-				this._waterfall.cols[i] = col;
+				this._waterfall.cols[i] = {elem: col, height: 0};
 				//Set vertical gutter width.
 				if(i < this._waterfall.colCount - 1){
 					col.style.paddingRight = this._gutterX + 'px';
@@ -700,48 +760,42 @@
 			this._g.appendChild(frag);
 		}
 	};
-
+	
 	ZGallery.prototype._resetLayoutWaterfall = function(){
 		this._g.innerHTML = '';
 		Util.arrayClear(this._waterfall.cols);
-		Util.arrayClear(this._imageElements);
 		this._waterfall.cols = null;
 		this._initColsWaterfall();
 		this._cacheCursor = 0;
 	};
 
+	//done
 	ZGallery.prototype._placeImageWaterfall = function(){
-		while(this._cacheCursor < this._commitCursor){
+		while(this._cacheCursor < this._cache.length){
 			var img = this._cache[this._cacheCursor].img;
-			img.setAttribute('z-g-index', this._cacheCursor++);
-			var wrapper = document.createElement('div');
-			wrapper.classList.add(ClassName.WRAPPER);
+			var wrapper = this._cache[this._cacheCursor].wrapper;
+			this._cacheCursor++;
 
 			//Set horizontal gutter width.
 			wrapper.style.marginBottom = this._gutterY + 'px';
-
 			//Find the shortest column.
 			var minIndex = 0;
 			var minCol = this._waterfall.cols[minIndex];
-			var min = minCol.clientHeight;
+			var min = minCol.height;
 			for(var i = 0; i < this._waterfall.colCount; i++){
-				var h = this._waterfall.cols[i].clientHeight;
+				var h = this._waterfall.cols[i].height;
 				if(min > h){
 					min = h;
 					minIndex = i;
 					minCol = this._waterfall.cols[minIndex];
 				}
 			}
-
-			this._assembleImage(this._title[this._cacheCursor], img, wrapper);
-
-			minCol.appendChild(wrapper);
-
-			//Add to image elements.
-			this._imageElements.push(wrapper);
+			minCol.height += img.height;
+			minCol.elem.appendChild(wrapper);
 		}
 	};
 
+	//done
 	ZGallery.prototype._removeImageWaterfall = function(image){
 		var flag = true;
 		for(var i = 0; i < image.length; i++){
@@ -750,6 +804,8 @@
 			col.removeChild(wrapper);
 			var img = wrapper.firstChild;
 			var index = parseInt(img.getAttribute('z-g-index'));
+
+			wrapper.innerHTML = '';
 
 			if(index >= 0){
 				this._removeImageData(index);
@@ -842,7 +898,6 @@
 
 	ZGallery.prototype._resetLayoutBrick = function(){
 		this._g.innerHTML = '';
-		Util.arrayClear(this._imageElements);
 		Util.arrayClear(this._brick.rows);
 		this._addPlaceholderRow();
 		this._cacheCursor = 0;
@@ -864,12 +919,12 @@
 		var preCursor = -1;
 		while(
 			preCursor != this._cacheCursor              //Images in the cache are meant to be left for rebuilding the last row in the future. 
-			&& this._cacheCursor < this._commitCursor   //When there are images left in the cache.
+			&& this._cacheCursor < this._cache.length   //When there are images left in the cache.
 			){
 
 			preCursor = this._cacheCursor;
 
-			var tail = this._commitCursor;
+			var tail = this._cache.length;
 			var head = this._cacheCursor;
 			var offset = tail - head;
 
@@ -915,28 +970,21 @@
 			//Add images to the row
 			for(var i = head; i < id; i++){
 				var img = this._cache[i].img;
-				img.setAttribute('z-g-index', i);
+				var wrapper = this._cache[i].wrapper;
 				if(isFull){
 					//images in this row may be not enough, can be used next time
 					this._cacheCursor++;
 				}
 				var styleWidth = (normHeight * img.width / img.height / containerBaseWidth);
 
-				var wrapper = document.createElement('div');
-				wrapper.classList.add(ClassName.WRAPPER);
+				
 				wrapper.style.width = styleWidth * 100 + '%';
 
 				wrapper.style.paddingBottom = this._gutterY + 'px';
 				if(i < id - 1){
 					wrapper.style.paddingRight = this._gutterX + 'px';
 				}
-
-				this._assembleImage(this._title[i], img, wrapper);
-
 				row.appendChild(wrapper);
-
-				//Add to image elements.
-				this._imageElements.push(wrapper);
 			}
 			this._g.appendChild(row);
 
@@ -954,6 +1002,8 @@
 			row.removeChild(wrapper);
 			var img = wrapper.firstChild;
 			var index = parseInt(img.getAttribute('z-g-index'));
+
+			wrapper.innerHTML = '';
 			
 			if(index >= 0){
 				this._removeImageData(index);
@@ -1048,7 +1098,6 @@
 			this._title = Util.arrayAppend(this._title, title);
 		}
 		this._fetchImage();
-		this._checkCacheCommit();
 	};
 
 	/**
@@ -1072,7 +1121,6 @@
 			this._title = Util.arrayAppend(this._title, title);
 		}
 		this._fetchImage();
-		this._checkCacheCommit();
 	};
 
 	/**
@@ -1166,7 +1214,7 @@
 	/**
 	 * Initialize zgallery based on specified layout.
 	 * @public
-	 * @param {object} opt Configuration options for zgallery.
+	 * @param {Object} opt Configuration options for zgallery.
 	 */
 	ZGallery.prototype.init = function(opt){
 		if(this._initialized){

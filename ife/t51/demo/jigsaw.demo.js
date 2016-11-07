@@ -3,6 +3,18 @@ window.onload = function(e){
 	var code = 13789837;
 
 	var urls = [init + code + '.jpg'];
+	for(var i = 1; i < 2; i++){
+		urls.push(init + (code + i) + '.jpg');
+	}
+	/*
+	var base = 'https://placehold.it/3500x1500';
+	var urls = [];
+	for(var i = 0; i < 2; i++){
+		var w = Math.floor(Math.random() * 500);
+		var h = Math.floor(Math.random() * 500);
+		var url = 'https://placehold.it/' + w + 'x' + h;
+		urls.push(url);
+	}*/
 
 	var gg = zGallery(document.querySelector('.container'));
 	gg.setLayout(gg.LAYOUT.JIGSAW);
