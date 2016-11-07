@@ -148,6 +148,10 @@
       width: 0;
       height: 0; }
 
+body {
+  margin: 0;
+  padding: 0; }
+
 .z-gallery {
   width: 100%;
   font-family: "Microsoft YaHei";
@@ -159,8 +163,6 @@
     box-shadow: 0 0 1px 1px #A0A0A0; }
     .z-gallery img:hover {
       opacity: 0.5; }
-  .z-gallery .wrapper img.loading {
-    visibility: hidden; }
   .z-gallery .wrapper .info {
     position: absolute;
     top: 0;
@@ -254,5 +256,21 @@
 
 .z-g-modal-show {
   visibility: visible; }
+
+.loading {
+  font-family: "Microsoft YaHei";
+  color: transparent;
+  width: 100%;
+  height: 3em;
+  line-height: 3em;
+  position: fixed;
+  bottom: 0;
+  text-align: center;
+  background-color: transparent;
+  transition: background-color 0.5s linear; }
+
+.loading-show {
+  color: white;
+  background-color: rgba(0, 0, 0, 0.8); }
 
 /*# sourceMappingURL=zgallery.css.map */

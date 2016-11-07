@@ -15,13 +15,22 @@ window.onload = function(e){/*
 		appendUrls.push(init + (code + i) + '.jpg');
 		appendTitle.push(String(code + i));
 	}*/
+
 	var base = 'https://placehold.it/3500x1500';
 	var urls = [];
 	for(var i = 0; i < 20; i++){
-		var w = Math.floor(Math.random() * 500);
-		var h = Math.floor(Math.random() * 500);
+		var w = Math.floor(100 + Math.random() * 200);
+		var h = Math.floor(100 + Math.random() * 200);
 		var url = 'https://placehold.it/' + w + 'x' + h;
 		urls.push(url);
+	}
+
+	var appendUrls = [];
+	for(var i = 0; i < 20; i++){
+		var w = Math.floor(100 + Math.random() * 200);
+		var h = Math.floor(100 + Math.random() * 200);
+		var url = 'https://placehold.it/' + w + 'x' + h;
+		appendUrls.push(url);
 	}
 
 	var gg = zGallery(document.querySelector('.container'));
@@ -35,7 +44,7 @@ window.onload = function(e){/*
 		var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
 		
 		if(window.innerHeight + scrollTop >= document.body.clientHeight){
-			gg.addImage(appendUrls, appendTitle);
+			gg.addImage(appendUrls);
 		}
 	};
 };
