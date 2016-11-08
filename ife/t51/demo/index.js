@@ -41,6 +41,7 @@ window.onload = function(e){
 			var add = gallery.getLayout() == zGallery.LAYOUT.JIGSAW ? 1 : 20;
 
 			fromPlaceholdit(urls, add);
+			//fromOther(urls, add);
 			gallery.setImage(urls);
 		}
 	};

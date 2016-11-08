@@ -2,13 +2,6 @@
 
 	'use strict';
 
-	/** 
-	 * @typedef LoadCacheItem
-	 * @type {Object} 
-	 * @property {HTMLImageElement} img - Store the element.
-	 * @property {boolean} commit - Indicate whether the image can be committed.
-	 */
-
 	/**
 	 * @typedef cacheItem
 	 * @type {Object}
@@ -252,6 +245,7 @@
 
 		this._loadingFlag = null;
 		this._onresize = null;
+		this._ondelete = null;
 
 		/**
 		 * Jigsaw layout member variables
@@ -382,20 +376,20 @@
 
 			if(img.complete){
 				//!!!
+				console.log('complete');
 				img.style.visibility = 'visible';
-				this._loadCache[this._urlIndex] = {img: img, commit: true};
+				this._loadCache[this._urlIndex] = img;
 				this._commitImage();
 			}else{
-				this._loadCache[this._urlIndex] = {img: img, commit: false};
-
 				img.onload = (function(i, that){
 
 					return function(e){
+						console.log('onerror');
 						e.target.onload = null;
 						//!!!
 						e.target.style.visibility = 'visible';
 						//!!!!
-						that._loadCache[i] = {img: e.target, commit: true};
+						that._loadCache[i] = e.target;
 						that._commitImage();
 					};
 
@@ -404,8 +398,9 @@
 				img.onerror = (function(i, that){
 
 					return function(e){
+						console.log('onerror');
 						e.target.onerror = null;
-						that._loadCache[i] = {img: null, commit: true};
+						that._loadCache[i] = null;
 						that._commitImage();
 						monitor[i] = null;
 					};
@@ -426,19 +421,18 @@
 					if(!item){
 						//onerror already happened
 						monitor.splice(i, 1);
-					}
-					if(item.img.width != 0
+					}else if(item.img.width != 0
 						&& item.img.height != 0){
 						//size fetched
+						console.log('fetched');
 						monitor.splice(i, 1);
-						that._loadCache[item.index].commit = true;
+						that._loadCache[item.index] = item.img;
 						that._commitImage();
 					}else if(timeOut > that._timeout){
 						console.log('timeout');
 						//timeout happens
 						monitor.splice(i, 1);
-						that._loadCache[item.index].commit = true;
-						that._loadCache[item.index].img = null;
+						that._loadCache[item.index] = null;
 						that._commitImage();
 					}
 				}
@@ -454,14 +448,14 @@
 
 	ZGallery.prototype._commitImage = function(){
 		var cursor = this._commitCursor;
-		while(cursor < this._loadCache.length && this._loadCache[cursor].commit){
-			if(!this._loadCache[cursor].img){
+		while(cursor < this._loadCache.length){
+			if(!this._loadCache[cursor]){
 				//!!!
 				cursor++;
 				continue;
 			}
 
-			var img = this._loadCache[cursor].img;
+			var img = this._loadCache[cursor];
 			img.setAttribute('z-g-index', this._cache.length);
 			
 			var wrapper = document.createElement('div');
@@ -1162,6 +1156,7 @@
 		if(this._initialized){
 			//If initialized, clear all.
 			Util.removeHandler(window, 'resize', this._onresize);
+			Util.removeHandler(this._g, 'click', this._ondelete);
 			this._resetLayout();
 			//In case that layout changes.
 			this._g.classList.remove(ClassName.WATERFALL_G);
@@ -1185,10 +1180,9 @@
 
 		this._methodBind(opt);
 
-		if(!this._initialized){
-			Util.addHandler(this._g, 'click', 
-				Util.eventHandlerWrapper(this._delete, this, false));
-		}
+		Util.addHandler(this._g, 'click', 
+			Util.eventHandlerWrapper(this._delete, this, false));
+		
 		this._initialized = true;
 
 		this._urls = Util.arrayAppend(this._urls, image);
