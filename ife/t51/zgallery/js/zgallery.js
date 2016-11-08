@@ -786,7 +786,7 @@
 		this._waterfall.maxWidth = opt && opt.maxWidth || 350;
 		this._cacheCursor = 0;
 		this._g.style.minWidth = this._waterfall.minWidth + 'px';
-		
+		this._waterfall.cols = null;
 		this._initColsWaterfall();
 		
 		function waterfallOnresize(e){
@@ -1168,7 +1168,8 @@
 			this._g.classList.remove(ClassName.BRICK_G);
 			this._g.classList.remove(ClassName.JIGSAW_G);
 			this._g.classList.remove(ClassName.JIGSAW_X + this._jigsaw.count);
-			//brick layout will add a placeholder row, should be cleared.
+			//when reset layout, brick layout will add a placeholder row, should be cleared.
+			//when reset layout, waterfall layout will add cols, should be cleared.
 			this._g.innerHTML = '';
 			this._g.setAttribute('style', '');
 
