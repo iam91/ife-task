@@ -364,7 +364,12 @@
 		while(this._urlIndex < this._urls.length){
 
 			var img = new Image();
-			img.src = this._urls[this._urlIndex];
+			try{
+				img.src = this._urls[this._urlIndex];
+			}catch(e){
+				console.log(e);
+				continue;
+			}
 			//!!!
 			img.style.visibility = 'hidden';
 
@@ -428,7 +433,7 @@
 						monitor.splice(i, 1);
 						that._loadCache[item.index].commit = true;
 						that._commitImage();
-					}else if(timeOut > this._timeout){
+					}else if(timeOut > that._timeout){
 						console.log('timeout');
 						//timeout happens
 						monitor.splice(i, 1);
@@ -1273,7 +1278,7 @@
      * @param {number} timeout Timeout time in millisecond.
      */
     ZGallery.prototype.setTimeout = function(timeout){
-    	this._timeout = timeout;
+    	this._timeout = timeout || 5000;
     };
 
     /**

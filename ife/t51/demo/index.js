@@ -40,7 +40,7 @@ window.onload = function(e){
 			gallery.setLayout(layout);
 			var add = gallery.getLayout() == zGallery.LAYOUT.JIGSAW ? 1 : 20;
 
-			fromOther(urls, add);
+			fromPlaceholdit(urls, add);
 			gallery.setImage(urls);
 		}
 	};
