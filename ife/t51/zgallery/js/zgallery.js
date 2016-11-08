@@ -227,6 +227,7 @@
 		 */
 		this._loadCache = [];
 		this._commitCursor = 0;
+		this._timeout = 5000;
 		/**
 		 * @type {CacheItem}
 		 */
@@ -379,13 +380,6 @@
 						e.target.style.visibility = 'visible';
 						//!!!!
 						that._loadCache[i] = {img: e.target, commit: true};
-
-						//if committed but not assembled yet, assemble it
-						if(i < this._commitCursor){
-							var cacheIndex = parseInt(e.target.getAttribute('z-g-index'));
-							this._assembleImage(cacheIndex);
-						}
-
 						that._commitImage();
 					};
 
@@ -407,10 +401,14 @@
 		}
 		
 		var check = (function(that){
+			var timeOutCnt = 0;
 			return function(){
+				timeOutCnt++;
+				var timeOut = timeOutCnt * timerInterval;
 				for(var i = 0; i < monitor.length; i++){
 					var item = monitor[i];
 					if(!item){
+						//onerror already happened
 						monitor.splice(i, 1);
 					}
 					if(item.img.width != item.width 
@@ -419,9 +417,17 @@
 						monitor.splice(i, 1);
 						that._loadCache[item.index].commit = true;
 						that._commitImage();
+					}else if(timeOut > this._timeout){//console.log(timeOut);
+						//timeout happens
+						monitor.splice(i, 1);
+						console.log(monitor.length);
+						that._loadCache[item.index].commit = true;
+						that._loadCache[item.index].img = null;
+						that._commitImage();
 					}
 				}
 				if(monitor.length == 0){
+					console.log('timer cleared');
 					clearInterval(timer);
 				}
 			};
@@ -433,8 +439,9 @@
 	ZGallery.prototype._commitImage = function(){
 		var cursor = this._commitCursor;
 		while(cursor < this._loadCache.length && this._loadCache[cursor].commit){
-
 			if(!this._loadCache[cursor].img){
+				//!!!
+				cursor++;
 				continue;
 			}
 
@@ -456,10 +463,7 @@
 			});
 			cursor++;
 
-			if(img.onload === null){
-				//onload triggered, assemble image.
-				this._assembleImage(this._cache.length - 1);
-			}
+			this._assembleImage(this._cache.length - 1);
 		}
 		this._commitCursor = cursor;
 		if(this._commitCursor == this._loadCache.length){
@@ -1195,6 +1199,24 @@
      */
     ZGallery.prototype.isFullScreenEnabled = function(){
     	return this._enableFullScreen;
+    };
+
+    /**
+     * Set the timeout time of loading an image.
+     * @public
+     * @param {number} timeout Timeout time in millisecond.
+     */
+    ZGallery.prototype.setTimeout = function(timeout){
+    	this._timeout = timeout;
+    };
+
+    /**
+     * Get the timeout time of loading an image.
+     * @public
+     * @return {number} Timeout time of loading an image.
+     */
+    ZGallery.prototype.getTimeout = function(){
+    	return this._timeout;
     };
 
 	/**

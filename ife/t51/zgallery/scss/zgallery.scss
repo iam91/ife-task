@@ -28,7 +28,7 @@ body{
 	padding: 20px;
 	box-sizing: border-box;
 	img{
-		transition: opacity 0.08s linear;
+		transition: opacity 0.1s linear, visibility 0.2s linear;
 	 	box-shadow: 0 0 1px 1px #A0A0A0;
 		&:hover{
 			opacity: 0.5;
