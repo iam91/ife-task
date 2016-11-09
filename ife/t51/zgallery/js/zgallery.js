@@ -384,7 +384,7 @@
 				img.onload = (function(i, that){
 
 					return function(e){
-						console.log('onerror');
+						console.log('onload');
 						e.target.onload = null;
 						//!!!
 						e.target.style.visibility = 'visible';
@@ -398,7 +398,7 @@
 				img.onerror = (function(i, that){
 
 					return function(e){
-						console.log('onerror');
+						console.log(e);
 						e.target.onerror = null;
 						that._loadCache[i] = null;
 						that._commitImage();
